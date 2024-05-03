@@ -7,7 +7,7 @@ project(tolangc)
 set(PROJECT_LIBRARY lib${PROJECT_NAME})
 
 # sysyc library
-file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp include/*.h)
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp)
 add_library(${PROJECT_LIBRARY} ${SOURCES})
 target_include_directories(${PROJECT_LIBRARY} PUBLIC include)
 
