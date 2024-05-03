@@ -2,8 +2,9 @@
 
 #include "llvm/ir/IrForward.h"
 #include "llvm/ir/Type.h"
-#include "utils.h"
 #include <string>
+
+#include "llvm/asm/AsmWriter.h"
 
 
 // All types used in LLVM for tolang.
@@ -57,6 +58,22 @@ public:
     // actually the type you want to cast to.
     template<typename _Ty>
     _Ty* As() { return static_cast<_Ty*>(this); }
+
+    /*
+     * Print the complete asm code of this value. This is used to print
+     * the value itself on its occurrence.
+     */
+    virtual AsmWriterPtr PrintAsm(AsmWriterPtr writer);
+
+    /*
+     * Print the use of this value. Usually, the type and name.
+     */
+    virtual AsmWriterPtr PrintUse(AsmWriterPtr writer);
+
+    /*
+     * Print only the name of this value. For example, only %1.
+     */
+    virtual AsmWriterPtr PrintName(AsmWriterPtr writer);
 
 public:
     using use_iterator = UseList::iterator;

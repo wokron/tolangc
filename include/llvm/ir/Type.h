@@ -1,5 +1,6 @@
 #pragma once
 
+#include "llvm/asm/AsmWriter.h"
 #include "llvm/ir/IrForward.h"
 
 /*
@@ -42,6 +43,8 @@ public:
     template<typename _Ty>
     _Ty* As() { return static_cast<_Ty*>(this); }
 
+    virtual void PrintAsm(AsmWriterPtr out);
+
 protected:
     // Prohibit direct instantiation.
     Type(LlvmContextPtr context, TypeID typeId)
@@ -65,6 +68,8 @@ class IntegerType : public Type
 
 public:
     ~IntegerType() override = default;
+
+    void PrintAsm(AsmWriterPtr out) override;
 
     static IntegerTypePtr Get(LlvmContextPtr context, unsigned bitWidth);
 
@@ -90,6 +95,8 @@ class FunctionType : public Type
 
 public:
     ~FunctionType() override = default;
+
+    void PrintAsm(AsmWriterPtr out) override;
 
     static FunctionTypePtr Get(TypePtr returnType, const std::vector<Type*>& paramTypes);
     static FunctionTypePtr Get(TypePtr returnType);
@@ -120,6 +127,7 @@ class PointerType : public Type
 public:
     ~PointerType() override = default;
 
+    void PrintAsm(AsmWriterPtr out) override;
     static PointerTypePtr Get(TypePtr elementType);
 
     TypePtr ElementType() const { return _elementType; }
