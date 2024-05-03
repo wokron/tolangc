@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ir/value/Function.h"
+#include "ir/IrForward.h"
 #include <unordered_map>
 
 /*
@@ -19,5 +19,6 @@ public:
 private:
     std::unordered_map<ValuePtr, int> _slot;
 };
+
 
 using SlotTrackerPtr = SlotTracker*;

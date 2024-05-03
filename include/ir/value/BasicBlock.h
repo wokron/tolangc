@@ -3,6 +3,7 @@
 #include "ir/value/Value.h"
 #include <list>
 
+
 class BasicBlock final : public Value, public HasParent<Function>
 {
 public:
@@ -15,7 +16,7 @@ public:
 public:
     using instruction_iterator = std::list<InstructionPtr>::iterator;
 
-    int InstructionCount() const { return _instructions.size(); }
+    int InstructionCount() const { return static_cast<int>(_instructions.size()); }
 
     // Insert an instruction at the end of the basic block.
     BasicBlockPtr InsertInstruction(InstructionPtr instruction);
@@ -26,7 +27,6 @@ public:
 
     instruction_iterator InstructionBegin() { return _instructions.begin(); }
     instruction_iterator InstructionEnd() { return _instructions.end(); }
-
 
 private:
     BasicBlock(FunctionPtr parent);

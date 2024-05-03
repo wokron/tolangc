@@ -22,6 +22,7 @@ public:
         PointerTyID
     };
 
+
     // Always use virtual destructor for base class.
     virtual ~Type() = default;
 
@@ -37,6 +38,10 @@ public:
     bool IsIntegerTy() const { return _typeId == IntegerTyID; }
     bool IsPointerTy() const { return _typeId == PointerTyID; }
 
+
+    template<typename _Ty>
+    _Ty* As() { return static_cast<_Ty*>(this); }
+
 protected:
     // Prohibit direct instantiation.
     Type(LlvmContextPtr context, TypeID typeId)
@@ -48,6 +53,7 @@ private:
     TypeID _typeId;
     LlvmContextPtr _context;
 };
+
 
 /*
  * Represent an integer. In tolang, it is the only type used
@@ -72,7 +78,8 @@ protected:
 
 private:
     unsigned _bitWidth;
-}
+};
+
 
 /*
  * A function's type consists of a return type and a list of parameter types.
@@ -100,6 +107,7 @@ private:
     TypePtr _returnType;
     std::vector<TypePtr> _paramTypes;
 };
+
 
 /*
  * A pointer type represents a pointer to another type.

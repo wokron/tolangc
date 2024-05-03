@@ -2,13 +2,13 @@
 
 #include "ir/value/Value.h"
 
+
 class Argument final : public Value, public HasParent<Function>
 {
 public:
     ~Argument() override = default;
 
     static bool classof(const ValueType type) { return type == ValueType::ArgumentTy; }
-    bool IsArgument() const override { return true; }
 
     static ArgumentPtr New(TypePtr type, const std::string& name, int argNo);
     int ArgNo() const { return _argNo; }

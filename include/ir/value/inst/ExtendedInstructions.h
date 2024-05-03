@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ir/value/inst/Instruction.h"
 #include "ir/value/inst/InstructionTypes.h"
 
 #pragma region InputInstruction
@@ -14,7 +15,7 @@ public:
     static InputInstPtr New(LlvmContextPtr context);
 
 private:
-    InputInst(TypePtr type);
+    InputInst(TypePtr type) : Instruction(ValueType::InputInstTy, type) {}
 };
 
 #pragma endregion

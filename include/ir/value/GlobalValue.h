@@ -12,6 +12,7 @@ class GlobalValue : public Constant
 public:
     ~GlobalValue() override = default;
 
+
     static bool classof(const ValueType type)
     {
         return ValueType::FunctionTy <= type && type <= ValueType::GlobalVariableTy;
@@ -24,5 +25,3 @@ protected:
         SetName(name);
     };
 };
-
-

@@ -1,7 +1,9 @@
 #pragma once
 
 #include "ir/IrForward.h"
+#include "ir/Type.h"
 #include <vector>
+
 
 /// <summary>
 /// One LLVM context per module, which holds all the types and values.
@@ -27,10 +29,26 @@ public:
     PointerTypePtr GetPointerType(TypePtr elementType);
 
     // Save all allocated values to avoid memory leak.
-    ValuePtr Save(ValuePtr value);
-    UsePtr Save(UsePtr use);
+    template<typename _Ty>
+    _Ty* SaveValue(_Ty* value)
+    {
+        _values.push_back(value);
+        return value->template As<_Ty>();
+    }
+
+
+    UsePtr SaveUse(UsePtr use)
+    {
+        _uses.push_back(use);
+        return use;
+    }
 
 private:
+    LlvmContext() : _voidTy(this, Type::VoidTyID), _labelTy(this, Type::LabelTyID), _int32Ty(this, 32)
+    {
+    }
+
+
     Type _voidTy;
     Type _labelTy;
 

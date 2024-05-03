@@ -3,7 +3,8 @@
 #include <iostream>
 #include <cstdarg>
 
-void _die(const char* message, const char* file, int line, ...)
+
+bool _die(const char* message, const char* file, int line, ...)
 {
     va_list args;
     va_start(args, line);

@@ -4,6 +4,7 @@
 #include "ir/SlotTracker.h"
 #include <list>
 
+
 class Function final : public GlobalValue
 {
 public:
@@ -22,13 +23,13 @@ public:
     TypePtr ReturnType() const;
 
 public:
-    int ArgCount() const { return _args.size(); }
+    int ArgCount() const { return static_cast<int>(_args.size()); }
 
     ArgumentPtr GetArg(int argNo) const { return _args[argNo]; }
     argument_iterator ArgBegin() { return _args.begin(); }
     argument_iterator ArgEnd() { return _args.end(); }
 
-    int BasicBlockCount() const { return _basicBlocks.size(); }
+    int BasicBlockCount() const { return static_cast<int>(_basicBlocks.size()); }
 
     // Insert a basic block at the end of the function.
     FunctionPtr InsertBasicBlock(BasicBlockPtr block);

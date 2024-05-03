@@ -9,12 +9,14 @@ class UnaryInstruction : public Instruction
 public:
     ~UnaryInstruction() override = default;
 
+
     static bool classof(const ValueType type)
     {
         return type == ValueType::LoadInstTy || type == ValueType::UnaryOperatorTy;
     }
 
-    ValuePtr Operand() const { return OperandAt(0); }
+
+    ValuePtr Operand() { return OperandAt(0); }
 
 protected:
     UnaryInstruction(ValueType valueType, TypePtr type, ValuePtr operand);
@@ -30,6 +32,7 @@ enum class UnaryOpType
     Neg,
     Pos
 };
+
 
 class UnaryOperator final : public UnaryInstruction
 {
@@ -57,13 +60,15 @@ class BinaryInstruction : public Instruction
 public:
     ~BinaryInstruction() override = default;
 
+
     static bool classof(const ValueType type)
     {
         return type == ValueType::BinaryOperatorTy || type == ValueType::StoreInstTy;
     }
 
-    ValuePtr LeftOperand() const { return OperandAt(0); }
-    ValuePtr RightOperand() const { return OperandAt(1); }
+
+    ValuePtr LeftOperand() { return OperandAt(0); }
+    ValuePtr RightOperand() { return OperandAt(1); }
 
 protected:
     BinaryInstruction(ValueType valueType, TypePtr type, ValuePtr lhs, ValuePtr rhs);
@@ -82,6 +87,7 @@ enum class BinaryOpType
     Mod
 };
 
+
 class BinaryOperator final : public BinaryInstruction
 {
 public:
@@ -94,7 +100,11 @@ public:
     BinaryOpType OpType() const { return _opType; }
 
 private:
-    BinaryOperator(TypePtr type, ValuePtr lhs, ValuePtr rhs, BinaryOpType opType);
+    BinaryOperator(TypePtr type, ValuePtr lhs, ValuePtr rhs, BinaryOpType opType)
+        : BinaryInstruction(ValueType::BinaryOperatorTy, type, lhs, rhs), _opType(opType)
+    {
+    }
+
 
     BinaryOpType _opType;
 };
@@ -103,7 +113,7 @@ private:
 
 #pragma region CompareInstruction
 
-enum class PredicateType
+enum class CompareOpType
 {
     Equal,
     NotEqual,
@@ -113,6 +123,7 @@ enum class PredicateType
     LessThanOrEqual
 };
 
+
 class CompareInstruction final : public BinaryInstruction
 {
 public:
@@ -120,12 +131,18 @@ public:
 
     static bool classof(const ValueType type) { return type == ValueType::CompareInstTy; }
 
-    static CompareInstructionPtr New(PredicateType predicateType, ValuePtr lhs, ValuePtr rhs);
+    static CompareInstructionPtr New(CompareOpType opType, ValuePtr lhs, ValuePtr rhs);
 
-    PredicateType GetPredicateType() const { return _predicateType; }
+    CompareOpType GetPredicateType() const { return _opType; }
 
 protected:
-    CompareInstruction(TypePtr type, ValuePtr lhs, ValuePtr rhs, PredicateType predicateType);
+    CompareInstruction(TypePtr type, ValuePtr lhs, ValuePtr rhs, CompareOpType opType)
+        : BinaryInstruction(ValueType::CompareInstTy, type, lhs, rhs), _opType(opType)
+    {
+    }
+
+private:
+    CompareOpType _opType;
 };
 
 #pragma endregion

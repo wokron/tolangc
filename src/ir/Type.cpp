@@ -2,12 +2,15 @@
 #include "ir/LlvmContext.h"
 #include "utils.h"
 
+#include "ir/value/Function.h"
+
 #pragma region Type
 
 TypePtr Type::GetVoidTy(LlvmContextPtr context)
 {
     return context->GetVoidTy();
 }
+
 
 TypePtr Type::GetLabelTy(LlvmContextPtr context)
 {
@@ -22,8 +25,6 @@ IntegerTypePtr IntegerType::Get(LlvmContextPtr context, unsigned bitWidth)
 {
     switch (bitWidth)
     {
-    case 8:
-        return context->GetInt8Ty();
     case 32:
         return context->GetInt32Ty();
     default:
@@ -37,15 +38,18 @@ IntegerTypePtr IntegerType::Get(LlvmContextPtr context, unsigned bitWidth)
 
 #pragma region FunctionType
 
-FunctionTypePtr FunctionType::Get(LlvmContextPtr context, TypePtr returnType, const std::vector<TypePtr>& paramTypes)
+FunctionTypePtr FunctionType::Get(TypePtr returnType, const std::vector<Type*>& paramTypes)
 {
-    return context->GetFunctionType(returnType, paramTypes);
+    return returnType->Context()->GetFunctionType(returnType, paramTypes);
+
 }
 
-FunctionTypePtr FunctionType::Get(LlvmContextPtr context, TypePtr returnType)
+
+FunctionTypePtr FunctionType::Get(TypePtr returnType)
 {
-    return context->GetFunctionType(returnType);
+    return returnType->Context()->GetFunctionType(returnType);
 }
+
 
 bool FunctionType::Equals(TypePtr returnType, const std::vector<TypePtr>& paramTypes) const
 {
@@ -67,18 +71,22 @@ bool FunctionType::Equals(TypePtr returnType, const std::vector<TypePtr>& paramT
     return true;
 }
 
+
 bool FunctionType::Equals(TypePtr returnType) const
 {
     return _returnType == returnType && _paramTypes.empty();
 }
 
+
 FunctionType::FunctionType(TypePtr returnType, const std::vector<TypePtr>& paramTypes)
-    : Type(FunctionTyID), _returnType(returnType), _paramTypes(paramTypes)
+    : Type(returnType->Context(), FunctionTyID), _returnType(returnType), _paramTypes(paramTypes)
 {
+
 }
 
+
 FunctionType::FunctionType(TypePtr returnType)
-    : Type(FunctionTyID), _returnType(returnType)
+    : Type(returnType->Context(), FunctionTyID), _returnType(returnType)
 {
 }
 
@@ -86,14 +94,17 @@ FunctionType::FunctionType(TypePtr returnType)
 
 #pragma region PointerType
 
-PointerTypePtr PointerType::Get(LlvmContextPtr context, TypePtr elementType)
+PointerTypePtr PointerType::Get(TypePtr elementType)
 {
-    return context->GetPointerType(elementType);
+    return elementType->Context()->GetPointerType(elementType);
 }
 
+
 PointerType::PointerType(TypePtr elementType)
-    : Type(PointerTyID), _elementType(elementType)
+    : Type(elementType->Context(), PointerTyID), _elementType(elementType)
 {
+
 }
+
 
 #pragma endregion

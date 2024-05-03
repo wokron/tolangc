@@ -103,7 +103,7 @@ class Use;
 using UsePtr = Use*;
 using UseList = std::vector<UsePtr>;
 using UseListPtr = UseList*;
-using UseListIter = UseList::iterator;
+
 
 template<typename _Ty>
 class HasParent
@@ -114,10 +114,13 @@ public:
     virtual ~HasParent() = default;
 
     void SetParent(_TyPtr parent) { _parent = parent; }
+    void RemoveParent() { _parent = nullptr; }
     _TyPtr Parent() const { return _parent; }
 
 protected:
-    HasParent(_TyPtr parent) : _parent(parent) {}
+    HasParent(_TyPtr parent = nullptr) : _parent(parent)
+    {
+    }
 
 private:
     _TyPtr _parent;

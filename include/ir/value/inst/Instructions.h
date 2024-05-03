@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ir/IrForward.h"
 #include "ir/value/inst/InstructionTypes.h"
 
 #pragma region AllocaInst
@@ -11,16 +12,13 @@ public:
     ~AllocaInst() override = default;
 
     static bool classof(const ValueType type) { return type == ValueType::AllocaInstTy; }
-    bool IsAlloca() const override { return true; }
 
     static AllocaInstPtr New(TypePtr type);
 
-    TypePtr AllocatedType() const { return _allocatedType; }
+    TypePtr AllocatedType() const;
 
 private:
     AllocaInst(TypePtr type);
-
-    TypePtr _allocatedType;
 };
 
 #pragma endregion
@@ -34,7 +32,6 @@ public:
     ~LoadInst() override = default;
 
     static bool classof(const ValueType type) { return type == ValueType::LoadInstTy; }
-    bool IsLoad() const override { return true; }
 
     static LoadInstPtr New(ValuePtr address);
 
@@ -42,8 +39,6 @@ public:
 
 private:
     LoadInst(TypePtr type, ValuePtr address);
-
-    ValuePtr _address;
 };
 
 #pragma endregion
@@ -76,7 +71,7 @@ class ReturnInst final : public Instruction
 public:
     ~ReturnInst() override = default;
 
-    static ReturnInstPtr New(LlvmContextPtr context, ValuePtr value);
+    static ReturnInstPtr New(ValuePtr value);
     static ReturnInstPtr New(LlvmContextPtr context);
 
     static bool classof(const ValueType type) { return type == ValueType::ReturnInstTy; }
@@ -99,14 +94,14 @@ class CallInst final : public Instruction
 public:
     static bool classof(const ValueType type) { return type == ValueType::CallInstTy; }
 
-    static CallInstPtr New(FunctionPtr function);
     static CallInstPtr New(FunctionPtr function, const std::vector<ValuePtr>& params);
+    static CallInstPtr New(FunctionPtr function);
 
     FunctionPtr GetFunction() const { return _function; }
 
 private:
-    CallInst(FunctionPtr function);
     CallInst(FunctionPtr function, const std::vector<ValuePtr>& parameters);
+    CallInst(FunctionPtr function);
 
     FunctionPtr _function;
 };

@@ -1,5 +1,9 @@
 #include "ir/LlvmContext.h"
+
 #include "ir/Type.h"
+#include "ir/value/Use.h"
+#include "ir/value/Value.h"
+
 
 LlvmContext::~LlvmContext()
 {
@@ -24,6 +28,7 @@ LlvmContext::~LlvmContext()
     }
 }
 
+
 FunctionTypePtr LlvmContext::GetFunctionType(TypePtr returnType, const std::vector<TypePtr>& paramTypes)
 {
     for (auto type : _functionTypes)
@@ -37,6 +42,7 @@ FunctionTypePtr LlvmContext::GetFunctionType(TypePtr returnType, const std::vect
     _functionTypes.push_back(functionType);
     return functionType;
 }
+
 
 FunctionTypePtr LlvmContext::GetFunctionType(TypePtr returnType)
 {
@@ -52,6 +58,7 @@ FunctionTypePtr LlvmContext::GetFunctionType(TypePtr returnType)
     return functionType;
 }
 
+
 PointerTypePtr LlvmContext::GetPointerType(TypePtr elementType)
 {
     for (auto type : _pointerTypes)
@@ -66,14 +73,15 @@ PointerTypePtr LlvmContext::GetPointerType(TypePtr elementType)
     return pointerType;
 }
 
-ValuePtr LlvmContext::Save(ValuePtr value)
-{
-    _values.push_back(value);
-    return value;
-}
 
-UsePtr LlvmContext::Save(UsePtr use)
-{
-    _uses.push_back(use);
-    return use;
-}
+//ValuePtr LlvmContext::Save(ValuePtr value)
+//{
+//    _values.push_back(value);
+//    return value;
+//}
+
+//UsePtr LlvmContext::Save(UsePtr use)
+//{
+//    _uses.push_back(use);
+//    return use;
+//}

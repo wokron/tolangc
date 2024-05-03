@@ -2,6 +2,7 @@
 
 #include "ir/value/GlobalValue.h"
 
+
 class GlobalVariable : public GlobalValue
 {
 public:
@@ -9,8 +10,11 @@ public:
 
     static bool classof(const ValueType type) { return type == ValueType::GlobalVariableTy; }
 
-    static GlobalVariablePtr New(TypePtr valueType, const std::string& name);
+    static GlobalVariablePtr New(TypePtr type, const std::string& name);
 
 private:
-    GlobalVariable(TypePtr type, const std::string& name);
+    GlobalVariable(TypePtr type, const std::string& name)
+        : GlobalValue(ValueType::GlobalVariableTy, type, name)
+    {
+    }
 };
