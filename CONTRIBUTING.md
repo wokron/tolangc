@@ -19,3 +19,13 @@
 单元测试位于 `tests/` 下。尽量为每一个模块编写单元测试，但不对覆盖率进行要求。单元测试文件名格式为 `test_<module>.cpp`，例如 `test_module_name.cpp`。
 
 本项目使用 [doctest](https://github.com/doctest/doctest) 实现单元测试。doctest 的使用方法见其文档。
+
+## 编码规范
+
+- 文件名使用 `snake_case`，后缀为 `.h` 和 `.cpp`。
+- 头文件中使用 `#param once` 而非 `#ifndef`。
+- 变量使用 `snake_case`。
+- 类名使用 `PascalCase`。
+- 函数使用 `snake_case`，类方法使用 `PascalCase`。
+- 私有方法、属性在前面加上一个下划线，如 `_PrivateMethod`、`_private_attr`。
+- 其他未明确的格式化规范由项目中的 `.clang-format` 确定。可使用脚本 `scripts/format.sh` 进行代码格式化。

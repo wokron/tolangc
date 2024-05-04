@@ -60,6 +60,10 @@ Ident: [a-zA-Z_][0-9a-zA-Z_]*
 Number: [1-9][0-9]*(\.[0-9]+)?
 ```
 
+## 项目维护
+
+见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+
 ## Todo
 - [ ] 编译器前端
   - [ ] 词法分析
