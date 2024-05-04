@@ -41,6 +41,8 @@ public:
 
     static bool classof(const ValueType type) { return type == ValueType::UnaryOperatorTy; }
 
+    void PrintAsm(AsmWriterPtr out) override;
+
     static UnaryOperatorPtr New(UnaryOpType opType, ValuePtr operand);
 
     UnaryOpType OpType() const { return _opType; }
@@ -95,6 +97,8 @@ public:
 
     static bool classof(const ValueType type) { return type == ValueType::BinaryOperatorTy; }
 
+    void PrintAsm(AsmWriterPtr out) override;
+
     static BinaryOperatorPtr New(BinaryOpType opType, ValuePtr lhs, ValuePtr rhs);
 
     BinaryOpType OpType() const { return _opType; }
@@ -131,9 +135,11 @@ public:
 
     static bool classof(const ValueType type) { return type == ValueType::CompareInstTy; }
 
+    void PrintAsm(AsmWriterPtr out) override;
+
     static CompareInstructionPtr New(CompareOpType opType, ValuePtr lhs, ValuePtr rhs);
 
-    CompareOpType GetPredicateType() const { return _opType; }
+    CompareOpType OpType() const { return _opType; }
 
 protected:
     CompareInstruction(TypePtr type, ValuePtr lhs, ValuePtr rhs, CompareOpType opType)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <string>
 #include <memory>
 
 class AsmWriter;
@@ -14,9 +15,11 @@ public:
 
     const AsmWriter& Push(char ch) const;
     const AsmWriter& Push(const char* format, ...) const;
+    const AsmWriter& Push(const std::string& str) const;
 
     const AsmWriter& PushNext(char ch) const;
     const AsmWriter& PushNext(const char* format, ...) const;
+    const AsmWriter& PushNext(const std::string& str) const;
 
     const AsmWriter& PushSpace() const;
     const AsmWriter& PushSpaces(int repeat) const;

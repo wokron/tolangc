@@ -12,10 +12,12 @@ public:
 
     static bool classof(const ValueType type) { return type == ValueType::InputInstTy; }
 
+    void PrintAsm(AsmWriterPtr out) override;
+
     static InputInstPtr New(LlvmContextPtr context);
 
 private:
-    InputInst(TypePtr type) : Instruction(ValueType::InputInstTy, type) {}
+    InputInst(TypePtr type);
 };
 
 #pragma endregion
@@ -28,6 +30,8 @@ public:
     ~OutputInst() override = default;
 
     static OutputInstPtr New(ValuePtr value);
+
+    void PrintAsm(AsmWriterPtr out) override;
 
     static bool classof(const ValueType type) { return type == ValueType::OutputInstTy; }
 

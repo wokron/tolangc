@@ -1,9 +1,7 @@
-﻿#include <utility>
-
-#include "llvm/asm/AsmPrinter.h"
+﻿#include "llvm/asm/AsmPrinter.h"
 #include "llvm/ir/Module.h"
-#include "llvm/ir/value/GlobalValue.h"
 #include "llvm/ir/value/Function.h"
+#include "llvm/ir/value/GlobalVariable.h"
 
 
 void AsmPrinter::Print(ModulePtr module, std::ostream& out)
@@ -14,6 +12,7 @@ void AsmPrinter::Print(ModulePtr module, std::ostream& out)
     _PrintFooter(writer);
 }
 
+
 /*
  * ; tolang LLVM IR
  * (blank line)
@@ -23,6 +22,7 @@ void AsmPrinter::_PrintHeader(AsmWriterPtr out)
     out->PushComment("tolang LLVM IR").PushNewLine();
 }
 
+
 /*
  * ; End of LLVM IR
  */
@@ -31,6 +31,7 @@ void AsmPrinter::_PrintFooter(AsmWriterPtr out)
     out->PushNewLine().PushComment("End of LLVM IR");
 }
 
+
 /*
  * ; LLVM IR Module: {module-name}
  * (blank line)
@@ -38,7 +39,6 @@ void AsmPrinter::_PrintFooter(AsmWriterPtr out)
  * (blank line)
  * {functions}
  */
-
 void AsmPrinter::_PrintModule(AsmWriterPtr out, ModulePtr module)
 {
     // Module name.
@@ -55,21 +55,22 @@ void AsmPrinter::_PrintModule(AsmWriterPtr out, ModulePtr module)
     // Global variables.
     for (auto it = module->GlobalBegin(); it != module->GlobalEnd(); ++it)
     {
-        // (*it)->PrintAsm(writer);
+        (*it)->PrintAsm(out);
     }
 
     // Functions.
     for (auto it = module->FunctionBegin(); it != module->FunctionEnd(); ++it)
     {
-        // (*it)->PrintAsm(writer);
+        (*it)->PrintAsm(out);
     }
 
     // Main function.
     if (module->MainFunction())
     {
-        // module->MainFunction()->PrintAsm(writer);
+        module->MainFunction()->PrintAsm(out);
     }
 }
+
 
 /*
  * This only prints the library function declaration... :(
@@ -80,8 +81,7 @@ void AsmPrinter::_PrintModule(AsmWriterPtr out, ModulePtr module)
  */
 void AsmPrinter::_PrintDeclaration(AsmWriterPtr out)
 {
-    out->Push("declare i32 @getint()").PushNewLine()
-        .Push("declare void @putint(i32)").PushNewLine()
-        .Push("declare void @putstr(i8*)").PushNewLine()
+    out->Push("declare i32 @get()").PushNewLine()
+        .Push("declare void @put(i32)").PushNewLine()
         .PushNewLine();
 }

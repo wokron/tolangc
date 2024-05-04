@@ -63,17 +63,17 @@ public:
      * Print the complete asm code of this value. This is used to print
      * the value itself on its occurrence.
      */
-    virtual AsmWriterPtr PrintAsm(AsmWriterPtr writer);
-
-    /*
-     * Print the use of this value. Usually, the type and name.
-     */
-    virtual AsmWriterPtr PrintUse(AsmWriterPtr writer);
+    virtual void PrintAsm(AsmWriterPtr out);
 
     /*
      * Print only the name of this value. For example, only %1.
      */
-    virtual AsmWriterPtr PrintName(AsmWriterPtr writer);
+    virtual void PrintName(AsmWriterPtr out);
+
+    /*
+     * Print the use of this value. Usually, the type and name.
+     */
+    virtual void PrintUse(AsmWriterPtr out);
 
 public:
     using use_iterator = UseList::iterator;

@@ -11,6 +11,10 @@ public:
 
     static bool classof(const ValueType type) { return type == ValueType::BasicBlockTy; }
 
+    void PrintAsm(AsmWriterPtr out) override;
+    void PrintName(AsmWriterPtr out) override;
+    void PrintUse(AsmWriterPtr out) override;
+
     static BasicBlockPtr New(FunctionPtr parent = nullptr);
 
 public:

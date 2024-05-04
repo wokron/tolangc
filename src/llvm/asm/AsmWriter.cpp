@@ -27,6 +27,14 @@ const AsmWriter& AsmWriter::Push(const char* format, ...) const
     return *this;
 }
 
+
+const AsmWriter& AsmWriter::Push(const std::string& str) const
+{
+    _out << str;
+    return *this;
+}
+
+
 const AsmWriter& AsmWriter::PushNext(char ch) const
 {
     return PushSpace().Push(ch);
@@ -39,6 +47,12 @@ const AsmWriter& AsmWriter::PushNext(const char* format, ...) const
     vsprintf(buffer, format, args);
     va_end(args);
     return PushSpace().Push(buffer);
+}
+
+
+const AsmWriter& AsmWriter::PushNext(const std::string& str) const
+{
+    return PushSpace().Push(str);
 }
 
 

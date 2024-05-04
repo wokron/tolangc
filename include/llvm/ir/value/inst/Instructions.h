@@ -13,6 +13,8 @@ public:
 
     static bool classof(const ValueType type) { return type == ValueType::AllocaInstTy; }
 
+    void PrintAsm(AsmWriterPtr out) override;
+
     static AllocaInstPtr New(TypePtr type);
 
     TypePtr AllocatedType() const;
@@ -33,12 +35,17 @@ public:
 
     static bool classof(const ValueType type) { return type == ValueType::LoadInstTy; }
 
+    void PrintAsm(AsmWriterPtr out) override;
+
     static LoadInstPtr New(ValuePtr address);
 
     ValuePtr Address() const;
 
 private:
-    LoadInst(TypePtr type, ValuePtr address);
+    LoadInst(TypePtr type, ValuePtr address)
+        : UnaryInstruction(ValueType::LoadInstTy, type, address)
+    {
+    }
 };
 
 #pragma endregion
@@ -53,6 +60,8 @@ public:
     ~StoreInst() override = default;
 
     static bool classof(const ValueType type) { return type == ValueType::StoreInstTy; }
+
+    void PrintAsm(AsmWriterPtr out) override;
 
     static StoreInstPtr New(ValuePtr value, ValuePtr address);
 
@@ -71,10 +80,12 @@ class ReturnInst final : public Instruction
 public:
     ~ReturnInst() override = default;
 
+    static bool classof(const ValueType type) { return type == ValueType::ReturnInstTy; }
+
+    void PrintAsm(AsmWriterPtr out) override;
+
     static ReturnInstPtr New(ValuePtr value);
     static ReturnInstPtr New(LlvmContextPtr context);
-
-    static bool classof(const ValueType type) { return type == ValueType::ReturnInstTy; }
 
     ValuePtr ReturnValue() const;
 
@@ -93,6 +104,8 @@ class CallInst final : public Instruction
 {
 public:
     static bool classof(const ValueType type) { return type == ValueType::CallInstTy; }
+
+    void PrintAsm(AsmWriterPtr out) override;
 
     static CallInstPtr New(FunctionPtr function, const std::vector<ValuePtr>& params);
     static CallInstPtr New(FunctionPtr function);

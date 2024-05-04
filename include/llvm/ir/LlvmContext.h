@@ -21,6 +21,7 @@ public:
 
     TypePtr GetVoidTy() { return &_voidTy; }
     TypePtr GetLabelTy() { return &_labelTy; }
+    IntegerTypePtr GetInt1Ty() { return &_int1Ty; }
     IntegerTypePtr GetInt32Ty() { return &_int32Ty; }
 
     FunctionTypePtr GetFunctionType(TypePtr returnType, const std::vector<TypePtr>& paramTypes);
@@ -44,7 +45,11 @@ public:
     }
 
 private:
-    LlvmContext() : _voidTy(this, Type::VoidTyID), _labelTy(this, Type::LabelTyID), _int32Ty(this, 32)
+    LlvmContext()
+        : _voidTy(this, Type::VoidTyID),
+        _labelTy(this, Type::LabelTyID),
+        _int1Ty(this, 1),
+        _int32Ty(this, 32)
     {
     }
 
@@ -52,6 +57,7 @@ private:
     Type _voidTy;
     Type _labelTy;
 
+    IntegerType _int1Ty;
     IntegerType _int32Ty;
 
     std::vector<FunctionTypePtr> _functionTypes;

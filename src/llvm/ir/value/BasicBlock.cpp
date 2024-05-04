@@ -12,21 +12,23 @@ BasicBlockPtr BasicBlock::New(FunctionPtr parent)
 
 BasicBlock::BasicBlock(FunctionPtr parent)
     : Value(ValueType::BasicBlockTy, parent->Context()->GetLabelTy()),
-      HasParent(parent)
+    HasParent(parent)
 {
 }
 
 
 BasicBlockPtr BasicBlock::InsertInstruction(InstructionPtr instruction)
 {
+    instruction->SetParent(this);
     _instructions.push_back(instruction);
     return this;
 }
 
 
-BasicBlockPtr BasicBlock::InsertInstruction(instruction_iterator iter, InstructionPtr inst)
+BasicBlockPtr BasicBlock::InsertInstruction(instruction_iterator iter, InstructionPtr instruction)
 {
-    _instructions.insert(iter, inst);
+    instruction->SetParent(this);
+    _instructions.insert(iter, instruction);
     return this;
 }
 

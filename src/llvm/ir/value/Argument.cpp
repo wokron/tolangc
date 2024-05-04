@@ -3,13 +3,13 @@
 #include "llvm/ir/Type.h"
 
 
-ArgumentPtr Argument::New(TypePtr type, const std::string& name, int argNo)
+ArgumentPtr Argument::New(TypePtr type, const std::string& name)
 {
-    return type->Context()->SaveValue(new Argument(type, name, argNo));
+    return type->Context()->SaveValue(new Argument(type, name));
 }
 
 
-Argument::Argument(TypePtr type, const std::string& name, int argNo)
-    : Value(ValueType::ArgumentTy, type, name), _argNo(argNo)
+Argument::Argument(TypePtr type, const std::string& name)
+    : Value(ValueType::ArgumentTy, type, name)
 {
 }

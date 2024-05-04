@@ -8,12 +8,11 @@
 class Function final : public GlobalValue
 {
 public:
-    using block_iterator = std::list<BasicBlockPtr>::iterator;
-    using argument_iterator = std::vector<ArgumentPtr>::iterator;
-
     ~Function() override = default;
 
     static bool classof(const ValueType type) { return type == ValueType::FunctionTy; }
+
+    void PrintAsm(AsmWriterPtr out) override;
 
     static FunctionPtr New(TypePtr returnType, const std::string& name);
     static FunctionPtr New(TypePtr returnType, const std::string& name, std::vector<ArgumentPtr> args);
@@ -23,6 +22,9 @@ public:
     TypePtr ReturnType() const;
 
 public:
+    using block_iterator = std::list<BasicBlockPtr>::iterator;
+    using argument_iterator = std::vector<ArgumentPtr>::iterator;
+
     int ArgCount() const { return static_cast<int>(_args.size()); }
 
     ArgumentPtr GetArg(int argNo) const { return _args[argNo]; }
@@ -40,6 +42,8 @@ public:
 
     block_iterator BasicBlockBegin() { return _basicBlocks.begin(); }
     block_iterator BasicBlockEnd() { return _basicBlocks.end(); }
+
+    SlotTrackerPtr GetSlotTracker() { return &_slotTracker; }
 
 private:
     Function(TypePtr type, const std::string& name);

@@ -10,6 +10,9 @@ public:
 
     static bool classof(const ValueType type) { return type == ValueType::ConstantDataTy; }
 
+    virtual void PrintAsm(AsmWriterPtr out);
+    virtual void PrintName(AsmWriterPtr out);
+
     static ConstantDataPtr New(TypePtr type, int value);
 
     int GetValue() const { return _value; }

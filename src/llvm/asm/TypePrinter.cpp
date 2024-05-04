@@ -20,7 +20,7 @@ void Type::PrintAsm(AsmWriterPtr out)
 // i32
 void IntegerType::PrintAsm(AsmWriterPtr out)
 {
-    out->Push('i').Push(std::to_string(_bitWidth).c_str());
+    out->Push('i').Push(std::to_string(_bitWidth));
 }
 
 // return type ( arg1, arg2, ... )

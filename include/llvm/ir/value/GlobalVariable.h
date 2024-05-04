@@ -10,6 +10,8 @@ public:
 
     static bool classof(const ValueType type) { return type == ValueType::GlobalVariableTy; }
 
+    virtual void PrintAsm(AsmWriterPtr out);
+
     static GlobalVariablePtr New(TypePtr type, const std::string& name);
 
 private:

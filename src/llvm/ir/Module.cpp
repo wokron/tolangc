@@ -3,6 +3,7 @@
 #include "llvm/ir/Module.h"
 #include "llvm/ir/value/Function.h"
 #include "llvm/ir/value/GlobalVariable.h"
+#include "utils.h"
 
 
 ModulePtr Module::New(const std::string& name)
