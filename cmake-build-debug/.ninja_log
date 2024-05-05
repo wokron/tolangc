@@ -1,0 +1,20 @@
+# ninja log v5
+1	344	7366252887304856	CMakeFiles/libtolangc.dir/src/keep.cpp.obj	dca72589d340ccda
+53	490	7366252888050063	tests/CMakeFiles/tests.dir/main.cpp.obj	11f8f206cf585ce1
+348	1053	7366252894399384	liblibtolangc.a	5ab29e250eaa56c6
+98	4577	7366252929631661	tests/CMakeFiles/tests.dir/test_symbol_table.cpp.obj	8e791fa13b024511
+4581	6337	7366252947181461	tests/tests.exe	8e8621f873cd8e9b
+3	4190	7366270280438696	tests/CMakeFiles/tests.dir/test_symbol_table.cpp.obj	8e791fa13b024511
+4193	5833	7366270296882683	tests/tests.exe	8e8621f873cd8e9b
+4	5035	7366291823729128	tests/CMakeFiles/tests.dir/test_symbol_table.cpp.obj	8e791fa13b024511
+5037	6766	7366291841009089	tests/tests.exe	8e8621f873cd8e9b
+2	4500	7366292176646491	tests/CMakeFiles/tests.dir/test_symbol_table.cpp.obj	8e791fa13b024511
+4502	6115	7366292193031378	tests/tests.exe	8e8621f873cd8e9b
+4	3963	7366292266202905	tests/CMakeFiles/tests.dir/test_symbol_table.cpp.obj	8e791fa13b024511
+3965	5615	7366292282743434	tests/tests.exe	8e8621f873cd8e9b
+3	4210	7366294790297291	tests/CMakeFiles/tests.dir/test_symbol_table.cpp.obj	8e791fa13b024511
+4212	5871	7366294806881440	tests/tests.exe	8e8621f873cd8e9b
+3	4071	7366295529077059	tests/CMakeFiles/tests.dir/test_symbol_table.cpp.obj	8e791fa13b024511
+4072	5688	7366295545216342	tests/tests.exe	8e8621f873cd8e9b
+6	4475	7366296966552468	tests/CMakeFiles/tests.dir/test_symbol_table.cpp.obj	8e791fa13b024511
+4478	6091	7366296982704151	tests/tests.exe	8e8621f873cd8e9b
