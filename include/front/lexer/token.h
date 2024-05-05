@@ -2,12 +2,12 @@
 
 #include <utility>
 
+#include "iostream"
 #include "string"
 #include "vector"
-#include "iostream"
 
 class Token {
-public:
+  public:
     enum TokenType {
         IDENFR,
         NUMBER,
@@ -42,6 +42,6 @@ public:
     std::string content;
     int line;
 
-    Token(TokenType type, std::string cont, int line) : token_type(type), content(cont), line(line) {
-    }
+    Token(TokenType type, std::string cont, int line)
+        : token_type(type), content(cont), line(line) {}
 };

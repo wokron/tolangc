@@ -1,38 +1,23 @@
 #pragma once
 
+#include "token.h"
 #include <fstream>
 #include <regex>
-#include "token.h"
 
 class Lexer {
-public:
-    std::vector<Token *> tokens;
-    int index = 0;
+  public:
+    bool has_next() { return _index < _tokens.size(); }
 
-    void append(Token *token) {
-        tokens.push_back(token);
-    }
+    Token *look() { return _tokens[_index]; }
 
-    bool has_next() {
-        return index < tokens.size();
-    }
+    Token *look_forward(int cnt) { return _tokens[_index + cnt]; }
 
-    Token *look() {
-        return tokens[index];
-    }
-
-    Token *look_forward(int cnt) {
-        return tokens[index + cnt];
-    }
-
-    Token *next() {
-        return tokens[index++];
-    }
+    Token *next() { return _tokens[_index++]; }
 
     Token *next_til(Token::TokenType type) {
-        Token *token = tokens[index];
+        Token *token = _tokens[_index];
         if (token->token_type == type) {
-            index++;
+            _index++;
             return token;
         }
         exit(1);
@@ -46,7 +31,9 @@ public:
         }
     }
 
-private:
+  private:
+    std::vector<Token *> _tokens;
+    int _index = 0;
     bool _in_annotation = false;
     int _line_number = 0;
 
@@ -54,14 +41,17 @@ private:
         std::string line_without_annotation;
         for (size_t i = 0; i < line.size(); i++) {
             if (_in_annotation) {
-                if (line[i] == '*' && i != line.length() - 1 && line[i + 1] == '/') {
+                if (line[i] == '*' && i != line.length() - 1 &&
+                    line[i + 1] == '/') {
                     _in_annotation = false;
                     i++;
                 }
             } else {
-                if (line[i] == '/' && i != line.size() - 1 && line[i + 1] == '/') {
+                if (line[i] == '/' && i != line.size() - 1 &&
+                    line[i + 1] == '/') {
                     break;
-                } else if (line[i] == '/' && i != line.size() - 1 && line[i + 1] == '*') {
+                } else if (line[i] == '/' && i != line.size() - 1 &&
+                           line[i + 1] == '*') {
                     _in_annotation = true;
                     i++;
                 } else {
@@ -95,9 +85,10 @@ private:
             token = _is_keyword(s);
             if (token != nullptr) {
                 size_t next_index = word_index + token->content.length();
-                if (next_index == line.size() || !isalnum(line[next_index]) && line[next_index] != '_') {
+                if (next_index == line.size() ||
+                    !isalnum(line[next_index]) && line[next_index] != '_') {
                     word_index = next_index;
-                    tokens.push_back(token);
+                    _tokens.push_back(token);
                     continue;
                 }
             }
@@ -106,29 +97,29 @@ private:
             token = _is_symbol(s);
             if (token != nullptr) {
                 word_index += token->content.length();
-                tokens.push_back(token);
+                _tokens.push_back(token);
                 continue;
             }
 
             // match number
             if (std::regex_search(s, match, number)) {
-                tokens.push_back(new Token(Token::NUMBER,
-                                           line.substr(word_index, match.length()),
-                                           _line_number));
+                _tokens.push_back(new Token(
+                    Token::NUMBER, line.substr(word_index, match.length()),
+                    _line_number));
                 word_index += match.length();
                 continue;
             }
 
             // match ident
             if (std::regex_search(s, match, ident)) {
-                tokens.push_back(new Token(Token::IDENFR,
-                                           line.substr(word_index, match.length()),
-                                           _line_number));
+                _tokens.push_back(new Token(
+                    Token::IDENFR, line.substr(word_index, match.length()),
+                    _line_number));
                 word_index += match.length();
                 continue;
             }
 
-            tokens.push_back(new Token(Token::ERR, "Err", _line_number));
+            _tokens.push_back(new Token(Token::ERR, "Err", _line_number));
         }
     }
 
@@ -152,7 +143,6 @@ private:
         } else {
             return nullptr;
         }
-
     }
 
     Token *_is_symbol(const std::string &line) {
