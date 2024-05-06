@@ -6,10 +6,8 @@
 
 #include "llvm/asm/AsmWriter.h"
 
-
 // All types used in LLVM for tolang.
-enum class ValueType
-{
+enum class ValueType {
     // Value
     ArgumentTy,
     BasicBlockTy,
@@ -36,28 +34,23 @@ enum class ValueType
     UnaryOperatorTy,
 };
 
-
 /// <summary>
 /// Base class for all values in LLVM.
 /// </summary>
-class Value
-{
-public:
+class Value {
+  public:
     virtual ~Value() = default;
 
     // This function is used for RTTI (RunTime Type Identification).
     static bool classof(ValueType type) { return true; }
 
     // Check if the value is a specific type.
-    template<typename _Ty>
-    bool Is() const { return _Ty::classof(_valueType); }
-
+    template <typename _Ty> bool Is() const { return _Ty::classof(_valueType); }
 
     // Cast this type to a specific type.
     // You should use this function only when you are sure that this type is
     // actually the type you want to cast to.
-    template<typename _Ty>
-    _Ty* As() { return static_cast<_Ty*>(this); }
+    template <typename _Ty> _Ty *As() { return static_cast<_Ty *>(this); }
 
     /*
      * Print the complete asm code of this value. This is used to print
@@ -75,15 +68,15 @@ public:
      */
     virtual void PrintUse(AsmWriterPtr out);
 
-public:
+  public:
     using use_iterator = UseList::iterator;
 
     ValueType GetValueType() const { return _valueType; }
     TypePtr GetType() const { return _type; }
     LlvmContextPtr Context() const { return GetType()->Context(); }
 
-    const std::string& GetName() const { return _name; }
-    void SetName(const std::string& name) { _name = name; }
+    const std::string &GetName() const { return _name; }
+    void SetName(const std::string &name) { _name = name; }
 
     void AddUser(UsePtr user) { _userList.push_back(user); }
     void AddUse(UsePtr use) { _useList.push_back(use); }
@@ -96,23 +89,20 @@ public:
     use_iterator UseBegin() { return _useList.begin(); }
     use_iterator UseEnd() { return _useList.end(); }
 
-protected:
-    Value(ValueType valueType, TypePtr type) : _type(type), _valueType(valueType)
-    {
-    }
+  protected:
+    Value(ValueType valueType, TypePtr type)
+        : _type(type), _valueType(valueType) {}
 
+    Value(ValueType ValueType, TypePtr type, const std::string &name)
+        : _type(type), _name(name), _valueType(ValueType) {}
 
-    Value(ValueType ValueType, TypePtr type, const std::string& name) : _type(type), _name(name), _valueType(ValueType)
-    {
-    }
-
-protected:
+  protected:
     TypePtr _type;
     std::string _name;
 
     UseList _useList;
     UseList _userList;
 
-private:
+  private:
     ValueType _valueType;
 };

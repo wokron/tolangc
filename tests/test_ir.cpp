@@ -69,10 +69,10 @@ define dso_local i32 @main() {
 )";
 
 FunctionPtr BuildAdd(ModulePtr module);
-FunctionPtr BuildMain(ModulePtr module, FunctionPtr add, GlobalVariablePtr i1, GlobalVariablePtr i2);
+FunctionPtr BuildMain(ModulePtr module, FunctionPtr add, GlobalVariablePtr i1,
+                      GlobalVariablePtr i2);
 
-TEST_CASE("LLVM IR Test")
-{
+TEST_CASE("LLVM IR Test") {
     ModulePtr module = Module::New("tolang.c");
     LlvmContextPtr context = module->Context();
 
@@ -94,29 +94,24 @@ TEST_CASE("LLVM IR Test")
     auto ir = ss.str();
     int line = 1;
     int ch = 1;
-    for (int i = 0; i < ir.size(); ++i)
-    {
-        if (ir[i] == '\n')
-        {
+    for (int i = 0; i < ir.size(); ++i) {
+        if (ir[i] == '\n') {
             line++;
             ch = 1;
-        }
-        else
-        {
+        } else {
             ch++;
         }
-        if (ir[i] != EXPECTED[i])
-        {
-            std::cout << "line: " << line << ", ch: " << ch << ", expected: " << EXPECTED[i] << ", actual: " << ir[i] << std::endl;
+        if (ir[i] != EXPECTED[i]) {
+            std::cout << "line: " << line << ", ch: " << ch
+                      << ", expected: " << EXPECTED[i] << ", actual: " << ir[i]
+                      << std::endl;
         }
     }
     CHECK_EQ(EXPECTED, ir);
     std::cout << ir;
 }
 
-
-FunctionPtr BuildAdd(ModulePtr module)
-{
+FunctionPtr BuildAdd(ModulePtr module) {
     auto context = module->Context();
 
     std::vector<ArgumentPtr> args;
@@ -149,9 +144,8 @@ FunctionPtr BuildAdd(ModulePtr module)
     return function;
 }
 
-
-FunctionPtr BuildMain(ModulePtr module, FunctionPtr add, GlobalVariablePtr i1, GlobalVariablePtr i2)
-{
+FunctionPtr BuildMain(ModulePtr module, FunctionPtr add, GlobalVariablePtr i1,
+                      GlobalVariablePtr i2) {
     auto context = module->Context();
 
     auto function = Function::New(module->Context()->GetInt32Ty(), "main");

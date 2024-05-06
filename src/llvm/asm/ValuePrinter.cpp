@@ -1,4 +1,5 @@
 ﻿#include "llvm/asm/AsmWriter.h"
+#include "utils.h"
 #include "llvm/ir/Type.h"
 #include "llvm/ir/value/Argument.h"
 #include "llvm/ir/value/BasicBlock.h"
@@ -6,56 +7,41 @@
 #include "llvm/ir/value/Function.h"
 #include "llvm/ir/value/GlobalValue.h"
 #include "llvm/ir/value/GlobalVariable.h"
-#include "llvm/ir/value/inst/ExtendedInstructions.h"
-#include "llvm/ir/value/inst/Instruction.h"
-#include "llvm/ir/value/inst/Instructions.h"
-#include "llvm/ir/value/inst/InstructionTypes.h"
 #include "llvm/ir/value/Use.h"
 #include "llvm/ir/value/Value.h"
-#include "utils.h"
+#include "llvm/ir/value/inst/ExtendedInstructions.h"
+#include "llvm/ir/value/inst/Instruction.h"
+#include "llvm/ir/value/inst/InstructionTypes.h"
+#include "llvm/ir/value/inst/Instructions.h"
 
-
-void Value::PrintAsm(AsmWriterPtr out)
-{
+void Value::PrintAsm(AsmWriterPtr out) {
     TOLANG_DIE("Operation not supported.");
 }
 
-
-void Value::PrintName(AsmWriterPtr out)
-{
+void Value::PrintName(AsmWriterPtr out) {
     TOLANG_DIE("Operation not supported.");
 }
 
-
-void Value::PrintUse(AsmWriterPtr out)
-{
+void Value::PrintUse(AsmWriterPtr out) {
     GetType()->PrintAsm(out);
     out->PushSpace();
     PrintName(out);
 }
 
-
-void ConstantData::PrintAsm(AsmWriterPtr out)
-{
+void ConstantData::PrintAsm(AsmWriterPtr out) {
     GetType()->PrintAsm(out);
     out->PushNext(std::to_string(_value));
 }
 
-
-void ConstantData::PrintName(AsmWriterPtr out)
-{
+void ConstantData::PrintName(AsmWriterPtr out) {
     out->Push(std::to_string(_value));
 }
 
-
-void GlobalValue::PrintName(AsmWriterPtr out)
-{
+void GlobalValue::PrintName(AsmWriterPtr out) {
     out->Push('@').Push(GetName());
 }
 
-
-void GlobalVariable::PrintAsm(AsmWriterPtr out)
-{
+void GlobalVariable::PrintAsm(AsmWriterPtr out) {
     // Name
     PrintName(out);
 
@@ -67,9 +53,7 @@ void GlobalVariable::PrintAsm(AsmWriterPtr out)
     // In tolang, we don't have initializer.
 }
 
-
-void Function::PrintAsm(AsmWriterPtr out)
-{
+void Function::PrintAsm(AsmWriterPtr out) {
     // First, we trace all the slot.
     GetSlotTracker()->Trace(this);
 
@@ -91,11 +75,9 @@ void Function::PrintAsm(AsmWriterPtr out)
 
     // Function parameters.
     out->Push('(');
-    for (auto it = ArgBegin(); it != ArgEnd(); ++it)
-    {
+    for (auto it = ArgBegin(); it != ArgEnd(); ++it) {
         auto arg = *it;
-        if (it != ArgBegin())
-        {
+        if (it != ArgBegin()) {
             out->Push(", ");
         }
         arg->PrintUse(out);
@@ -106,8 +88,7 @@ void Function::PrintAsm(AsmWriterPtr out)
     out->PushNext('{').PushNewLine();
 
     // Basic blocks.
-    for (auto it = BasicBlockBegin(); it != BasicBlockEnd(); ++it)
-    {
+    for (auto it = BasicBlockBegin(); it != BasicBlockEnd(); ++it) {
         (*it)->PrintAsm(out);
     }
 
@@ -115,63 +96,49 @@ void Function::PrintAsm(AsmWriterPtr out)
     out->Push('}').PushNewLine();
 }
 
-
-void Argument::PrintAsm(AsmWriterPtr out)
-{
+void Argument::PrintAsm(AsmWriterPtr out) {
     GetType()->PrintAsm(out);
-    out->PushNext('%').Push(std::to_string(Parent()->GetSlotTracker()->Slot(this)));
+    out->PushNext('%').Push(
+        std::to_string(Parent()->GetSlotTracker()->Slot(this)));
 }
 
+void Argument::PrintUse(AsmWriterPtr out) { PrintAsm(out); }
 
-void Argument::PrintUse(AsmWriterPtr out)
-{
-    PrintAsm(out);
-}
-
-
-void BasicBlock::PrintAsm(AsmWriterPtr out)
-{
-    for (auto it = InstructionBegin(); it != InstructionEnd(); ++it)
-    {
+void BasicBlock::PrintAsm(AsmWriterPtr out) {
+    for (auto it = InstructionBegin(); it != InstructionEnd(); ++it) {
         out->PushSpaces(4);
         (*it)->PrintAsm(out);
     }
 }
 
-
-void BasicBlock::PrintName(AsmWriterPtr out)
-{
+void BasicBlock::PrintName(AsmWriterPtr out) {
     out->Push('%').Push(std::to_string(Parent()->GetSlotTracker()->Slot(this)));
 }
 
-
-void BasicBlock::PrintUse(AsmWriterPtr out)
-{
+void BasicBlock::PrintUse(AsmWriterPtr out) {
     GetType()->PrintAsm(out);
     out->PushSpace();
     PrintName(out);
 }
 
+void Instruction::PrintName(AsmWriterPtr out) {
+    TOLANG_DIE_IF_NOT(!GetType()->IsVoidTy(),
+                      "Only instruction with non-void type can call this.");
 
-void Instruction::PrintName(AsmWriterPtr out)
-{
-    TOLANG_DIE_IF_NOT(!GetType()->IsVoidTy(), "Only instruction with non-void type can call this.");
-
-    out->Push('%').Push(std::to_string(Parent()->Parent()->GetSlotTracker()->Slot(this)));
+    out->Push('%').Push(
+        std::to_string(Parent()->Parent()->GetSlotTracker()->Slot(this)));
 }
 
-
-void Instruction::PrintUse(AsmWriterPtr out)
-{
-    TOLANG_DIE_IF_NOT(!GetType()->IsVoidTy(), "Only instruction with non-void type can call this.");
+void Instruction::PrintUse(AsmWriterPtr out) {
+    TOLANG_DIE_IF_NOT(!GetType()->IsVoidTy(),
+                      "Only instruction with non-void type can call this.");
 
     GetType()->PrintAsm(out);
-    out->PushNext('%').Push(std::to_string(Parent()->Parent()->GetSlotTracker()->Slot(this)));
+    out->PushNext('%').Push(
+        std::to_string(Parent()->Parent()->GetSlotTracker()->Slot(this)));
 }
 
-
-void AllocaInst::PrintAsm(AsmWriterPtr out)
-{
+void AllocaInst::PrintAsm(AsmWriterPtr out) {
     PrintName(out);
 
     out->PushNext('=').PushNext("alloca").PushSpace();
@@ -179,9 +146,7 @@ void AllocaInst::PrintAsm(AsmWriterPtr out)
     out->PushNewLine();
 }
 
-
-void StoreInst::PrintAsm(AsmWriterPtr out)
-{
+void StoreInst::PrintAsm(AsmWriterPtr out) {
     out->Push("store").PushSpace();
 
     LeftOperand()->PrintUse(out);
@@ -190,9 +155,7 @@ void StoreInst::PrintAsm(AsmWriterPtr out)
     out->PushNewLine();
 }
 
-
-void LoadInst::PrintAsm(AsmWriterPtr out)
-{
+void LoadInst::PrintAsm(AsmWriterPtr out) {
     PrintName(out);
 
     out->PushNext('=').PushNext("load").PushSpace();
@@ -202,28 +165,20 @@ void LoadInst::PrintAsm(AsmWriterPtr out)
     out->PushNewLine();
 }
 
-
-void ReturnInst::PrintAsm(AsmWriterPtr out)
-{
+void ReturnInst::PrintAsm(AsmWriterPtr out) {
     out->Push("ret");
     ValuePtr ret = OperandAt(0);
-    if (!ret || ret->GetType()->IsVoidTy())
-    {
+    if (!ret || ret->GetType()->IsVoidTy()) {
         out->PushNext("void");
-    }
-    else
-    {
+    } else {
         out->PushSpace();
         ret->PrintUse(out);
     }
     out->PushNewLine();
 }
 
-
-void CallInst::PrintAsm(AsmWriterPtr out)
-{
-    if (!GetType()->IsVoidTy())
-    {
+void CallInst::PrintAsm(AsmWriterPtr out) {
+    if (!GetType()->IsVoidTy()) {
         PrintName(out);
         out->Push(" = ");
     }
@@ -239,10 +194,8 @@ void CallInst::PrintAsm(AsmWriterPtr out)
 
     // Parameters.
     out->Push('(');
-    for (auto it = UseBegin(); it != UseEnd(); ++it)
-    {
-        if (it != UseBegin())
-        {
+    for (auto it = UseBegin(); it != UseEnd(); ++it) {
+        if (it != UseBegin()) {
             out->Push(", ");
         }
         (*it)->GetValue()->PrintUse(out);
@@ -250,16 +203,13 @@ void CallInst::PrintAsm(AsmWriterPtr out)
     out->Push(')').PushNewLine();
 }
 
-
 /*
  * %2 = add nsw i32 0, %1
  * %2 = sub nsw i32 0, %1
  * %2 = xor i1 %1, 1
  */
-void UnaryOperator::PrintAsm(AsmWriterPtr out)
-{
-    if (OpType() == UnaryOpType::Not)
-    {
+void UnaryOperator::PrintAsm(AsmWriterPtr out) {
+    if (OpType() == UnaryOpType::Not) {
         PrintName(out);
         out->PushNext('=').Push("xor").PushSpace();
         Operand()->GetType()->PrintAsm(out);
@@ -269,10 +219,9 @@ void UnaryOperator::PrintAsm(AsmWriterPtr out)
         return;
     }
 
-    const char* op;
+    const char *op;
 
-    switch (OpType())
-    {
+    switch (OpType()) {
     case UnaryOpType::Pos:
         op = "add nsw";
         break;
@@ -294,7 +243,6 @@ void UnaryOperator::PrintAsm(AsmWriterPtr out)
     out->PushNewLine();
 }
 
-
 /*
  * %11 = add nsw i32 %9, %10
  * %18 = sub nsw i32 0, %7
@@ -302,11 +250,9 @@ void UnaryOperator::PrintAsm(AsmWriterPtr out)
  * %15 = sdiv i32 %14, 2
  * %17 = srem i32 %16, 2
  */
-void BinaryOperator::PrintAsm(AsmWriterPtr out)
-{
-    const char* op;
-    switch (OpType())
-    {
+void BinaryOperator::PrintAsm(AsmWriterPtr out) {
+    const char *op;
+    switch (OpType()) {
     case BinaryOpType::Add:
         op = "add nsw";
         break;
@@ -337,13 +283,10 @@ void BinaryOperator::PrintAsm(AsmWriterPtr out)
     out->PushNewLine();
 }
 
+void CompareInstruction::PrintAsm(AsmWriterPtr out) {
+    const char *op;
 
-void CompareInstruction::PrintAsm(AsmWriterPtr out)
-{
-    const char* op;
-
-    switch (OpType())
-    {
+    switch (OpType()) {
     case CompareOpType::Equal:
         op = "eq";
         break;
@@ -372,18 +315,14 @@ void CompareInstruction::PrintAsm(AsmWriterPtr out)
     out->PushNewLine();
 }
 
-
-void InputInst::PrintAsm(AsmWriterPtr out)
-{
+void InputInst::PrintAsm(AsmWriterPtr out) {
     PrintName(out);
     out->PushNext('=').PushNext("call").PushSpace();
     GetType()->PrintAsm(out);
     out->PushNext('@').Push(GetName()).Push("()").PushNewLine();
 }
 
-
-void OutputInst::PrintAsm(AsmWriterPtr out)
-{
+void OutputInst::PrintAsm(AsmWriterPtr out) {
     out->Push("call").PushSpace();
     GetType()->PrintAsm(out);
     out->PushSpace();

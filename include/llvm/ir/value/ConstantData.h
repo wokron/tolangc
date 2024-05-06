@@ -2,27 +2,24 @@
 
 #include "llvm/ir/value/Constant.h"
 
-
-class ConstantData : public Constant
-{
-public:
+class ConstantData : public Constant {
+  public:
     ~ConstantData() override = default;
 
-    static bool classof(const ValueType type) { return type == ValueType::ConstantDataTy; }
+    static bool classof(const ValueType type) {
+        return type == ValueType::ConstantDataTy;
+    }
 
-    virtual void PrintAsm(AsmWriterPtr out);
-    virtual void PrintName(AsmWriterPtr out);
+    void PrintAsm(AsmWriterPtr out) override;
+    void PrintName(AsmWriterPtr out) override;
 
     static ConstantDataPtr New(TypePtr type, int value);
 
     int GetValue() const { return _value; }
 
-private:
+  private:
     ConstantData(TypePtr type, int value)
-        : Constant(ValueType::ConstantDataTy, type), _value(value)
-    {
-    }
-
+        : Constant(ValueType::ConstantDataTy, type), _value(value) {}
 
     int _value;
 };

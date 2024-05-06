@@ -4,37 +4,29 @@
 #include "llvm/ir/value/Use.h"
 #include "llvm/ir/value/Value.h"
 
-
-LlvmContext::~LlvmContext()
-{
-    for (auto type : _functionTypes)
-    {
+LlvmContext::~LlvmContext() {
+    for (auto type : _functionTypes) {
         delete type;
     }
 
-    for (auto type : _pointerTypes)
-    {
+    for (auto type : _pointerTypes) {
         delete type;
     }
 
-    for (auto value : _values)
-    {
+    for (auto value : _values) {
         delete value;
     }
 
-    for (auto use : _uses)
-    {
+    for (auto use : _uses) {
         delete use;
     }
 }
 
-
-FunctionTypePtr LlvmContext::GetFunctionType(TypePtr returnType, const std::vector<TypePtr>& paramTypes)
-{
-    for (auto type : _functionTypes)
-    {
-        if (type->Equals(returnType, paramTypes))
-        {
+FunctionTypePtr
+LlvmContext::GetFunctionType(TypePtr returnType,
+                             const std::vector<TypePtr> &paramTypes) {
+    for (auto type : _functionTypes) {
+        if (type->Equals(returnType, paramTypes)) {
             return type;
         }
     }
@@ -43,13 +35,9 @@ FunctionTypePtr LlvmContext::GetFunctionType(TypePtr returnType, const std::vect
     return functionType;
 }
 
-
-FunctionTypePtr LlvmContext::GetFunctionType(TypePtr returnType)
-{
-    for (auto type : _functionTypes)
-    {
-        if (type->Equals(returnType))
-        {
+FunctionTypePtr LlvmContext::GetFunctionType(TypePtr returnType) {
+    for (auto type : _functionTypes) {
+        if (type->Equals(returnType)) {
             return type;
         }
     }
@@ -58,13 +46,9 @@ FunctionTypePtr LlvmContext::GetFunctionType(TypePtr returnType)
     return functionType;
 }
 
-
-PointerTypePtr LlvmContext::GetPointerType(TypePtr elementType)
-{
-    for (auto type : _pointerTypes)
-    {
-        if (type->ElementType() == elementType)
-        {
+PointerTypePtr LlvmContext::GetPointerType(TypePtr elementType) {
+    for (auto type : _pointerTypes) {
+        if (type->ElementType() == elementType) {
             return type;
         }
     }
@@ -73,14 +57,13 @@ PointerTypePtr LlvmContext::GetPointerType(TypePtr elementType)
     return pointerType;
 }
 
-
-//ValuePtr LlvmContext::Save(ValuePtr value)
+// ValuePtr LlvmContext::Save(ValuePtr value)
 //{
 //    _values.push_back(value);
 //    return value;
 //}
 
-//UsePtr LlvmContext::Save(UsePtr use)
+// UsePtr LlvmContext::Save(UsePtr use)
 //{
 //    _uses.push_back(use);
 //    return use;

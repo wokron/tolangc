@@ -9,107 +9,103 @@ class Module;
 using ModulePtr = std::shared_ptr<Module>;
 
 class LlvmContext;
-using LlvmContextPtr = LlvmContext*;
+using LlvmContextPtr = LlvmContext *;
 
 class Type;
-using TypePtr = Type*;
+using TypePtr = Type *;
 
 class IntegerType;
-using IntegerTypePtr = IntegerType*;
+using IntegerTypePtr = IntegerType *;
 
 class FunctionType;
-using FunctionTypePtr = FunctionType*;
+using FunctionTypePtr = FunctionType *;
 
 class PointerType;
-using PointerTypePtr = PointerType*;
-
+using PointerTypePtr = PointerType *;
 
 ///////////////////////////////////////////////////////////
 // Value Forward Declaration
 class Value;
-using ValuePtr = Value*;
+using ValuePtr = Value *;
 using ValueSmartPtr = std::shared_ptr<Value>;
 
 class Argument;
-using ArgumentPtr = Argument*;
+using ArgumentPtr = Argument *;
 
 class Function;
-using FunctionPtr = Function*;
+using FunctionPtr = Function *;
 
 class BasicBlock;
-using BasicBlockPtr = BasicBlock*;
+using BasicBlockPtr = BasicBlock *;
 
 class User;
-using UserPtr = User*;
+using UserPtr = User *;
 
 ///////////////////////////////////////////////////////////
 // Constant Forward Declaration
 class Constant;
-using ConstantPtr = Constant*;
+using ConstantPtr = Constant *;
 
 class ConstantData;
-using ConstantDataPtr = ConstantData*;
+using ConstantDataPtr = ConstantData *;
 
 class GlobalValue;
-using GlobalValuePtr = GlobalValue*;
+using GlobalValuePtr = GlobalValue *;
 
 class GlobalVariable;
-using GlobalVariablePtr = GlobalVariable*;
+using GlobalVariablePtr = GlobalVariable *;
 
 class Function;
-using FunctionPtr = Function*;
+using FunctionPtr = Function *;
 
 ///////////////////////////////////////////////////////////
 // Instruction Forward Declaration
 class Instruction;
-using InstructionPtr = Instruction*;
+using InstructionPtr = Instruction *;
 
 class UnaryInstruction;
-using UnaryInstructionPtr = UnaryInstruction*;
+using UnaryInstructionPtr = UnaryInstruction *;
 
 class UnaryOperator;
-using UnaryOperatorPtr = UnaryOperator*;
+using UnaryOperatorPtr = UnaryOperator *;
 
 class BinaryOperator;
-using BinaryOperatorPtr = BinaryOperator*;
+using BinaryOperatorPtr = BinaryOperator *;
 
 class CompareInstruction;
-using CompareInstructionPtr = CompareInstruction*;
+using CompareInstructionPtr = CompareInstruction *;
 
 class AllocaInst;
-using AllocaInstPtr = AllocaInst*;
+using AllocaInstPtr = AllocaInst *;
 
 class LoadInst;
-using LoadInstPtr = LoadInst*;
+using LoadInstPtr = LoadInst *;
 
 class StoreInst;
-using StoreInstPtr = StoreInst*;
+using StoreInstPtr = StoreInst *;
 
 class CallInst;
-using CallInstPtr = CallInst*;
+using CallInstPtr = CallInst *;
 
 class ReturnInst;
-using ReturnInstPtr = ReturnInst*;
+using ReturnInstPtr = ReturnInst *;
 
 class InputInst;
-using InputInstPtr = InputInst*;
+using InputInstPtr = InputInst *;
 
 class OutputInst;
-using OutputInstPtr = OutputInst*;
+using OutputInstPtr = OutputInst *;
 
 ///////////////////////////////////////////////////////////
 // Use Forward Declaration
 class Use;
-using UsePtr = Use*;
+using UsePtr = Use *;
 using UseList = std::vector<UsePtr>;
-using UseListPtr = UseList*;
+using UseListPtr = UseList *;
 
-
-template<typename _Ty>
-class HasParent
-{
-public:
-    using _TyPtr = _Ty*;
+template <typename _Ty> class HasParent {
+  public:
+    using _TyPtr = _Ty *;
 
     virtual ~HasParent() = default;
 
@@ -117,11 +113,9 @@ public:
     void RemoveParent() { _parent = nullptr; }
     _TyPtr Parent() const { return _parent; }
 
-protected:
-    HasParent(_TyPtr parent = nullptr) : _parent(parent)
-    {
-    }
+  protected:
+    HasParent(_TyPtr parent = nullptr) : _parent(parent) {}
 
-private:
+  private:
     _TyPtr _parent;
 };

@@ -1,27 +1,28 @@
 #pragma once
 
-#include "llvm/ir/value/GlobalValue.h"
 #include "llvm/ir/SlotTracker.h"
+#include "llvm/ir/value/GlobalValue.h"
 #include <list>
 
-
-class Function final : public GlobalValue
-{
-public:
+class Function final : public GlobalValue {
+  public:
     ~Function() override = default;
 
-    static bool classof(const ValueType type) { return type == ValueType::FunctionTy; }
+    static bool classof(const ValueType type) {
+        return type == ValueType::FunctionTy;
+    }
 
     void PrintAsm(AsmWriterPtr out) override;
 
-    static FunctionPtr New(TypePtr returnType, const std::string& name);
-    static FunctionPtr New(TypePtr returnType, const std::string& name, std::vector<ArgumentPtr> args);
+    static FunctionPtr New(TypePtr returnType, const std::string &name);
+    static FunctionPtr New(TypePtr returnType, const std::string &name,
+                           std::vector<ArgumentPtr> args);
 
     BasicBlockPtr NewBasicBlock();
 
     TypePtr ReturnType() const;
 
-public:
+  public:
     using block_iterator = std::list<BasicBlockPtr>::iterator;
     using argument_iterator = std::vector<ArgumentPtr>::iterator;
 
@@ -31,7 +32,9 @@ public:
     argument_iterator ArgBegin() { return _args.begin(); }
     argument_iterator ArgEnd() { return _args.end(); }
 
-    int BasicBlockCount() const { return static_cast<int>(_basicBlocks.size()); }
+    int BasicBlockCount() const {
+        return static_cast<int>(_basicBlocks.size());
+    }
 
     // Insert a basic block at the end of the function.
     FunctionPtr InsertBasicBlock(BasicBlockPtr block);
@@ -45,11 +48,12 @@ public:
 
     SlotTrackerPtr GetSlotTracker() { return &_slotTracker; }
 
-private:
-    Function(TypePtr type, const std::string& name);
-    Function(TypePtr type, const std::string& name, std::vector<ArgumentPtr> args);
+  private:
+    Function(TypePtr type, const std::string &name);
+    Function(TypePtr type, const std::string &name,
+             std::vector<ArgumentPtr> args);
 
-private:
+  private:
     // We can generate arguments via its type.
     std::vector<ArgumentPtr> _args;
     std::list<BasicBlockPtr> _basicBlocks;

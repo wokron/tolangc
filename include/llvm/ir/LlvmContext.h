@@ -4,55 +4,45 @@
 #include "llvm/ir/Type.h"
 #include <vector>
 
-
 /// <summary>
 /// One LLVM context per module, which holds all the types and values.
 /// </summary>
-class LlvmContext
-{
+class LlvmContext {
     // Only Module can create a context.
     friend class Module;
 
-public:
+  public:
     ~LlvmContext();
 
-    LlvmContext(const LlvmContext&) = delete;
-    LlvmContext& operator=(const LlvmContext&) = delete;
+    LlvmContext(const LlvmContext &) = delete;
+    LlvmContext &operator=(const LlvmContext &) = delete;
 
     TypePtr GetVoidTy() { return &_voidTy; }
     TypePtr GetLabelTy() { return &_labelTy; }
     IntegerTypePtr GetInt1Ty() { return &_int1Ty; }
     IntegerTypePtr GetInt32Ty() { return &_int32Ty; }
 
-    FunctionTypePtr GetFunctionType(TypePtr returnType, const std::vector<TypePtr>& paramTypes);
+    FunctionTypePtr GetFunctionType(TypePtr returnType,
+                                    const std::vector<TypePtr> &paramTypes);
     FunctionTypePtr GetFunctionType(TypePtr returnType);
 
     PointerTypePtr GetPointerType(TypePtr elementType);
 
     // Save all allocated values to avoid memory leak.
-    template<typename _Ty>
-    _Ty* SaveValue(_Ty* value)
-    {
+    template <typename _Ty> _Ty *SaveValue(_Ty *value) {
         _values.push_back(value);
         return value->template As<_Ty>();
     }
 
-
-    UsePtr SaveUse(UsePtr use)
-    {
+    UsePtr SaveUse(UsePtr use) {
         _uses.push_back(use);
         return use;
     }
 
-private:
+  private:
     LlvmContext()
-        : _voidTy(this, Type::VoidTyID),
-        _labelTy(this, Type::LabelTyID),
-        _int1Ty(this, 1),
-        _int32Ty(this, 32)
-    {
-    }
-
+        : _voidTy(this, Type::VoidTyID), _labelTy(this, Type::LabelTyID),
+          _int1Ty(this, 1), _int32Ty(this, 32) {}
 
     Type _voidTy;
     Type _labelTy;

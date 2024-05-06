@@ -8,5 +8,5 @@
 #include "llvm/ir/value/Function.h"
 #include "llvm/ir/value/GlobalVariable.h"
 #include "llvm/ir/value/inst/ExtendedInstructions.h"
-#include "llvm/ir/value/inst/Instructions.h"
 #include "llvm/ir/value/inst/InstructionTypes.h"
+#include "llvm/ir/value/inst/Instructions.h"
