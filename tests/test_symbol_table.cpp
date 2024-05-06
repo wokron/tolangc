@@ -17,7 +17,6 @@ TEST_CASE("LOW_SYMBOL_TABLE_TEST") {
     cur_symbol_table = symbol_table_manager->createSymbolTable();
 //    CHECK(cur_symbol_table);
 //    CHECK(symbol_table_manager);
-
     if (!cur_symbol_table->addSymbol(std::make_shared<VariableSymbol>("a", 10))) {
         CHECK(1 != 1);
     }
