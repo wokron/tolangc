@@ -9,7 +9,7 @@
 #include <vector>
 #include "symbol_table.h"
 
-TEST_CASE("LOW_SYMBOL_TABLE_TEST") {
+TEST_CASE("testing low symbol table") {
     // 创建父符号表
     std::shared_ptr<SymbolTableManager> symbol_table_manager = std::make_shared<SymbolTableManager>();
     std::shared_ptr<SymbolTable> cur_symbol_table;
