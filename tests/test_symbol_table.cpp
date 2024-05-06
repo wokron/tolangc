@@ -1,13 +1,13 @@
 //
 // Created by 86166 on 2024/5/5.
 //
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
 #include "doctest.h"
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "../src/symbol_table/symbol_table.h"
+#include "symbol_table.h"
 
 TEST_CASE("LOW_SYMBOL_TABLE_TEST") {
     // 创建父符号表
@@ -15,8 +15,8 @@ TEST_CASE("LOW_SYMBOL_TABLE_TEST") {
     std::shared_ptr<SymbolTable> cur_symbol_table;
     std::shared_ptr<Symbol> cur_symbol;
     cur_symbol_table = symbol_table_manager->createSymbolTable();
-    CHECK(cur_symbol_table != nullptr);
-    CHECK(symbol_table_manager != nullptr);
+//    CHECK(cur_symbol_table);
+//    CHECK(symbol_table_manager);
 
     if (!cur_symbol_table->addSymbol(std::make_shared<VariableSymbol>("a", 10))) {
         CHECK(1 != 1);

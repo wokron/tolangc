@@ -23,11 +23,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="15adeddf-69b3-4b06-8068-fc5eacfe6b1d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/symbol_table/symbol_table.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/symbol_table/symbol_table.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/test_symbol_table.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/.cmake/api/v1/reply/index-2024-05-05T15-05-54-0965.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/.ninja_deps" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/.ninja_deps" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/.ninja_log" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/.ninja_log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/Testing/Temporary/LastTest.log" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/Testing/Temporary/LastTest.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/symbol_table/symbol_table.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/symbol_table.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/tests/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_symbol_table.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_symbol_table.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,10 +85,15 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Users\CompileEngineeringAssistant\ToLangCompiler\tolangc\include" />
+    </key>
+  </component>
   <component name="RunManager" selected="CMake Application.tests">
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
       </method>
     </configuration>
     <configuration name="libtolangc" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="tolangc" TARGET_NAME="libtolangc" CONFIG_NAME="Debug">
@@ -125,7 +135,8 @@
       <workItem from="1714204472982" duration="12421000" />
       <workItem from="1714908936770" duration="5479000" />
       <workItem from="1714915818633" duration="6412000" />
-      <workItem from="1714923407077" duration="2538000" />
+      <workItem from="1714923407077" duration="3118000" />
+      <workItem from="1714962006470" duration="1395000" />
     </task>
     <servers />
   </component>
