@@ -31,4 +31,7 @@
 *.out
 *.app
 
+cmake-build-debug
+tests/cmake-build-debug
+.idea
 build/
