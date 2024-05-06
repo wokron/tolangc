@@ -1,23 +1,21 @@
-//
-// Created by 86166 on 2024/5/5.
-//
-
 #include "doctest.h"
+#include "symbol_table.h"
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "symbol_table.h"
 
 TEST_CASE("testing low symbol table") {
     // 创建父符号表
-    std::shared_ptr<SymbolTableManager> symbol_table_manager = std::make_shared<SymbolTableManager>();
+    std::shared_ptr<SymbolTableManager> symbol_table_manager =
+        std::make_shared<SymbolTableManager>();
     std::shared_ptr<SymbolTable> cur_symbol_table;
     std::shared_ptr<Symbol> cur_symbol;
     cur_symbol_table = symbol_table_manager->createSymbolTable();
-//    CHECK(cur_symbol_table);
-//    CHECK(symbol_table_manager);
-    if (!cur_symbol_table->addSymbol(std::make_shared<VariableSymbol>("a", 10))) {
+    //    CHECK(cur_symbol_table);
+    //    CHECK(symbol_table_manager);
+    if (!cur_symbol_table->addSymbol(
+            std::make_shared<VariableSymbol>("a", 10))) {
         CHECK(1 != 1);
     }
 
@@ -25,7 +23,8 @@ TEST_CASE("testing low symbol table") {
         CHECK(1 != 1);
     }
 
-    if (!cur_symbol_table->addSymbol(std::make_shared<FunctionSymbol>("a", 30))) {
+    if (!cur_symbol_table->addSymbol(
+            std::make_shared<FunctionSymbol>("a", 30))) {
         // 重复声明，错误处理
     } else {
         CHECK(1 != 1);
@@ -49,7 +48,8 @@ TEST_CASE("testing low symbol table") {
 
     ///////////////////////////////////////////////////////////////////////////////////////
     // 创建新符号表
-    cur_symbol_table = symbol_table_manager->createSymbolTable(cur_symbol_table);
+    cur_symbol_table =
+        symbol_table_manager->createSymbolTable(cur_symbol_table);
 
     if ((cur_symbol = cur_symbol_table->getSymbol("a")) != nullptr) {
         CHECK(cur_symbol->getLineNumber() == 10);
@@ -57,7 +57,8 @@ TEST_CASE("testing low symbol table") {
         CHECK(1 != 1);
     }
 
-    if (!cur_symbol_table->addSymbol(std::make_shared<VariableSymbol>("a", 40))) {
+    if (!cur_symbol_table->addSymbol(
+            std::make_shared<VariableSymbol>("a", 40))) {
         CHECK(1 != 1);
     }
 
@@ -89,5 +90,6 @@ TEST_CASE("testing low symbol table") {
 
     CHECK(cur_symbol_table->printSymbolTable() == "a 10\nb 20\n");
 
-    CHECK(symbol_table_manager->printAllSymbolTable() == "a 10\nb 20\n======\na 40\nb 50\n======\n");
+    CHECK(symbol_table_manager->printAllSymbolTable() ==
+          "a 10\nb 20\n======\na 40\nb 50\n======\n");
 }
