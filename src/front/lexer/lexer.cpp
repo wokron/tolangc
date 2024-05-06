@@ -3,58 +3,53 @@
 #include <fstream>
 #include <regex>
 
-bool Lexer::has_next() { return _index < _tokens.size(); }
-
-Token *Lexer::look() { return _tokens[_index]; }
-
-Token *Lexer::look_forward(int cnt) { return _tokens[_index + cnt]; }
-
-Token *Lexer::next() { return _tokens[_index++]; }
-
-Token *Lexer::next_assert(Token::TokenType type) {
-    Token *token = _tokens[_index];
-    if (token->token_type == type) {
-        _index++;
-        return token;
-    }
-    exit(1);
-}
-
-void Lexer::run(std::ifstream *input) {
-    std::string line;
-    while (getline(*input, line)) {
+bool Lexer::next(Token &token) {
+    while (_cur_line.size() == _word_index) {
+        if (!getline(_input, _cur_line)) {
+            return false;
+        }
         _line_number++;
-        _deal_with_line(line);
+        _word_index = 0;
+        _deal_with_line();
+    }
+
+    Token *next_token = _next_token(_cur_line);
+    if (next_token == nullptr) {
+        return next(token);
+    } else {
+        token = *next_token;
+        return true;
     }
 }
 
-void Lexer::_deal_with_line(std::string line) {
+Lexer::Lexer(std::istream &in) : _input(in) {}
+
+void Lexer::_deal_with_line() {
     std::string line_without_annotation;
-    for (size_t i = 0; i < line.size(); i++) {
+    for (size_t i = 0; i < _cur_line.size(); i++) {
         if (_in_annotation) {
-            if (line[i] == '*' && i != line.length() - 1 &&
-                line[i + 1] == '/') {
+            if (_cur_line[i] == '*' && i != _cur_line.length() - 1 &&
+                _cur_line[i + 1] == '/') {
                 _in_annotation = false;
                 i++;
             }
         } else {
-            if (line[i] == '/' && i != line.size() - 1 && line[i + 1] == '/') {
+            if (_cur_line[i] == '/' && i != _cur_line.size() - 1 &&
+                _cur_line[i + 1] == '/') {
                 break;
-            } else if (line[i] == '/' && i != line.size() - 1 &&
-                       line[i + 1] == '*') {
+            } else if (_cur_line[i] == '/' && i != _cur_line.size() - 1 &&
+                       _cur_line[i + 1] == '*') {
                 _in_annotation = true;
                 i++;
             } else {
-                line_without_annotation += line[i];
+                line_without_annotation += _cur_line[i];
             }
         }
     }
-
-    _to_tokens(line_without_annotation);
+    _cur_line = line_without_annotation;
 }
 
-void Lexer::_to_tokens(std::string line) {
-    size_t word_index = 0;
+Token *Lexer::_next_token(std::string line) {
 
     std::regex blank("^\\s+");
     std::regex number("^[1-9][0-9]*(\\.[0-9]+)?");
@@ -62,11 +57,11 @@ void Lexer::_to_tokens(std::string line) {
 
     std::smatch match;
 
-    while (word_index < line.size()) {
+    while (_word_index < line.size()) {
         // match blank
-        std::string s = line.substr(word_index);
+        std::string s = line.substr(_word_index);
         if (std::regex_search(s, match, blank)) {
-            word_index += match.length();
+            _word_index += match.length();
             continue;
         }
 
@@ -74,43 +69,42 @@ void Lexer::_to_tokens(std::string line) {
         // match keyword
         token = _is_keyword(s);
         if (token != nullptr) {
-            size_t next_index = word_index + token->content.length();
+            size_t next_index = _word_index + token->content.length();
             if (next_index == line.size() ||
                 !isalnum(line[next_index]) && line[next_index] != '_') {
-                word_index = next_index;
-                _tokens.push_back(token);
-                continue;
+                _word_index = next_index;
+                return token;
             }
         }
 
         // match symbol
         token = _is_symbol(s);
         if (token != nullptr) {
-            word_index += token->content.length();
-            _tokens.push_back(token);
-            continue;
+            _word_index += token->content.length();
+            return token;
         }
 
         // match number
         if (std::regex_search(s, match, number)) {
-            _tokens.push_back(new Token(Token::NUMBER,
-                                        line.substr(word_index, match.length()),
-                                        _line_number));
-            word_index += match.length();
-            continue;
+            _word_index += match.length();
+            return new Token(
+                Token::NUMBER,
+                line.substr(_word_index - match.length(), match.length()),
+                _line_number);
         }
 
         // match ident
         if (std::regex_search(s, match, ident)) {
-            _tokens.push_back(new Token(Token::IDENFR,
-                                        line.substr(word_index, match.length()),
-                                        _line_number));
-            word_index += match.length();
-            continue;
+            _word_index += match.length();
+            return new Token(
+                Token::IDENFR,
+                line.substr(_word_index - match.length(), match.length()),
+                _line_number);
         }
 
-        _tokens.push_back(new Token(Token::ERR, "Err", _line_number));
+        return new Token(Token::ERR, "Err", _line_number);
     }
+    return nullptr;
 }
 
 Token *Lexer::_is_keyword(const std::string &line) {

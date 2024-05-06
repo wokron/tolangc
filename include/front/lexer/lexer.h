@@ -6,27 +6,19 @@
 
 class Lexer {
   public:
-    bool has_next();
-
-    Token *look();
-
-    Token *look_forward(int);
-
-    Token *next();
-
-    Token *next_assert(Token::TokenType);
-
-    void run(std::ifstream *input);
+    bool next(Token &);
+    Lexer(std::istream &);
 
   private:
-    std::vector<Token *> _tokens;
-    int _index = 0;
     bool _in_annotation = false;
     int _line_number = 0;
+    size_t _word_index = 0;
+    std::istream &_input;
+    std::string _cur_line;
 
-    void _deal_with_line(std::string line);
+    void _deal_with_line();
 
-    void _to_tokens(std::string line);
+    Token *_next_token(std::string line);
 
     Token *_is_keyword(const std::string &line);
 
