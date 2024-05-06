@@ -102,6 +102,7 @@ Token *Lexer::_next_token(std::string line) {
                 _line_number);
         }
 
+        _word_index = _cur_line.size();
         return new Token(Token::ERR, "Err", _line_number);
     }
     return nullptr;
