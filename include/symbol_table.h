@@ -5,6 +5,9 @@
 #include <unordered_map>
 #include <vector>
 
+// just a mock of ir value
+using Value = std::nullptr_t;
+
 enum SymbolType { Variable, Tag, Function };
 
 struct Symbol {
