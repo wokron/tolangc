@@ -36,7 +36,7 @@ struct CompUnit : public Node {
     std::vector<std::shared_ptr<VarDecl>> varDecls;
     std::vector<std::shared_ptr<Stmt>> stmts;
 
-    void print(std::ostream &out) override;
+    void print(std::ostream &out) override { /* TODO: need to implement */ };
 };
 
 struct FuncFParams;
@@ -46,44 +46,44 @@ struct FuncDef : public Node {
     std::shared_ptr<FuncFParams> funcFParams;
     std::shared_ptr<Exp> exp;
 
-    void print(std::ostream &out) override;
+    void print(std::ostream &out) override { /* TODO: need to implement */ };
 };
 
 struct FuncFParams : public Node {
     std::vector<Ident> idents;
 
-    void print(std::ostream &out) override;
+    void print(std::ostream &out) override { /* TODO: need to implement */ };
 };
 
 struct VarDecl : public Node {
     Ident ident;
 
-    void print(std::ostream &out) override;
+    void print(std::ostream &out) override { /* TODO: need to implement */ };
 };
 
 struct GetStmt : public Node {
     Ident ident;
 
-    void print(std::ostream &out) override;
+    void print(std::ostream &out) override { /* TODO: need to implement */ };
 };
 
 struct PutStmt : public Node {
     std::shared_ptr<Exp> exp;
 
-    void print(std::ostream &out) override;
+    void print(std::ostream &out) override { /* TODO: need to implement */ };
 };
 
 struct TagStmt : public Node {
     Ident ident;
 
-    void print(std::ostream &out) override;
+    void print(std::ostream &out) override { /* TODO: need to implement */ };
 };
 
 struct LetStmt : public Node {
     Ident ident;
     std::shared_ptr<Exp> exp;
 
-    void print(std::ostream &out) override;
+    void print(std::ostream &out) override { /* TODO: need to implement */ };
 };
 
 struct Cond;
@@ -92,13 +92,13 @@ struct IfStmt : public Node {
     std::shared_ptr<Cond> cond;
     Ident ident;
 
-    void print(std::ostream &out) override;
+    void print(std::ostream &out) override { /* TODO: need to implement */ };
 };
 
 struct ToStmt : public Node {
     Ident ident;
 
-    void print(std::ostream &out) override;
+    void print(std::ostream &out) override { /* TODO: need to implement */ };
 };
 
 struct BinaryExp : public Node {
@@ -112,7 +112,7 @@ struct BinaryExp : public Node {
     } op;
     std::shared_ptr<Exp> rexp;
 
-    void print(std::ostream &out) override;
+    void print(std::ostream &out) override { /* TODO: need to implement */ };
 };
 
 struct FuncRParams;
@@ -121,7 +121,7 @@ struct CallExp : public Node {
     Ident ident;
     std::shared_ptr<FuncRParams> funcRParams;
 
-    void print(std::ostream &out) override;
+    void print(std::ostream &out) override { /* TODO: need to implement */ };
 };
 
 struct UnaryExp : public Node {
@@ -131,13 +131,13 @@ struct UnaryExp : public Node {
     } op;
     std::shared_ptr<Exp> exp;
 
-    void print(std::ostream &out) override;
+    void print(std::ostream &out) override { /* TODO: need to implement */ };
 };
 
 struct FuncRParams : public Node {
     std::vector<std::shared_ptr<Exp>> exps;
 
-    void print(std::ostream &out) override;
+    void print(std::ostream &out) override { /* TODO: need to implement */ };
 };
 
 struct Cond : public Node {
@@ -152,11 +152,11 @@ struct Cond : public Node {
     } op;
     std::shared_ptr<Exp> right;
 
-    void print(std::ostream &out) override;
+    void print(std::ostream &out) override { /* TODO: need to implement */ };
 };
 
 struct Number : public Node {
     float value;
 
-    void print(std::ostream &out) override;
+    void print(std::ostream &out) override { /* TODO: need to implement */ };
 };

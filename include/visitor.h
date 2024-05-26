@@ -2,11 +2,14 @@
 
 #include "ast.h"
 #include "symbol_table.h"
+#include "llvm/ir/Module.h"
 
 class Visitor {
   public:
-    Visitor() : _cur_scope(std::make_shared<SymbolTable>()) {}
-    Visitor(std::shared_ptr<SymbolTable> cur_scope) : _cur_scope(cur_scope) {}
+    Visitor(ModulePtr module)
+        : _ir_module(module), _cur_scope(std::make_shared<SymbolTable>()) {}
+    Visitor(ModulePtr module, std::shared_ptr<SymbolTable> cur_scope)
+        : _ir_module(module), _cur_scope(cur_scope) {}
 
     void visit(const CompUnit &node);
     void visitFuncDef(const FuncDef &node);
@@ -22,17 +25,19 @@ class Visitor {
     void visitIfStmt(const IfStmt &node);
     void visitToStmt(const ToStmt &node);
 
-    std::shared_ptr<Value> visitExp(const Exp &node);
-    std::shared_ptr<Value> visitBinaryExp(const BinaryExp &node);
-    std::shared_ptr<Value> visitCallExp(const CallExp &node);
-    std::shared_ptr<Value> visitUnaryExp(const UnaryExp &node);
-    std::shared_ptr<Value> visitIdent(const Ident &node);
-    std::shared_ptr<Value> visitNumber(const Number &node);
-    std::shared_ptr<Value> visitCond(const Cond &node);
+    ValuePtr visitExp(const Exp &node);
+    ValuePtr visitBinaryExp(const BinaryExp &node);
+    ValuePtr visitCallExp(const CallExp &node);
+    ValuePtr visitUnaryExp(const UnaryExp &node);
+    ValuePtr visitIdent(const Ident &node);
+    ValuePtr visitNumber(const Number &node);
+    ValuePtr visitCond(const Cond &node);
 
-    std::vector<std::shared_ptr<Value>>
-    visitFuncRParams(const FuncRParams &node);
+    std::vector<ValuePtr> visitFuncRParams(const FuncRParams &node);
 
   private:
     std::shared_ptr<SymbolTable> _cur_scope;
+    ModulePtr _ir_module;
+    FunctionPtr _cur_func = nullptr;
+    BasicBlockPtr _cur_block = nullptr;
 };

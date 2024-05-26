@@ -4,9 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-// just a mock of ir value
-using Value = std::nullptr_t;
+#include "llvm/ir/Llvm.h"
 
 enum SymbolType { Variable, Tag, Function };
 
@@ -14,11 +12,12 @@ struct Symbol {
     SymbolType type;
     std::string name;
     int line_number;
+    ValuePtr value;
 
     virtual ~Symbol() = default;
 
-    Symbol(SymbolType type, std::string name, int line_number)
-        : type(type), name(name), line_number(line_number) {}
+    Symbol(SymbolType type, std::string name, ValuePtr value, int line_number)
+        : type(type), name(name), value(value), line_number(line_number) {}
 
     std::string printSymbol() const {
         return name + " " + std::to_string(line_number) + "\n";
@@ -26,20 +25,20 @@ struct Symbol {
 };
 
 struct VariableSymbol : public Symbol {
-    VariableSymbol(std::string name, int line_number)
-        : Symbol(SymbolType::Variable, name, line_number) {}
+    VariableSymbol(std::string name, ValuePtr value, int line_number)
+        : Symbol(SymbolType::Variable, name, value, line_number) {}
 };
 
 struct TagSymbol : public Symbol {
-    TagSymbol(std::string name, int line_number)
-        : Symbol(SymbolType::Tag, name, line_number) {}
+    TagSymbol(std::string name, ValuePtr value, int line_number)
+        : Symbol(SymbolType::Tag, name, value, line_number) {}
 };
 
 struct FunctionSymbol : public Symbol {
     int params_count = 0;
 
-    FunctionSymbol(std::string name, int line_number, int params_count)
-        : Symbol(SymbolType::Function, name, line_number),
+    FunctionSymbol(std::string name, ValuePtr value, int line_number, int params_count)
+        : Symbol(SymbolType::Function, name, value, line_number),
           params_count(params_count) {}
 };
 

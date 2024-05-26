@@ -10,16 +10,16 @@ TEST_CASE("testing low symbol table") {
     std::shared_ptr<Symbol> cur_symbol;
 
     if (!cur_symbol_table->addSymbol(
-            std::make_shared<VariableSymbol>("a", 10))) {
+            std::make_shared<VariableSymbol>("a", nullptr, 10))) {
         CHECK(1 != 1);
     }
 
-    if (!cur_symbol_table->addSymbol(std::make_shared<TagSymbol>("b", 20))) {
+    if (!cur_symbol_table->addSymbol(std::make_shared<TagSymbol>("b", nullptr, 20))) {
         CHECK(1 != 1);
     }
 
     if (!cur_symbol_table->addSymbol(
-            std::make_shared<FunctionSymbol>("a", 30, 0))) {
+            std::make_shared<FunctionSymbol>("a", nullptr, 30, 0))) {
         // 重复声明，错误处理
     } else {
         CHECK(1 != 1);
@@ -50,7 +50,7 @@ TEST_CASE("testing low symbol table") {
     }
 
     if (!cur_symbol_table->addSymbol(
-            std::make_shared<VariableSymbol>("a", 40))) {
+            std::make_shared<VariableSymbol>("a", nullptr, 40))) {
         CHECK(1 != 1);
     }
 
@@ -60,11 +60,11 @@ TEST_CASE("testing low symbol table") {
         CHECK(1 != 1);
     }
 
-    if (!cur_symbol_table->addSymbol(std::make_shared<TagSymbol>("b", 50))) {
+    if (!cur_symbol_table->addSymbol(std::make_shared<TagSymbol>("b", nullptr, 50))) {
         CHECK(1 != 1);
     }
 
-    if (!cur_symbol_table->addSymbol(std::make_shared<TagSymbol>("b", 60))) {
+    if (!cur_symbol_table->addSymbol(std::make_shared<TagSymbol>("b", nullptr, 60))) {
         // 重复声明，错误处理
     } else {
         CHECK(1 != 1);
