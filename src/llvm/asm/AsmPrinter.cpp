@@ -63,14 +63,13 @@ void AsmPrinter::_PrintModule(AsmWriterPtr out, ModulePtr module) {
 /*
  * This only prints the library function declaration... :(
  *
- * declare dso_local i32 @getint()
- * declare dso_local void @putstr(i8*)
- * declare dso_local void @putint(i32)
+ * declare dso_local float @get()
+ * declare dso_local void @put(float)
  */
 void AsmPrinter::_PrintDeclaration(AsmWriterPtr out) {
-    out->Push("declare i32 @get()")
+    out->Push("declare float @get()")
         .PushNewLine()
-        .Push("declare void @put(i32)")
+        .Push("declare void @put(float)")
         .PushNewLine()
         .PushNewLine();
 }

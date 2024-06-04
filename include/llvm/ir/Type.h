@@ -17,6 +17,7 @@ class Type {
 
         // Derived types
         IntegerTyID,
+        FloatTyID,
         FunctionTyID,
         PointerTyID
     };
@@ -34,6 +35,8 @@ class Type {
     bool IsLabelTy() const { return _typeId == LabelTyID; }
 
     bool IsIntegerTy() const { return _typeId == IntegerTyID; }
+    bool IsFloatTy() const { return _typeId == FloatTyID; }
+    bool IsArithmeticTy() const { return IsIntegerTy() || IsFloatTy(); }
     bool IsPointerTy() const { return _typeId == PointerTyID; }
 
     template <typename _Ty> _Ty *As() { return static_cast<_Ty *>(this); }
@@ -74,8 +77,28 @@ class IntegerType : public Type {
     unsigned _bitWidth;
 };
 
+class FloatType : public Type {
+    friend class LlvmContext;
+
+  public:
+    ~FloatType() override = default;
+
+    void PrintAsm(AsmWriterPtr out) override;
+
+    static FloatTypePtr Get(LlvmContextPtr context, unsigned bitWidth);
+
+    unsigned BitWidth() const { return _bitWidth; }
+
+  private:
+    FloatType(LlvmContextPtr context, unsigned bitWidth)
+        : Type(context, FloatTyID), _bitWidth(bitWidth) {}
+
+    unsigned _bitWidth;
+};
+
 /*
- * A function's type consists of a return type and a list of parameter types.
+ * A function's type consists of a return type and a list of parameter
+ * types.
  */
 class FunctionType : public Type {
     friend class LlvmContext;

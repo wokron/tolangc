@@ -1,5 +1,5 @@
-﻿#include "llvm/asm/AsmWriter.h"
-#include "utils.h"
+﻿#include "utils.h"
+#include "llvm/asm/AsmWriter.h"
 #include "llvm/ir/Type.h"
 #include "llvm/ir/value/Argument.h"
 #include "llvm/ir/value/BasicBlock.h"
@@ -30,11 +30,18 @@ void Value::PrintUse(AsmWriterPtr out) {
 
 void ConstantData::PrintAsm(AsmWriterPtr out) {
     GetType()->PrintAsm(out);
-    out->PushNext(std::to_string(_value));
+    out->PushSpace();
+    PrintName(out);
 }
 
 void ConstantData::PrintName(AsmWriterPtr out) {
-    out->Push(std::to_string(_value));
+    if (GetType()->IsFloatTy()) {
+        out->Push(std::to_string(_floatValue));
+    } else if (GetType()->IsIntegerTy()) {
+        out->Push(std::to_string(_intValue));
+    } else {
+        TOLANG_DIE("Invalid ConstantData type");
+    }
 }
 
 void GlobalValue::PrintName(AsmWriterPtr out) {
@@ -48,9 +55,15 @@ void GlobalVariable::PrintAsm(AsmWriterPtr out) {
     out->PushNext('=');
 
     // Attribute
-    out->PushNext("dso_local").PushNext("global").PushNewLine();
+    out->PushNext("dso_local").PushNext("global").PushSpace();
 
-    // In tolang, we don't have initializer.
+    if (_initializer) {
+        _initializer->PrintAsm(out);
+    } else {
+        out->Push("zeroinitializer");
+    }
+
+    out->PushNewLine();
 }
 
 void Function::PrintAsm(AsmWriterPtr out) {
@@ -252,20 +265,23 @@ void UnaryOperator::PrintAsm(AsmWriterPtr out) {
  */
 void BinaryOperator::PrintAsm(AsmWriterPtr out) {
     const char *op;
+    bool isFloat = GetType()->IsFloatTy();
     switch (OpType()) {
     case BinaryOpType::Add:
-        op = "add nsw";
+        op = isFloat ? "fadd" : "add nsw";
         break;
     case BinaryOpType::Sub:
-        op = "sub nsw";
+        op = isFloat ? "fsub" : "sub nsw";
         break;
     case BinaryOpType::Mul:
-        op = "mul nsw";
+        op = isFloat ? "fmul" : "mul nsw";
         break;
     case BinaryOpType::Div:
-        op = "sdiv";
+        op = isFloat ? "fdiv" : "sdiv";
         break;
     case BinaryOpType::Mod:
+        TOLANG_ASSERT(!isFloat,
+                      "Mod operation is not supported for float type.");
         op = "srem";
         break;
     }

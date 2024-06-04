@@ -1,5 +1,6 @@
 #pragma once
 
+#include "llvm/ir/value/Value.h"
 #include "llvm/ir/value/inst/Instruction.h"
 
 #pragma region UnaryInstruction

@@ -1,8 +1,9 @@
 #include "llvm/ir/value/inst/ExtendedInstructions.h"
 #include "llvm/ir/LlvmContext.h"
+#include "llvm/ir/value/Value.h"
 
 InputInstPtr InputInst::New(LlvmContextPtr context) {
-    return context->SaveValue(new InputInst(context->GetInt32Ty()));
+    return context->SaveValue(new InputInst(context->GetFloatTy()));
 }
 
 InputInst::InputInst(TypePtr type) : Instruction(ValueType::InputInstTy, type) {

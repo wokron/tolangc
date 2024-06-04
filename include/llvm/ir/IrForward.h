@@ -17,6 +17,9 @@ using TypePtr = Type *;
 class IntegerType;
 using IntegerTypePtr = IntegerType *;
 
+class FloatType;
+using FloatTypePtr = FloatType *;
+
 class FunctionType;
 using FunctionTypePtr = FunctionType *;
 

@@ -21,6 +21,7 @@ class LlvmContext {
     TypePtr GetLabelTy() { return &_labelTy; }
     IntegerTypePtr GetInt1Ty() { return &_int1Ty; }
     IntegerTypePtr GetInt32Ty() { return &_int32Ty; }
+    FloatTypePtr GetFloatTy() { return &_floatTy; }
 
     FunctionTypePtr GetFunctionType(TypePtr returnType,
                                     const std::vector<TypePtr> &paramTypes);
@@ -42,13 +43,14 @@ class LlvmContext {
   private:
     LlvmContext()
         : _voidTy(this, Type::VoidTyID), _labelTy(this, Type::LabelTyID),
-          _int1Ty(this, 1), _int32Ty(this, 32) {}
+          _int1Ty(this, 1), _int32Ty(this, 32), _floatTy(this, 32) {}
 
     Type _voidTy;
     Type _labelTy;
 
     IntegerType _int1Ty;
     IntegerType _int32Ty;
+    FloatType _floatTy;
 
     std::vector<FunctionTypePtr> _functionTypes;
     std::vector<PointerTypePtr> _pointerTypes;

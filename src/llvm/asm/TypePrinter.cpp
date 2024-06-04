@@ -1,5 +1,5 @@
-﻿#include "llvm/ir/Type.h"
-#include "utils.h"
+﻿#include "utils.h"
+#include "llvm/ir/Type.h"
 #include <string>
 
 void Type::PrintAsm(AsmWriterPtr out) {
@@ -18,6 +18,17 @@ void Type::PrintAsm(AsmWriterPtr out) {
 // i32
 void IntegerType::PrintAsm(AsmWriterPtr out) {
     out->Push('i').Push(std::to_string(_bitWidth));
+}
+
+// float
+void FloatType::PrintAsm(AsmWriterPtr out) {
+    if (_bitWidth == 32) {
+        out->Push("float");
+    } else if (_bitWidth == 64) {
+        out->Push("double");
+    } else {
+        TOLANG_DIE("Unsupport float bit width: %u", _bitWidth);
+    }
 }
 
 // return type ( arg1, arg2, ... )

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "utils.h"
+
 #include "llvm/ir/value/Constant.h"
 
 class ConstantData : public Constant {
@@ -14,12 +16,21 @@ class ConstantData : public Constant {
     void PrintName(AsmWriterPtr out) override;
 
     static ConstantDataPtr New(TypePtr type, int value);
+    static ConstantDataPtr New(TypePtr type, float value);
 
-    int GetValue() const { return _value; }
+    int GetIntValue() const { return _intValue; }
+    float GetFloatValue() const { return _floatValue; }
 
   private:
     ConstantData(TypePtr type, int value)
-        : Constant(ValueType::ConstantDataTy, type), _value(value) {}
+        : Constant(ValueType::ConstantDataTy, type), _intValue(value) {}
 
-    int _value;
+    ConstantData(TypePtr type, float value)
+        : Constant(ValueType::ConstantDataTy, type), _floatValue(value) {}
+
+    // Anonymous union.
+    union {
+        int _intValue;
+        float _floatValue;
+    };
 };

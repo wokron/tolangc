@@ -2,6 +2,7 @@
 #include "utils.h"
 #include "llvm/ir/LlvmContext.h"
 #include "llvm/ir/Type.h"
+#include "llvm/ir/value/Value.h"
 
 UnaryInstruction::UnaryInstruction(ValueType valueType, TypePtr type,
                                    ValuePtr operand)
@@ -28,9 +29,11 @@ BinaryInstruction::BinaryInstruction(ValueType valueType, TypePtr type,
 
 BinaryOperatorPtr BinaryOperator::New(BinaryOpType opType, ValuePtr lhs,
                                       ValuePtr rhs) {
-    TOLANG_DIE_IF_NOT(lhs->GetType()->IsIntegerTy() &&
-                          rhs->GetType()->IsIntegerTy(),
-                      "BinaryOperator operands must be of integer type");
+    TOLANG_DIE_IF_NOT(lhs->GetType()->IsArithmeticTy() &&
+                          rhs->GetType()->IsArithmeticTy(),
+                      "BinaryOperator operands must be of arithmetic type");
+    TOLANG_DIE_IF_NOT(lhs->GetType() == rhs->GetType(),
+                      "BinaryOperator operands must have the same type");
     auto type = lhs->GetType();
 
     return lhs->Context()->SaveValue(
@@ -39,10 +42,10 @@ BinaryOperatorPtr BinaryOperator::New(BinaryOpType opType, ValuePtr lhs,
 
 CompareInstructionPtr CompareInstruction::New(CompareOpType opType,
                                               ValuePtr lhs, ValuePtr rhs) {
-    TOLANG_DIE_IF_NOT(lhs->GetType()->IsIntegerTy() &&
-                          rhs->GetType()->IsIntegerTy(),
-                      "CompareInstruction operands must be of integer type");
-    auto type = lhs->Context()->GetInt32Ty();
+    TOLANG_DIE_IF_NOT(lhs->GetType()->IsArithmeticTy() &&
+                          rhs->GetType()->IsArithmeticTy(),
+                      "CompareInstruction operands must be of arithmetic type");
+    auto type = lhs->Context()->GetInt1Ty();
     return lhs->Context()->SaveValue(
         new CompareInstruction(type, lhs, rhs, opType));
 }

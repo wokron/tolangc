@@ -1,6 +1,6 @@
 #pragma once
 
-#include "llvm/ir/value/User.h"
+#include "llvm/ir/value/Value.h"
 
 // In LLVM, Constant actually inherits from User, but in our simple
 // case, it is totally ok to make it a value with no operands.
