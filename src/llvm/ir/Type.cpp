@@ -8,6 +8,7 @@
 
 TypePtr Type::GetVoidTy(LlvmContextPtr context) { return context->GetVoidTy(); }
 
+
 TypePtr Type::GetLabelTy(LlvmContextPtr context) {
     return context->GetLabelTy();
 }
@@ -36,9 +37,11 @@ FunctionTypePtr FunctionType::Get(TypePtr returnType,
     return returnType->Context()->GetFunctionType(returnType, paramTypes);
 }
 
+
 FunctionTypePtr FunctionType::Get(TypePtr returnType) {
     return returnType->Context()->GetFunctionType(returnType);
 }
+
 
 bool FunctionType::Equals(TypePtr returnType,
                           const std::vector<TypePtr> &paramTypes) const {
@@ -56,17 +59,22 @@ bool FunctionType::Equals(TypePtr returnType,
     return true;
 }
 
+
 bool FunctionType::Equals(TypePtr returnType) const {
     return _returnType == returnType && _paramTypes.empty();
 }
 
+
 FunctionType::FunctionType(TypePtr returnType,
                            const std::vector<TypePtr> &paramTypes)
     : Type(returnType->Context(), FunctionTyID), _returnType(returnType),
-      _paramTypes(paramTypes) {}
+      _paramTypes(paramTypes) {
+}
+
 
 FunctionType::FunctionType(TypePtr returnType)
-    : Type(returnType->Context(), FunctionTyID), _returnType(returnType) {}
+    : Type(returnType->Context(), FunctionTyID), _returnType(returnType) {
+}
 
 #pragma endregion
 
@@ -76,7 +84,9 @@ PointerTypePtr PointerType::Get(TypePtr elementType) {
     return elementType->Context()->GetPointerType(elementType);
 }
 
+
 PointerType::PointerType(TypePtr elementType)
-    : Type(elementType->Context(), PointerTyID), _elementType(elementType) {}
+    : Type(elementType->Context(), PointerTyID), _elementType(elementType) {
+}
 
 #pragma endregion

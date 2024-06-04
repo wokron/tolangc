@@ -7,8 +7,9 @@
 class AsmWriter;
 using AsmWriterPtr = std::shared_ptr<AsmWriter>;
 
+
 class AsmWriter {
-  public:
+public:
     static AsmWriterPtr New(std::ostream &out);
 
     const AsmWriter &Push(char ch) const;
@@ -28,8 +29,10 @@ class AsmWriter {
     const AsmWriter &CommentBegin() const;
     const AsmWriter &CommentEnd() const;
 
-  private:
-    AsmWriter(std::ostream &out) : _out(out) {}
+private:
+    AsmWriter(std::ostream &out) : _out(out) {
+    }
+
 
     std::ostream &_out;
 };

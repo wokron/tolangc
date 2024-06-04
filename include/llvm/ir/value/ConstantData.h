@@ -4,13 +4,16 @@
 
 #include "llvm/ir/value/Constant.h"
 
+
 class ConstantData : public Constant {
-  public:
+public:
     ~ConstantData() override = default;
+
 
     static bool classof(const ValueType type) {
         return type == ValueType::ConstantDataTy;
     }
+
 
     void PrintAsm(AsmWriterPtr out) override;
     void PrintName(AsmWriterPtr out) override;
@@ -21,12 +24,16 @@ class ConstantData : public Constant {
     int GetIntValue() const { return _intValue; }
     float GetFloatValue() const { return _floatValue; }
 
-  private:
+private:
     ConstantData(TypePtr type, int value)
-        : Constant(ValueType::ConstantDataTy, type), _intValue(value) {}
+        : Constant(ValueType::ConstantDataTy, type), _intValue(value) {
+    }
+
 
     ConstantData(TypePtr type, float value)
-        : Constant(ValueType::ConstantDataTy, type), _floatValue(value) {}
+        : Constant(ValueType::ConstantDataTy, type), _floatValue(value) {
+    }
+
 
     // Anonymous union.
     union {

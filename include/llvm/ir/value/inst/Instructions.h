@@ -7,12 +7,14 @@
 
 // %1 = alloca i32
 class AllocaInst final : public Instruction {
-  public:
+public:
     ~AllocaInst() override = default;
+
 
     static bool classof(const ValueType type) {
         return type == ValueType::AllocaInstTy;
     }
+
 
     void PrintAsm(AsmWriterPtr out) override;
 
@@ -20,7 +22,7 @@ class AllocaInst final : public Instruction {
 
     TypePtr AllocatedType() const;
 
-  private:
+private:
     AllocaInst(TypePtr type);
 };
 
@@ -30,12 +32,14 @@ class AllocaInst final : public Instruction {
 
 // %4 = load i32, i32* %2, align 4
 class LoadInst final : public UnaryInstruction {
-  public:
+public:
     ~LoadInst() override = default;
+
 
     static bool classof(const ValueType type) {
         return type == ValueType::LoadInstTy;
     }
+
 
     void PrintAsm(AsmWriterPtr out) override;
 
@@ -43,9 +47,10 @@ class LoadInst final : public UnaryInstruction {
 
     ValuePtr Address() const;
 
-  private:
+private:
     LoadInst(TypePtr type, ValuePtr address)
-        : UnaryInstruction(ValueType::LoadInstTy, type, address) {}
+        : UnaryInstruction(ValueType::LoadInstTy, type, address) {
+    }
 };
 
 #pragma endregion
@@ -55,18 +60,20 @@ class LoadInst final : public UnaryInstruction {
 // store i32 0, i32* %1, align 4
 // store i32 %4, i32* %3, align 4
 class StoreInst final : public BinaryInstruction {
-  public:
+public:
     ~StoreInst() override = default;
+
 
     static bool classof(const ValueType type) {
         return type == ValueType::StoreInstTy;
     }
 
+
     void PrintAsm(AsmWriterPtr out) override;
 
     static StoreInstPtr New(ValuePtr value, ValuePtr address);
 
-  private:
+private:
     StoreInst(ValuePtr value, ValuePtr address);
 };
 
@@ -75,12 +82,14 @@ class StoreInst final : public BinaryInstruction {
 #pragma region BranchInst
 
 class BranchInst final : public Instruction {
-  public:
+public:
     ~BranchInst() override = default;
+
 
     static bool classof(const ValueType type) {
         return type == ValueType::BranchInstTy;
     }
+
 
     void PrintAsm(AsmWriterPtr out) override;
 
@@ -93,7 +102,7 @@ class BranchInst final : public Instruction {
     BasicBlockPtr FalseBlock() const { return _falseBlock; }
     BasicBlockPtr SetFalseBlock(BasicBlockPtr block);
 
-  private:
+private:
     BranchInst(ValuePtr condition, BasicBlockPtr trueBlock,
                BasicBlockPtr falseBlock);
 
@@ -107,12 +116,14 @@ class BranchInst final : public Instruction {
 #pragma region JumpInst
 
 class JumpInst final : public Instruction {
-  public:
+public:
     ~JumpInst() override = default;
+
 
     static bool classof(const ValueType type) {
         return type == ValueType::JumpInstTy;
     }
+
 
     void PrintAsm(AsmWriterPtr out) override;
 
@@ -121,7 +132,7 @@ class JumpInst final : public Instruction {
     BasicBlockPtr Target() const { return _target; }
     BasicBlockPtr SetTarget(BasicBlockPtr block);
 
-  private:
+private:
     JumpInst(BasicBlockPtr target);
 
     BasicBlockPtr _target;
@@ -134,12 +145,14 @@ class JumpInst final : public Instruction {
 // ret i32 0
 // ret
 class ReturnInst final : public Instruction {
-  public:
+public:
     ~ReturnInst() override = default;
+
 
     static bool classof(const ValueType type) {
         return type == ValueType::ReturnInstTy;
     }
+
 
     void PrintAsm(AsmWriterPtr out) override;
 
@@ -148,7 +161,7 @@ class ReturnInst final : public Instruction {
 
     ValuePtr ReturnValue() const;
 
-  private:
+private:
     ReturnInst(TypePtr type, ValuePtr value);
     ReturnInst(TypePtr type);
 };
@@ -160,10 +173,11 @@ class ReturnInst final : public Instruction {
 // %6 = call i32 @add(i32 %4, i32 %5)
 // The parameters are the operands of the call instruction.
 class CallInst final : public Instruction {
-  public:
+public:
     static bool classof(const ValueType type) {
         return type == ValueType::CallInstTy;
     }
+
 
     void PrintAsm(AsmWriterPtr out) override;
 
@@ -173,7 +187,7 @@ class CallInst final : public Instruction {
 
     FunctionPtr GetFunction() const { return _function; }
 
-  private:
+private:
     CallInst(FunctionPtr function, const std::vector<ValuePtr> &parameters);
     CallInst(FunctionPtr function);
 

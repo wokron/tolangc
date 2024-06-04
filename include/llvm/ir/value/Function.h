@@ -4,13 +4,16 @@
 #include "llvm/ir/value/GlobalValue.h"
 #include <list>
 
+
 class Function final : public GlobalValue {
-  public:
+public:
     ~Function() override = default;
+
 
     static bool classof(const ValueType type) {
         return type == ValueType::FunctionTy;
     }
+
 
     void PrintAsm(AsmWriterPtr out) override;
 
@@ -22,7 +25,7 @@ class Function final : public GlobalValue {
 
     TypePtr ReturnType() const;
 
-  public:
+public:
     using block_iterator = std::list<BasicBlockPtr>::iterator;
     using argument_iterator = std::vector<ArgumentPtr>::iterator;
 
@@ -32,9 +35,11 @@ class Function final : public GlobalValue {
     argument_iterator ArgBegin() { return _args.begin(); }
     argument_iterator ArgEnd() { return _args.end(); }
 
+
     int BasicBlockCount() const {
         return static_cast<int>(_basicBlocks.size());
     }
+
 
     // Insert a basic block at the end of the function.
     FunctionPtr InsertBasicBlock(BasicBlockPtr block);
@@ -48,12 +53,12 @@ class Function final : public GlobalValue {
 
     SlotTrackerPtr GetSlotTracker() { return &_slotTracker; }
 
-  private:
+private:
     Function(TypePtr type, const std::string &name);
     Function(TypePtr type, const std::string &name,
              std::vector<ArgumentPtr> args);
 
-  private:
+private:
     // We can generate arguments via its type.
     std::vector<ArgumentPtr> _args;
     std::list<BasicBlockPtr> _basicBlocks;

@@ -6,6 +6,7 @@
 
 #include "llvm/asm/AsmWriter.h"
 
+
 // All types used in LLVM for tolang.
 enum class ValueType {
     // Value
@@ -35,12 +36,13 @@ enum class ValueType {
     UnaryOperatorTy,
 };
 
+
 /// <summary>
 /// Base class for all values in LLVM.
 /// </summary>
 class Value {
     friend class User; // to access protected methods
-  public:
+public:
     virtual ~Value() = default;
 
     // This function is used for RTTI (RunTime Type Identification).
@@ -70,7 +72,7 @@ class Value {
      */
     virtual void PrintUse(AsmWriterPtr out);
 
-  public:
+public:
     using use_iterator = UseList::iterator;
 
     ValueType GetValueType() const { return _valueType; }
@@ -84,23 +86,26 @@ class Value {
     use_iterator UserEnd() { return _userList.end(); }
     UseListPtr GetUserList() { return &_userList; }
 
-  protected:
+protected:
     void AddUser(UserPtr user);
     UserPtr RemoveUser(UserPtr user);
 
-  protected:
+protected:
     Value(ValueType valueType, TypePtr type)
-        : _type(type), _valueType(valueType) {}
+        : _type(type), _valueType(valueType) {
+    }
+
 
     Value(ValueType ValueType, TypePtr type, const std::string &name)
-        : _type(type), _name(name), _valueType(ValueType) {}
+        : _type(type), _name(name), _valueType(ValueType) {
+    }
 
-  protected:
+protected:
     TypePtr _type;
     std::string _name;
 
     UseList _userList;
 
-  private:
+private:
     ValueType _valueType;
 };

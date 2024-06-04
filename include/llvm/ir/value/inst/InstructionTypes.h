@@ -6,17 +6,19 @@
 #pragma region UnaryInstruction
 
 class UnaryInstruction : public Instruction {
-  public:
+public:
     ~UnaryInstruction() override = default;
+
 
     static bool classof(const ValueType type) {
         return type == ValueType::LoadInstTy ||
                type == ValueType::UnaryOperatorTy;
     }
 
+
     ValuePtr Operand() { return OperandAt(0); }
 
-  protected:
+protected:
     UnaryInstruction(ValueType valueType, TypePtr type, ValuePtr operand);
 };
 
@@ -26,13 +28,16 @@ class UnaryInstruction : public Instruction {
 
 enum class UnaryOpType { Not, Neg, Pos };
 
+
 class UnaryOperator final : public UnaryInstruction {
-  public:
+public:
     ~UnaryOperator() override = default;
+
 
     static bool classof(const ValueType type) {
         return type == ValueType::UnaryOperatorTy;
     }
+
 
     void PrintAsm(AsmWriterPtr out) override;
 
@@ -40,7 +45,7 @@ class UnaryOperator final : public UnaryInstruction {
 
     UnaryOpType OpType() const { return _opType; }
 
-  private:
+private:
     UnaryOperator(TypePtr type, ValuePtr operand, UnaryOpType opType);
 
     UnaryOpType _opType;
@@ -51,18 +56,20 @@ class UnaryOperator final : public UnaryInstruction {
 #pragma region BinaryInstruction
 
 class BinaryInstruction : public Instruction {
-  public:
+public:
     ~BinaryInstruction() override = default;
+
 
     static bool classof(const ValueType type) {
         return type == ValueType::BinaryOperatorTy ||
                type == ValueType::StoreInstTy;
     }
 
+
     ValuePtr LeftOperand() { return OperandAt(0); }
     ValuePtr RightOperand() { return OperandAt(1); }
 
-  protected:
+protected:
     BinaryInstruction(ValueType valueType, TypePtr type, ValuePtr lhs,
                       ValuePtr rhs);
 };
@@ -73,13 +80,16 @@ class BinaryInstruction : public Instruction {
 
 enum class BinaryOpType { Add, Sub, Mul, Div, Mod };
 
+
 class BinaryOperator final : public BinaryInstruction {
-  public:
+public:
     ~BinaryOperator() override = default;
+
 
     static bool classof(const ValueType type) {
         return type == ValueType::BinaryOperatorTy;
     }
+
 
     void PrintAsm(AsmWriterPtr out) override;
 
@@ -88,11 +98,13 @@ class BinaryOperator final : public BinaryInstruction {
 
     BinaryOpType OpType() const { return _opType; }
 
-  private:
+private:
     BinaryOperator(TypePtr type, ValuePtr lhs, ValuePtr rhs,
                    BinaryOpType opType)
         : BinaryInstruction(ValueType::BinaryOperatorTy, type, lhs, rhs),
-          _opType(opType) {}
+          _opType(opType) {
+    }
+
 
     BinaryOpType _opType;
 };
@@ -110,13 +122,16 @@ enum class CompareOpType {
     LessThanOrEqual
 };
 
+
 class CompareInstruction final : public BinaryInstruction {
-  public:
+public:
     ~CompareInstruction() override = default;
+
 
     static bool classof(const ValueType type) {
         return type == ValueType::CompareInstTy;
     }
+
 
     void PrintAsm(AsmWriterPtr out) override;
 
@@ -125,13 +140,14 @@ class CompareInstruction final : public BinaryInstruction {
 
     CompareOpType OpType() const { return _opType; }
 
-  protected:
+protected:
     CompareInstruction(TypePtr type, ValuePtr lhs, ValuePtr rhs,
                        CompareOpType opType)
         : BinaryInstruction(ValueType::CompareInstTy, type, lhs, rhs),
-          _opType(opType) {}
+          _opType(opType) {
+    }
 
-  private:
+private:
     CompareOpType _opType;
 };
 

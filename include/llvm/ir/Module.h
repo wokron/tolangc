@@ -4,14 +4,15 @@
 #include "llvm/ir/LlvmContext.h"
 #include <string>
 
+
 class Module final {
-  public:
+public:
     static ModulePtr New(const std::string &name);
 
     const std::string Name() const { return _name; }
     LlvmContextPtr Context() { return &_context; }
 
-  public:
+public:
     using function_iterator = std::vector<FunctionPtr>::iterator;
 
     function_iterator FunctionBegin() { return _functions.begin(); }
@@ -20,11 +21,11 @@ class Module final {
 
     FunctionPtr MainFunction() const { return _mainFunction; }
 
-  public:
+public:
     void AddFunction(FunctionPtr function);
     void AddMainFunction(FunctionPtr function);
 
-  private:
+private:
     Module(const std::string &name);
 
     std::string _name;

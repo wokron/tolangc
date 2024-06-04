@@ -9,7 +9,7 @@
 class Type {
     friend class LlvmContext;
 
-  public:
+public:
     enum TypeID {
         // Primitive types
         VoidTyID,
@@ -21,6 +21,7 @@ class Type {
         FunctionTyID,
         PointerTyID
     };
+
 
     // Always use virtual destructor for base class.
     virtual ~Type() = default;
@@ -43,15 +44,17 @@ class Type {
 
     virtual void PrintAsm(AsmWriterPtr out);
 
-  protected:
+protected:
     // Prohibit direct instantiation.
     Type(LlvmContextPtr context, TypeID typeId)
-        : _typeId(typeId), _context(context) {}
+        : _typeId(typeId), _context(context) {
+    }
 
-  private:
+private:
     TypeID _typeId;
     LlvmContextPtr _context;
 };
+
 
 /*
  * Represent an integer. In tolang, it is the only type used
@@ -60,7 +63,7 @@ class Type {
 class IntegerType : public Type {
     friend class LlvmContext;
 
-  public:
+public:
     ~IntegerType() override = default;
 
     void PrintAsm(AsmWriterPtr out) override;
@@ -69,18 +72,20 @@ class IntegerType : public Type {
 
     unsigned BitWidth() const { return _bitWidth; }
 
-  protected:
+protected:
     IntegerType(LlvmContextPtr context, unsigned bitWidth)
-        : Type(context, IntegerTyID), _bitWidth(bitWidth) {}
+        : Type(context, IntegerTyID), _bitWidth(bitWidth) {
+    }
 
-  private:
+private:
     unsigned _bitWidth;
 };
+
 
 class FloatType : public Type {
     friend class LlvmContext;
 
-  public:
+public:
     ~FloatType() override = default;
 
     void PrintAsm(AsmWriterPtr out) override;
@@ -89,12 +94,15 @@ class FloatType : public Type {
 
     unsigned BitWidth() const { return _bitWidth; }
 
-  private:
+private:
     FloatType(LlvmContextPtr context, unsigned bitWidth)
-        : Type(context, FloatTyID), _bitWidth(bitWidth) {}
+        : Type(context, FloatTyID), _bitWidth(bitWidth) {
+    }
+
 
     unsigned _bitWidth;
 };
+
 
 /*
  * A function's type consists of a return type and a list of parameter
@@ -103,7 +111,7 @@ class FloatType : public Type {
 class FunctionType : public Type {
     friend class LlvmContext;
 
-  public:
+public:
     ~FunctionType() override = default;
 
     void PrintAsm(AsmWriterPtr out) override;
@@ -119,13 +127,14 @@ class FunctionType : public Type {
                 const std::vector<TypePtr> &paramTypes) const;
     bool Equals(TypePtr returnType) const;
 
-  private:
+private:
     FunctionType(TypePtr returnType, const std::vector<TypePtr> &paramTypes);
     FunctionType(TypePtr returnType);
 
     TypePtr _returnType;
     std::vector<TypePtr> _paramTypes;
 };
+
 
 /*
  * A pointer type represents a pointer to another type.
@@ -134,7 +143,7 @@ class FunctionType : public Type {
 class PointerType : public Type {
     friend class LlvmContext;
 
-  public:
+public:
     ~PointerType() override = default;
 
     void PrintAsm(AsmWriterPtr out) override;
@@ -142,7 +151,7 @@ class PointerType : public Type {
 
     TypePtr ElementType() const { return _elementType; }
 
-  private:
+private:
     PointerType(TypePtr elementType);
 
     TypePtr _elementType;

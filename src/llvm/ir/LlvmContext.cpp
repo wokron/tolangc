@@ -4,6 +4,7 @@
 #include "llvm/ir/value/Use.h"
 #include "llvm/ir/value/Value.h"
 
+
 LlvmContext::~LlvmContext() {
     for (auto type : _functionTypes) {
         delete type;
@@ -22,6 +23,7 @@ LlvmContext::~LlvmContext() {
     }
 }
 
+
 FunctionTypePtr
 LlvmContext::GetFunctionType(TypePtr returnType,
                              const std::vector<TypePtr> &paramTypes) {
@@ -35,6 +37,7 @@ LlvmContext::GetFunctionType(TypePtr returnType,
     return functionType;
 }
 
+
 FunctionTypePtr LlvmContext::GetFunctionType(TypePtr returnType) {
     for (auto type : _functionTypes) {
         if (type->Equals(returnType)) {
@@ -46,6 +49,7 @@ FunctionTypePtr LlvmContext::GetFunctionType(TypePtr returnType) {
     return functionType;
 }
 
+
 PointerTypePtr LlvmContext::GetPointerType(TypePtr elementType) {
     for (auto type : _pointerTypes) {
         if (type->ElementType() == elementType) {
@@ -56,6 +60,7 @@ PointerTypePtr LlvmContext::GetPointerType(TypePtr elementType) {
     _pointerTypes.push_back(pointerType);
     return pointerType;
 }
+
 
 // ValuePtr LlvmContext::Save(ValuePtr value)
 //{

@@ -4,6 +4,7 @@
 #include "llvm/ir/Type.h"
 #include <vector>
 
+
 /// <summary>
 /// One LLVM context per module, which holds all the types and values.
 /// </summary>
@@ -11,7 +12,7 @@ class LlvmContext {
     // Only Module can create a context.
     friend class Module;
 
-  public:
+public:
     ~LlvmContext();
 
     LlvmContext(const LlvmContext &) = delete;
@@ -35,15 +36,18 @@ class LlvmContext {
         return value->template As<_Ty>();
     }
 
+
     UsePtr SaveUse(UsePtr use) {
         _uses.push_back(use);
         return use;
     }
 
-  private:
+private:
     LlvmContext()
         : _voidTy(this, Type::VoidTyID), _labelTy(this, Type::LabelTyID),
-          _int1Ty(this, 1), _int32Ty(this, 32), _floatTy(this, 32) {}
+          _int1Ty(this, 1), _int32Ty(this, 32), _floatTy(this, 32) {
+    }
+
 
     Type _voidTy;
     Type _labelTy;

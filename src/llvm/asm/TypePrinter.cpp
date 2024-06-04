@@ -2,6 +2,7 @@
 #include "llvm/ir/Type.h"
 #include <string>
 
+
 void Type::PrintAsm(AsmWriterPtr out) {
     switch (_typeId) {
     case VoidTyID:
@@ -15,10 +16,12 @@ void Type::PrintAsm(AsmWriterPtr out) {
     }
 }
 
+
 // i32
 void IntegerType::PrintAsm(AsmWriterPtr out) {
     out->Push('i').Push(std::to_string(_bitWidth));
 }
+
 
 // float
 void FloatType::PrintAsm(AsmWriterPtr out) {
@@ -30,6 +33,7 @@ void FloatType::PrintAsm(AsmWriterPtr out) {
         TOLANG_DIE("Unsupport float bit width: %u", _bitWidth);
     }
 }
+
 
 // return type ( arg1, arg2, ... )
 void FunctionType::PrintAsm(AsmWriterPtr out) {
@@ -46,6 +50,7 @@ void FunctionType::PrintAsm(AsmWriterPtr out) {
     }
     out->Push(')');
 }
+
 
 // type*
 void PointerType::PrintAsm(AsmWriterPtr out) {

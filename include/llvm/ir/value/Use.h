@@ -2,8 +2,9 @@
 
 #include "llvm/ir/IrForward.h"
 
+
 class Use {
-  public:
+public:
     // Prevent copying.
     Use(const Use &) = delete;
     Use &operator=(const Use &) = delete;
@@ -13,8 +14,10 @@ class Use {
     ValuePtr GetValue() const { return _value; }
     UserPtr GetUser() const { return _user; }
 
-  private:
-    Use(UserPtr user, ValuePtr value) : _user(user), _value(value) {}
+private:
+    Use(UserPtr user, ValuePtr value) : _user(user), _value(value) {
+    }
+
 
     UserPtr _user;
     ValuePtr _value;

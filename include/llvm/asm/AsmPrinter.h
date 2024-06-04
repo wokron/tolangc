@@ -4,11 +4,12 @@
 #include "llvm/ir/IrForward.h"
 #include <iostream>
 
+
 class AsmPrinter {
-  public:
+public:
     void Print(ModulePtr module, std::ostream &out);
 
-  private:
+private:
     void _PrintHeader(AsmWriterPtr out);
     void _PrintFooter(AsmWriterPtr out);
 

@@ -7,18 +7,20 @@
 #pragma region InputInstruction
 
 class InputInst final : public Instruction {
-  public:
+public:
     ~InputInst() override = default;
+
 
     static bool classof(const ValueType type) {
         return type == ValueType::InputInstTy;
     }
 
+
     void PrintAsm(AsmWriterPtr out) override;
 
     static InputInstPtr New(LlvmContextPtr context);
 
-  private:
+private:
     InputInst(TypePtr type);
 };
 
@@ -27,18 +29,19 @@ class InputInst final : public Instruction {
 #pragma region OutputInstruction
 
 class OutputInst final : public UnaryInstruction {
-  public:
+public:
     ~OutputInst() override = default;
 
     static OutputInstPtr New(ValuePtr value);
 
     void PrintAsm(AsmWriterPtr out) override;
 
+
     static bool classof(const ValueType type) {
         return type == ValueType::OutputInstTy;
     }
 
-  private:
+private:
     OutputInst(ValuePtr value);
 };
 
