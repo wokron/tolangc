@@ -1,7 +1,6 @@
 ﻿#include "llvm/asm/AsmPrinter.h"
 #include "llvm/ir/Module.h"
 #include "llvm/ir/value/Function.h"
-#include "llvm/ir/value/GlobalVariable.h"
 
 void AsmPrinter::Print(ModulePtr module, std::ostream &out) {
     AsmWriterPtr writer = AsmWriter::New(out);
@@ -43,11 +42,6 @@ void AsmPrinter::_PrintModule(AsmWriterPtr out, ModulePtr module) {
 
     // Library function declaration.
     _PrintDeclaration(out);
-
-    // Global variables.
-    for (auto it = module->GlobalBegin(); it != module->GlobalEnd(); ++it) {
-        (*it)->PrintAsm(out);
-    }
 
     // Functions.
     for (auto it = module->FunctionBegin(); it != module->FunctionEnd(); ++it) {

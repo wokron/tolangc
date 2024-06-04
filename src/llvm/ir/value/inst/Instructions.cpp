@@ -2,6 +2,7 @@
 #include "utils.h"
 #include "llvm/ir/LlvmContext.h"
 #include "llvm/ir/Type.h"
+#include "llvm/ir/value/BasicBlock.h"
 #include "llvm/ir/value/Function.h"
 
 #pragma region AllocaInst
@@ -47,6 +48,78 @@ StoreInstPtr StoreInst::New(ValuePtr value, ValuePtr address) {
 StoreInst::StoreInst(ValuePtr value, ValuePtr address)
     : BinaryInstruction(ValueType::StoreInstTy, value->Context()->GetVoidTy(),
                         value, address) {}
+
+#pragma endregion
+
+#pragma region BranchInst
+
+BranchInst::BranchInst(ValuePtr condition, BasicBlockPtr trueBlock,
+                       BasicBlockPtr falseBlock)
+    : Instruction(ValueType::BranchInstTy, condition->Context()->GetVoidTy()),
+      _condition(condition), _trueBlock(trueBlock), _falseBlock(falseBlock) {
+    AddOperand(condition);
+    if (trueBlock) {
+        AddOperand(trueBlock);
+    }
+    if (falseBlock) {
+        AddOperand(falseBlock);
+    }
+}
+
+BranchInstPtr BranchInst::New(ValuePtr condition, BasicBlockPtr trueBlock,
+                              BasicBlockPtr falseBlock) {
+    return condition->Context()->SaveValue(
+        new BranchInst(condition, trueBlock, falseBlock));
+}
+
+BasicBlockPtr BranchInst::SetTrueBlock(BasicBlockPtr block) {
+    if (_trueBlock) {
+        ReplaceOperand(_trueBlock, block);
+        return _trueBlock;
+    }
+
+    _trueBlock = block;
+    AddOperand(_trueBlock);
+
+    return nullptr;
+}
+
+BasicBlockPtr BranchInst::SetFalseBlock(BasicBlockPtr block) {
+    if (_falseBlock) {
+        ReplaceOperand(_falseBlock, block);
+        return _falseBlock;
+    }
+
+    _falseBlock = block;
+    AddOperand(_falseBlock);
+
+    return nullptr;
+}
+
+#pragma endregion
+
+#pragma region JumpInst
+
+JumpInst::JumpInst(BasicBlockPtr target)
+    : Instruction(ValueType::JumpInstTy, target->Context()->GetVoidTy()),
+      _target(target) {
+    AddOperand(target);
+}
+
+JumpInstPtr JumpInst::New(BasicBlockPtr target) {
+    return target->Context()->SaveValue(new JumpInst(target));
+}
+
+BasicBlockPtr JumpInst::SetTarget(BasicBlockPtr block) {
+    if (_target) {
+        ReplaceOperand(_target, block);
+        return _target;
+    }
+
+    _target = block;
+    AddOperand(_target);
+    return nullptr;
+}
 
 #pragma endregion
 

@@ -7,7 +7,6 @@
 #include "llvm/ir/value/BasicBlock.h"
 #include "llvm/ir/value/ConstantData.h"
 #include "llvm/ir/value/Function.h"
-#include "llvm/ir/value/GlobalVariable.h"
 #include "llvm/ir/value/inst/ExtendedInstructions.h"
 #include "llvm/ir/value/inst/Instruction.h"
 #include "llvm/ir/value/inst/InstructionTypes.h"

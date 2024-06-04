@@ -6,13 +6,14 @@
 #include "llvm/ir/value/ConstantData.h"
 #include "llvm/ir/value/Function.h"
 #include "llvm/ir/value/GlobalValue.h"
-#include "llvm/ir/value/GlobalVariable.h"
 #include "llvm/ir/value/Use.h"
 #include "llvm/ir/value/Value.h"
 #include "llvm/ir/value/inst/ExtendedInstructions.h"
 #include "llvm/ir/value/inst/Instruction.h"
 #include "llvm/ir/value/inst/InstructionTypes.h"
 #include "llvm/ir/value/inst/Instructions.h"
+
+#include <algorithm>
 
 void Value::PrintAsm(AsmWriterPtr out) {
     TOLANG_DIE("Operation not supported.");
@@ -46,24 +47,6 @@ void ConstantData::PrintName(AsmWriterPtr out) {
 
 void GlobalValue::PrintName(AsmWriterPtr out) {
     out->Push('@').Push(GetName());
-}
-
-void GlobalVariable::PrintAsm(AsmWriterPtr out) {
-    // Name
-    PrintName(out);
-
-    out->PushNext('=');
-
-    // Attribute
-    out->PushNext("dso_local").PushNext("global").PushSpace();
-
-    if (_initializer) {
-        _initializer->PrintAsm(out);
-    } else {
-        out->Push("zeroinitializer");
-    }
-
-    out->PushNewLine();
 }
 
 void Function::PrintAsm(AsmWriterPtr out) {
@@ -118,6 +101,32 @@ void Argument::PrintAsm(AsmWriterPtr out) {
 void Argument::PrintUse(AsmWriterPtr out) { PrintAsm(out); }
 
 void BasicBlock::PrintAsm(AsmWriterPtr out) {
+    // We don't print the first basic block.
+    if (this != *Parent()->BasicBlockBegin()) {
+        auto tracker = Parent()->GetSlotTracker();
+        std::string slot(std::to_string(tracker->Slot(this)));
+        out->Push(slot).Push(':');
+        if (!this->GetUserList()->empty()) {
+            int padding = 50 - static_cast<int>(slot.length()) - 1;
+            out->PushSpaces(padding).Push("; preds = ");
+            std::vector<int> preds;
+            for (auto it = this->UserBegin(); it != UserEnd(); ++it) {
+                // The user MUST be a BranchInst or JumpInst.
+                auto user =
+                    dynamic_cast<HasParent<BasicBlock> *>((*it)->GetUser());
+                TOLANG_ASSERT(user);
+                preds.push_back(tracker->Slot(user->Parent()));
+            }
+            std::sort(preds.begin(), preds.end(), std::less<int>());
+            for (auto it = preds.begin(); it != preds.end(); ++it) {
+                out->Push(std::to_string(*it));
+                if (it + 1 != preds.end()) {
+                    out->Push(", ");
+                }
+            }
+        }
+        out->PushNewLine();
+    }
     for (auto it = InstructionBegin(); it != InstructionEnd(); ++it) {
         out->PushSpaces(4);
         (*it)->PrintAsm(out);
@@ -178,6 +187,23 @@ void LoadInst::PrintAsm(AsmWriterPtr out) {
     out->PushNewLine();
 }
 
+void BranchInst::PrintAsm(AsmWriterPtr out) {
+    out->Push("br").PushSpace();
+
+    Condition()->PrintUse(out);
+    out->Push(", ");
+    TrueBlock()->PrintUse(out);
+    out->Push(", ");
+    FalseBlock()->PrintUse(out);
+    out->PushNewLine();
+}
+
+void JumpInst::PrintAsm(AsmWriterPtr out) {
+    out->Push("br").PushSpace();
+    Target()->PrintUse(out);
+    out->PushNewLine();
+}
+
 void ReturnInst::PrintAsm(AsmWriterPtr out) {
     out->Push("ret");
     ValuePtr ret = OperandAt(0);
@@ -233,13 +259,14 @@ void UnaryOperator::PrintAsm(AsmWriterPtr out) {
     }
 
     const char *op;
+    bool isFloat = GetType()->IsFloatTy();
 
     switch (OpType()) {
     case UnaryOpType::Pos:
-        op = "add nsw";
+        op = isFloat ? "fadd" : "add nsw";
         break;
     case UnaryOpType::Neg:
-        op = "sub nsw";
+        op = isFloat ? "fsub" : "sub nsw";
         break;
     default:
         TOLANG_DIE("Shouldn't reach here.");
@@ -249,8 +276,7 @@ void UnaryOperator::PrintAsm(AsmWriterPtr out) {
     out->PushNext("=").PushNext(op).PushSpace();
 
     GetType()->PrintAsm(out);
-    out->PushNext('0').Push(", ");
-    out->PushSpace();
+    out->PushNext(isFloat ? "0.0" : "0").Push(',').PushSpace();
     Operand()->PrintName(out);
 
     out->PushNewLine();
@@ -280,8 +306,7 @@ void BinaryOperator::PrintAsm(AsmWriterPtr out) {
         op = isFloat ? "fdiv" : "sdiv";
         break;
     case BinaryOpType::Mod:
-        TOLANG_ASSERT(!isFloat,
-                      "Mod operation is not supported for float type.");
+        TOLANG_ASSERT(!isFloat);
         op = "srem";
         break;
     }
@@ -301,32 +326,41 @@ void BinaryOperator::PrintAsm(AsmWriterPtr out) {
 
 void CompareInstruction::PrintAsm(AsmWriterPtr out) {
     const char *op;
+    bool isFloat = LeftOperand()->GetType()->IsFloatTy();
 
     switch (OpType()) {
     case CompareOpType::Equal:
-        op = "eq";
+        op = isFloat ? "oeq" : "eq";
         break;
     case CompareOpType::NotEqual:
-        op = "ne";
+        op = isFloat ? "one" : "ne";
         break;
     case CompareOpType::GreaterThan:
-        op = "sgt";
+        op = isFloat ? "ogt" : "sgt";
         break;
     case CompareOpType::GreaterThanOrEqual:
-        op = "sge";
+        op = isFloat ? "oge" : "sge";
         break;
     case CompareOpType::LessThan:
-        op = "slt";
+        op = isFloat ? "olt" : "slt";
         break;
     case CompareOpType::LessThanOrEqual:
-        op = "sle";
+        op = isFloat ? "ole" : "sle";
         break;
     }
 
     PrintName(out);
-    out->PushNext("=").PushNext("icmp").PushNext(op).PushSpace();
+    out->PushNext("=");
+    if (isFloat) {
+        out->PushNext("fcmp");
+    } else {
+        out->PushNext("icmp");
+    }
+    out->PushNext(op).PushSpace();
     LeftOperand()->GetType()->PrintAsm(out);
-    out->Push(", ");
+    out->PushSpace();
+    LeftOperand()->PrintName(out);
+    out->Push(',').PushSpace();
     RightOperand()->PrintName(out);
     out->PushNewLine();
 }

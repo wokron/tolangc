@@ -24,6 +24,7 @@ enum class ValueType {
     BinaryOperatorTy,
     CompareInstTy,
     BranchInstTy,
+    JumpInstTy,
     ReturnInstTy,
     StoreInstTy,
     CallInstTy,
@@ -38,6 +39,7 @@ enum class ValueType {
 /// Base class for all values in LLVM.
 /// </summary>
 class Value {
+    friend class User; // to access protected methods
   public:
     virtual ~Value() = default;
 
@@ -78,16 +80,13 @@ class Value {
     const std::string &GetName() const { return _name; }
     void SetName(const std::string &name) { _name = name; }
 
-    void AddUser(UsePtr user) { _userList.push_back(user); }
-    void AddUse(UsePtr use) { _useList.push_back(use); }
-
-    UseListPtr GetUserList() { return &_userList; }
-    UseListPtr GetUseList() { return &_useList; }
-
     use_iterator UserBegin() { return _userList.begin(); }
     use_iterator UserEnd() { return _userList.end(); }
-    use_iterator UseBegin() { return _useList.begin(); }
-    use_iterator UseEnd() { return _useList.end(); }
+    UseListPtr GetUserList() { return &_userList; }
+
+  protected:
+    void AddUser(UserPtr user);
+    UserPtr RemoveUser(UserPtr user);
 
   protected:
     Value(ValueType valueType, TypePtr type)
@@ -100,7 +99,6 @@ class Value {
     TypePtr _type;
     std::string _name;
 
-    UseList _useList;
     UseList _userList;
 
   private:

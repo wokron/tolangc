@@ -72,6 +72,63 @@ class StoreInst final : public BinaryInstruction {
 
 #pragma endregion
 
+#pragma region BranchInst
+
+class BranchInst final : public Instruction {
+  public:
+    ~BranchInst() override = default;
+
+    static bool classof(const ValueType type) {
+        return type == ValueType::BranchInstTy;
+    }
+
+    void PrintAsm(AsmWriterPtr out) override;
+
+    static BranchInstPtr New(ValuePtr condition, BasicBlockPtr trueBlock,
+                             BasicBlockPtr falseBlock);
+
+    ValuePtr Condition() const { return _condition; }
+    BasicBlockPtr TrueBlock() const { return _trueBlock; }
+    BasicBlockPtr SetTrueBlock(BasicBlockPtr block);
+    BasicBlockPtr FalseBlock() const { return _falseBlock; }
+    BasicBlockPtr SetFalseBlock(BasicBlockPtr block);
+
+  private:
+    BranchInst(ValuePtr condition, BasicBlockPtr trueBlock,
+               BasicBlockPtr falseBlock);
+
+    ValuePtr _condition;
+    BasicBlockPtr _trueBlock;
+    BasicBlockPtr _falseBlock;
+};
+
+#pragma endregion
+
+#pragma region JumpInst
+
+class JumpInst final : public Instruction {
+  public:
+    ~JumpInst() override = default;
+
+    static bool classof(const ValueType type) {
+        return type == ValueType::JumpInstTy;
+    }
+
+    void PrintAsm(AsmWriterPtr out) override;
+
+    static JumpInstPtr New(BasicBlockPtr target);
+
+    BasicBlockPtr Target() const { return _target; }
+    BasicBlockPtr SetTarget(BasicBlockPtr block);
+
+  private:
+    JumpInst(BasicBlockPtr target);
+
+    BasicBlockPtr _target;
+};
+
+#pragma endregion
+
 #pragma region ReturnInst
 
 // ret i32 0

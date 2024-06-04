@@ -12,15 +12,7 @@ class Module final {
     LlvmContextPtr Context() { return &_context; }
 
   public:
-    using global_iterator = std::vector<GlobalVariablePtr>::iterator;
     using function_iterator = std::vector<FunctionPtr>::iterator;
-
-    global_iterator GlobalBegin() { return _globalVariables.begin(); }
-    global_iterator GlobalEnd() { return _globalVariables.end(); }
-
-    int GlobalCount() const {
-        return static_cast<int>(_globalVariables.size());
-    }
 
     function_iterator FunctionBegin() { return _functions.begin(); }
     function_iterator FunctionEnd() { return _functions.end(); }
@@ -29,7 +21,6 @@ class Module final {
     FunctionPtr MainFunction() const { return _mainFunction; }
 
   public:
-    void AddGlobalVariable(GlobalVariablePtr globalVariable);
     void AddFunction(FunctionPtr function);
     void AddMainFunction(FunctionPtr function);
 
@@ -40,7 +31,6 @@ class Module final {
     LlvmContext _context;
 
     // These will be managed by LlvmContext. So we don't need to delete them.
-    std::vector<GlobalVariablePtr> _globalVariables;
     std::vector<FunctionPtr> _functions;
     FunctionPtr _mainFunction;
 };

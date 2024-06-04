@@ -55,9 +55,6 @@ using ConstantDataPtr = ConstantData *;
 class GlobalValue;
 using GlobalValuePtr = GlobalValue *;
 
-class GlobalVariable;
-using GlobalVariablePtr = GlobalVariable *;
-
 class Function;
 using FunctionPtr = Function *;
 
@@ -89,6 +86,12 @@ using StoreInstPtr = StoreInst *;
 
 class CallInst;
 using CallInstPtr = CallInst *;
+
+class BranchInst;
+using BranchInstPtr = BranchInst *;
+
+class JumpInst;
+using JumpInstPtr = JumpInst *;
 
 class ReturnInst;
 using ReturnInstPtr = ReturnInst *;
