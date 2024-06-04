@@ -129,7 +129,7 @@ void BasicBlock::PrintAsm(AsmWriterPtr out) {
             }
             std::sort(preds.begin(), preds.end(), std::less<int>());
             for (auto it = preds.begin(); it != preds.end(); ++it) {
-                out->Push(std::to_string(*it));
+                out->Push('%').Push(std::to_string(*it));
                 if (it + 1 != preds.end()) {
                     out->Push(", ");
                 }
