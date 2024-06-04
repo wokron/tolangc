@@ -63,7 +63,7 @@ define dso_local i32 @main() {
     %3 = call float @get()
     store float %3, float* %2
     br label %4
-4:                                                ; preds = 0, 10
+4:                                                ; preds = %0, %10
     %5 = load float, float* %1
     %6 = load float, float* %2
     %7 = call float @calc(float %5, float %6)
@@ -71,11 +71,11 @@ define dso_local i32 @main() {
     %8 = load float, float* %1
     %9 = fcmp olt float %8, %6
     br i1 %9, label %10, label %11
-10:                                               ; preds = 4
+10:                                               ; preds = %4
     br label %4
-11:                                               ; preds = 4
+11:                                               ; preds = %4
     br label %12
-12:                                               ; preds = 11
+12:                                               ; preds = %11
     %13 = load float, float* %1
     call void @put(float %13)
     ret i32 0

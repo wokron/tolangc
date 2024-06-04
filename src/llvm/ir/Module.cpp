@@ -20,6 +20,6 @@ void Module::AddFunction(FunctionPtr function) {
 
 
 void Module::AddMainFunction(FunctionPtr function) {
-    TOLANG_DIE_IF_NOT(_mainFunction, "Main function already exists.");
+    TOLANG_DIE_IF_NOT(_mainFunction == nullptr, "Main function already exists.");
     _mainFunction = function;
 }
