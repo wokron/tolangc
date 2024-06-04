@@ -8,6 +8,7 @@
 /*
 Suppose we have such a source file.
 
+=========================================
 fn calc ( lhs, rhs ) => +lhs + rhs - lhs * rhs / lhs + 1.0;
 
 var i1;
@@ -21,6 +22,11 @@ i1 = calc(i1, i2);
 if i1 < i2 to do;
 
 put i1;
+=========================================
+
+ Input: 12345.6789
+Output: 12345.927734
+
  */
 
 constexpr char EXPECTED[] = R"(; tolang LLVM IR
