@@ -148,15 +148,33 @@ void Visitor::visitTagStmt(const TagStmt &node) {
 
         auto tag_symbol = std::dynamic_pointer_cast<TagSymbol>(symbol);
 
-        // TODO: IR: create new label
+        // create new label
+        auto jump = JumpInst::New(_ir_module->Context());
+        _cur_block->InsertInstruction(jump);
+        _cur_block = _cur_func->NewBasicBlock();
+        jump->SetTarget(_cur_block);
+        auto label = _cur_block;
+        tag_symbol->target = label;
 
-        // TODO: backpatching all jump inst before tag
+        // backpatching all jump inst before tag
+        for (auto &inst : tag_symbol->jump_insts) {
+            if (auto branch = dynamic_cast<BranchInst *>(inst)) {
+                branch->SetTrueBlock(label);
+            } else if (auto jump = dynamic_cast<JumpInst *>(inst)) {
+                jump->SetTarget(label);
+            }
+        }
 
     } else {
-        // TODO: IR: create new label
+        auto jump = JumpInst::New(_ir_module->Context());
+        _cur_block->InsertInstruction(jump);
+        _cur_block = _cur_func->NewBasicBlock();
+        jump->SetTarget(_cur_block);
+        auto label = _cur_block;
 
         auto symbol =
             std::make_shared<TagSymbol>(node.ident, nullptr, node.line);
+        symbol->target = label;
         _cur_scope->addSymbol(symbol);
     }
 }
@@ -192,17 +210,30 @@ void Visitor::visitIfStmt(const IfStmt &node) {
             return;
         }
 
-        // TODO: IR: jump inst
+        auto jump = BranchInst::New(val, nullptr, nullptr);
+        _cur_block->InsertInstruction(jump);
+        _cur_block = _cur_func->NewBasicBlock();
+        jump->SetFalseBlock(_cur_block);
 
-        // TODO: if the tag is not declared, add jump inst to symbol.
+        // if the tag is not declared, add jump inst to symbol.
         // otherwise set the target of jump to tag
+        auto tag_symbol = std::static_pointer_cast<TagSymbol>(symbol);
+        if (tag_symbol->target) {
+            jump->SetTrueBlock(tag_symbol->target);
+        } else {
+            tag_symbol->jump_insts.push_back(jump);
+        }
 
     } else {
-        // TODO: IR: jump inst
+        auto jump = BranchInst::New(val, nullptr, nullptr);
+        _cur_block->InsertInstruction(jump);
+        _cur_block = _cur_func->NewBasicBlock();
+        jump->SetFalseBlock(_cur_block);
 
-        // TODO: add jump inst to symbol
         auto symbol = std::make_shared<TagSymbol>(node.ident, nullptr, -1);
         _cur_scope->addSymbol(symbol);
+        // add jump inst to symbol
+        symbol->jump_insts.push_back(jump);
     }
 }
 
@@ -214,17 +245,28 @@ void Visitor::visitToStmt(const ToStmt &node) {
             return;
         }
 
-        // TODO: IR: jump inst
+        auto jump = JumpInst::New(_ir_module->Context());
+        _cur_block->InsertInstruction(jump);
+        _cur_block = _cur_func->NewBasicBlock();
 
-        // TODO: if the tag is not declared, add jump inst to symbol.
+        // if the tag is not declared, add jump inst to symbol.
         // otherwise set the target of jump to tag
-
+        auto tag_symbol = std::static_pointer_cast<TagSymbol>(symbol);
+        if (tag_symbol->target) {
+            jump->SetTarget(tag_symbol->target);
+        } else {
+            tag_symbol->jump_insts.push_back(jump);
+        }
     } else {
-        // TODO: IR: jump inst
+        auto jump = JumpInst::New(_ir_module->Context());
+        _cur_block->InsertInstruction(jump);
+        _cur_block = _cur_func->NewBasicBlock();
 
-        // TODO: add jump inst to symbol
         auto symbol = std::make_shared<TagSymbol>(node.ident, nullptr, -1);
         _cur_scope->addSymbol(symbol);
+
+        // add jump inst to symbol
+        symbol->jump_insts.push_back(jump);
     }
 }
 

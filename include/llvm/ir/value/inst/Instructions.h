@@ -128,12 +128,14 @@ public:
     void PrintAsm(AsmWriterPtr out) override;
 
     static JumpInstPtr New(BasicBlockPtr target);
+    static JumpInstPtr New(LlvmContextPtr context);
 
     BasicBlockPtr Target() const { return _target; }
     BasicBlockPtr SetTarget(BasicBlockPtr block);
 
 private:
     JumpInst(BasicBlockPtr target);
+    JumpInst(LlvmContextPtr context);
 
     BasicBlockPtr _target;
 };

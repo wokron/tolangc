@@ -1,10 +1,10 @@
 #pragma once
 
+#include "llvm/ir/Llvm.h"
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "llvm/ir/Llvm.h"
 
 enum SymbolType { Variable, Tag, Function };
 
@@ -30,6 +30,9 @@ struct VariableSymbol : public Symbol {
 };
 
 struct TagSymbol : public Symbol {
+    BasicBlockPtr target;
+    std::vector<InstructionPtr> jump_insts;
+
     TagSymbol(std::string name, ValuePtr value, int line_number)
         : Symbol(SymbolType::Tag, name, value, line_number) {}
 };
@@ -37,7 +40,8 @@ struct TagSymbol : public Symbol {
 struct FunctionSymbol : public Symbol {
     int params_count = 0;
 
-    FunctionSymbol(std::string name, ValuePtr value, int line_number, int params_count)
+    FunctionSymbol(std::string name, ValuePtr value, int line_number,
+                   int params_count)
         : Symbol(SymbolType::Function, name, value, line_number),
           params_count(params_count) {}
 };

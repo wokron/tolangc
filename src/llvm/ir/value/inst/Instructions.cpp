@@ -11,12 +11,9 @@ AllocaInstPtr AllocaInst::New(TypePtr type) {
     return type->Context()->SaveValue(new AllocaInst(type));
 }
 
-
 AllocaInst::AllocaInst(TypePtr type)
     : Instruction(ValueType::AllocaInstTy,
-                  type->Context()->GetPointerType(type)) {
-}
-
+                  type->Context()->GetPointerType(type)) {}
 
 TypePtr AllocaInst::AllocatedType() const {
     return GetType()->As<PointerType>()->ElementType();
@@ -34,7 +31,6 @@ LoadInstPtr LoadInst::New(ValuePtr address) {
     return address->Context()->SaveValue(new LoadInst(type, address));
 }
 
-
 ValuePtr LoadInst::Address() const { return OperandAt(0); }
 
 #pragma endregion
@@ -49,11 +45,9 @@ StoreInstPtr StoreInst::New(ValuePtr value, ValuePtr address) {
     return address->Context()->SaveValue(new StoreInst(value, address));
 }
 
-
 StoreInst::StoreInst(ValuePtr value, ValuePtr address)
     : BinaryInstruction(ValueType::StoreInstTy, value->Context()->GetVoidTy(),
-                        value, address) {
-}
+                        value, address) {}
 
 #pragma endregion
 
@@ -72,13 +66,11 @@ BranchInst::BranchInst(ValuePtr condition, BasicBlockPtr trueBlock,
     }
 }
 
-
 BranchInstPtr BranchInst::New(ValuePtr condition, BasicBlockPtr trueBlock,
                               BasicBlockPtr falseBlock) {
     return condition->Context()->SaveValue(
         new BranchInst(condition, trueBlock, falseBlock));
 }
-
 
 BasicBlockPtr BranchInst::SetTrueBlock(BasicBlockPtr block) {
     if (_trueBlock) {
@@ -91,7 +83,6 @@ BasicBlockPtr BranchInst::SetTrueBlock(BasicBlockPtr block) {
 
     return nullptr;
 }
-
 
 BasicBlockPtr BranchInst::SetFalseBlock(BasicBlockPtr block) {
     if (_falseBlock) {
@@ -115,11 +106,17 @@ JumpInst::JumpInst(BasicBlockPtr target)
     AddOperand(target);
 }
 
+JumpInst::JumpInst(LlvmContextPtr context)
+    : Instruction(ValueType::JumpInstTy, context->GetVoidTy()),
+      _target(nullptr) {}
 
 JumpInstPtr JumpInst::New(BasicBlockPtr target) {
     return target->Context()->SaveValue(new JumpInst(target));
 }
 
+JumpInstPtr JumpInst::New(LlvmContextPtr context) {
+    return context->SaveValue(new JumpInst(context));
+}
 
 BasicBlockPtr JumpInst::SetTarget(BasicBlockPtr block) {
     if (_target) {
@@ -144,11 +141,9 @@ ReturnInstPtr ReturnInst::New(ValuePtr value) {
         new ReturnInst(value->Context()->GetVoidTy(), value));
 }
 
-
 ReturnInstPtr ReturnInst::New(LlvmContextPtr context) {
     return context->SaveValue(new ReturnInst(context->GetVoidTy()));
 }
-
 
 ReturnInst::ReturnInst(TypePtr type, ValuePtr value)
     : Instruction(ValueType::ReturnInstTy, type) {
@@ -157,11 +152,8 @@ ReturnInst::ReturnInst(TypePtr type, ValuePtr value)
     }
 }
 
-
 ReturnInst::ReturnInst(TypePtr type)
-    : Instruction(ValueType::ReturnInstTy, type) {
-}
-
+    : Instruction(ValueType::ReturnInstTy, type) {}
 
 ValuePtr ReturnInst::ReturnValue() const {
     if (OperandCount() == 0) {
@@ -181,11 +173,9 @@ CallInstPtr CallInst::New(FunctionPtr function,
     return function->Context()->SaveValue(new CallInst(function, params));
 }
 
-
 CallInstPtr CallInst::New(FunctionPtr function) {
     return function->Context()->SaveValue(new CallInst(function));
 }
-
 
 CallInst::CallInst(FunctionPtr function,
                    const std::vector<ValuePtr> &parameters)
@@ -196,10 +186,8 @@ CallInst::CallInst(FunctionPtr function,
     }
 }
 
-
 CallInst::CallInst(FunctionPtr function)
     : Instruction(ValueType::CallInstTy, function->ReturnType()),
-      _function(function) {
-}
+      _function(function) {}
 
 #pragma endregion

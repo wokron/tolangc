@@ -102,7 +102,6 @@ TEST_CASE("LLVM IR Test") {
     auto ir = ss.str();
 
     CHECK_EQ(EXPECTED, ir);
-    std::cout << ir;
 }
 
 
