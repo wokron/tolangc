@@ -4,7 +4,6 @@
 #include "llvm/ir/LlvmContext.h"
 #include <string>
 
-
 class Module final {
 public:
     static ModulePtr New(const std::string &name);
@@ -33,5 +32,5 @@ private:
 
     // These will be managed by LlvmContext. So we don't need to delete them.
     std::vector<FunctionPtr> _functions;
-    FunctionPtr _mainFunction;
+    FunctionPtr _mainFunction = nullptr;
 };

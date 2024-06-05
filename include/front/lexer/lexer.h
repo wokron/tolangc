@@ -5,11 +5,11 @@
 #include <regex>
 
 class Lexer {
-  public:
+public:
     bool next(Token &);
     Lexer(std::istream &);
 
-  private:
+private:
     bool _in_annotation = false;
     int _line_number = 0;
     size_t _word_index = 0;

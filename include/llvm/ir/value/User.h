@@ -2,14 +2,12 @@
 
 #include "llvm/ir/value/Value.h"
 
-
 /// <summary>
 /// User represent a value that has operands.
 /// </summary>
 class User : public Value {
 public:
     ~User() override = default;
-
 
     static bool classof(ValueType type) {
         return type >= ValueType::BinaryOperatorTy;
@@ -33,9 +31,7 @@ protected:
     ValuePtr ReplaceUse(ValuePtr oldValue, ValuePtr newValue);
 
 protected:
-    User(ValueType valueType, TypePtr type) : Value(valueType, type) {
-    }
-
+    User(ValueType valueType, TypePtr type) : Value(valueType, type) {}
 
     UseList _useList;
 };

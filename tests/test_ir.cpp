@@ -102,9 +102,7 @@ TEST_CASE("LLVM IR Test") {
     auto ir = ss.str();
 
     CHECK_EQ(EXPECTED, ir);
-    std::cout << ir;
 }
-
 
 static FunctionPtr BuildCalc(ModulePtr module) {
     LlvmContextPtr context = module->Context();
@@ -151,16 +149,15 @@ static FunctionPtr BuildCalc(ModulePtr module) {
     auto t6 = BinaryOperator::New(BinaryOpType::Add, t5, one);
 
     block->InsertInstruction(t1)
-         ->InsertInstruction(t2)
-         ->InsertInstruction(t3)
-         ->InsertInstruction(t4)
-         ->InsertInstruction(t5)
-         ->InsertInstruction(t6);
+        ->InsertInstruction(t2)
+        ->InsertInstruction(t3)
+        ->InsertInstruction(t4)
+        ->InsertInstruction(t5)
+        ->InsertInstruction(t6);
     block->InsertInstruction(ReturnInst::New(t6));
 
     return calcFunc;
 }
-
 
 static FunctionPtr BuildMain(ModulePtr module, FunctionPtr calc) {
     LlvmContextPtr context = module->Context();
@@ -193,9 +190,9 @@ static FunctionPtr BuildMain(ModulePtr module, FunctionPtr calc) {
     auto call = CallInst::New(calc, {load_i1, load_i2});
     auto store_i1 = StoreInst::New(call, i1);
     block->InsertInstruction(load_i1)
-         ->InsertInstruction(load_i2)
-         ->InsertInstruction(call)
-         ->InsertInstruction(store_i1);
+        ->InsertInstruction(load_i2)
+        ->InsertInstruction(call)
+        ->InsertInstruction(store_i1);
 
     // if i1 < i2 to do;
     load_i1 = LoadInst::New(i1);
@@ -206,8 +203,8 @@ static FunctionPtr BuildMain(ModulePtr module, FunctionPtr calc) {
         CompareInstruction::New(CompareOpType::LessThan, load_i1, load_i2);
     auto branch = BranchInst::New(comp, trueBlock, falseBlock);
     block->InsertInstruction(load_i1)
-         ->InsertInstruction(comp)
-         ->InsertInstruction(branch);
+        ->InsertInstruction(comp)
+        ->InsertInstruction(branch);
 
     trueBlock->InsertInstruction(JumpInst::New(block));
     falseBlock->InsertInstruction(JumpInst::New(nextBlock));

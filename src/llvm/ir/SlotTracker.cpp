@@ -8,7 +8,6 @@
 #include "llvm/ir/value/Function.h"
 #include "llvm/ir/value/inst/Instruction.h"
 
-
 void SlotTracker::Trace(FunctionPtr function) {
     int slot = 0;
 
@@ -37,7 +36,6 @@ void SlotTracker::Trace(FunctionPtr function) {
         }
     }
 }
-
 
 int SlotTracker::Slot(ValuePtr value) {
     auto iter = _slot.find(value);

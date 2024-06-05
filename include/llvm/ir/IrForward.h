@@ -109,7 +109,6 @@ using UsePtr = Use *;
 using UseList = std::vector<UsePtr>;
 using UseListPtr = UseList *;
 
-
 template <typename _Ty> class HasParent {
 public:
     using _TyPtr = _Ty *;
@@ -121,8 +120,7 @@ public:
     _TyPtr Parent() const { return _parent; }
 
 protected:
-    HasParent(_TyPtr parent = nullptr) : _parent(parent) {
-    }
+    HasParent(_TyPtr parent = nullptr) : _parent(parent) {}
 
 private:
     _TyPtr _parent;

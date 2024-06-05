@@ -10,11 +10,9 @@ class AllocaInst final : public Instruction {
 public:
     ~AllocaInst() override = default;
 
-
     static bool classof(const ValueType type) {
         return type == ValueType::AllocaInstTy;
     }
-
 
     void PrintAsm(AsmWriterPtr out) override;
 
@@ -35,11 +33,9 @@ class LoadInst final : public UnaryInstruction {
 public:
     ~LoadInst() override = default;
 
-
     static bool classof(const ValueType type) {
         return type == ValueType::LoadInstTy;
     }
-
 
     void PrintAsm(AsmWriterPtr out) override;
 
@@ -49,8 +45,7 @@ public:
 
 private:
     LoadInst(TypePtr type, ValuePtr address)
-        : UnaryInstruction(ValueType::LoadInstTy, type, address) {
-    }
+        : UnaryInstruction(ValueType::LoadInstTy, type, address) {}
 };
 
 #pragma endregion
@@ -63,11 +58,9 @@ class StoreInst final : public BinaryInstruction {
 public:
     ~StoreInst() override = default;
 
-
     static bool classof(const ValueType type) {
         return type == ValueType::StoreInstTy;
     }
-
 
     void PrintAsm(AsmWriterPtr out) override;
 
@@ -85,11 +78,9 @@ class BranchInst final : public Instruction {
 public:
     ~BranchInst() override = default;
 
-
     static bool classof(const ValueType type) {
         return type == ValueType::BranchInstTy;
     }
-
 
     void PrintAsm(AsmWriterPtr out) override;
 
@@ -119,21 +110,21 @@ class JumpInst final : public Instruction {
 public:
     ~JumpInst() override = default;
 
-
     static bool classof(const ValueType type) {
         return type == ValueType::JumpInstTy;
     }
 
-
     void PrintAsm(AsmWriterPtr out) override;
 
     static JumpInstPtr New(BasicBlockPtr target);
+    static JumpInstPtr New(LlvmContextPtr context);
 
     BasicBlockPtr Target() const { return _target; }
     BasicBlockPtr SetTarget(BasicBlockPtr block);
 
 private:
     JumpInst(BasicBlockPtr target);
+    JumpInst(LlvmContextPtr context);
 
     BasicBlockPtr _target;
 };
@@ -148,11 +139,9 @@ class ReturnInst final : public Instruction {
 public:
     ~ReturnInst() override = default;
 
-
     static bool classof(const ValueType type) {
         return type == ValueType::ReturnInstTy;
     }
-
 
     void PrintAsm(AsmWriterPtr out) override;
 
@@ -177,7 +166,6 @@ public:
     static bool classof(const ValueType type) {
         return type == ValueType::CallInstTy;
     }
-
 
     void PrintAsm(AsmWriterPtr out) override;
 

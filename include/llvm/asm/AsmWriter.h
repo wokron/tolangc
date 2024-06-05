@@ -7,7 +7,6 @@
 class AsmWriter;
 using AsmWriterPtr = std::shared_ptr<AsmWriter>;
 
-
 class AsmWriter {
 public:
     static AsmWriterPtr New(std::ostream &out);
@@ -30,9 +29,7 @@ public:
     const AsmWriter &CommentEnd() const;
 
 private:
-    AsmWriter(std::ostream &out) : _out(out) {
-    }
-
+    AsmWriter(std::ostream &out) : _out(out) {}
 
     std::ostream &_out;
 };

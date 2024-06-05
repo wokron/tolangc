@@ -9,12 +9,10 @@ class UnaryInstruction : public Instruction {
 public:
     ~UnaryInstruction() override = default;
 
-
     static bool classof(const ValueType type) {
         return type == ValueType::LoadInstTy ||
                type == ValueType::UnaryOperatorTy;
     }
-
 
     ValuePtr Operand() { return OperandAt(0); }
 
@@ -28,16 +26,13 @@ protected:
 
 enum class UnaryOpType { Not, Neg, Pos };
 
-
 class UnaryOperator final : public UnaryInstruction {
 public:
     ~UnaryOperator() override = default;
 
-
     static bool classof(const ValueType type) {
         return type == ValueType::UnaryOperatorTy;
     }
-
 
     void PrintAsm(AsmWriterPtr out) override;
 
@@ -59,12 +54,10 @@ class BinaryInstruction : public Instruction {
 public:
     ~BinaryInstruction() override = default;
 
-
     static bool classof(const ValueType type) {
         return type == ValueType::BinaryOperatorTy ||
                type == ValueType::StoreInstTy;
     }
-
 
     ValuePtr LeftOperand() { return OperandAt(0); }
     ValuePtr RightOperand() { return OperandAt(1); }
@@ -80,16 +73,13 @@ protected:
 
 enum class BinaryOpType { Add, Sub, Mul, Div, Mod };
 
-
 class BinaryOperator final : public BinaryInstruction {
 public:
     ~BinaryOperator() override = default;
 
-
     static bool classof(const ValueType type) {
         return type == ValueType::BinaryOperatorTy;
     }
-
 
     void PrintAsm(AsmWriterPtr out) override;
 
@@ -102,9 +92,7 @@ private:
     BinaryOperator(TypePtr type, ValuePtr lhs, ValuePtr rhs,
                    BinaryOpType opType)
         : BinaryInstruction(ValueType::BinaryOperatorTy, type, lhs, rhs),
-          _opType(opType) {
-    }
-
+          _opType(opType) {}
 
     BinaryOpType _opType;
 };
@@ -122,16 +110,13 @@ enum class CompareOpType {
     LessThanOrEqual
 };
 
-
 class CompareInstruction final : public BinaryInstruction {
 public:
     ~CompareInstruction() override = default;
 
-
     static bool classof(const ValueType type) {
         return type == ValueType::CompareInstTy;
     }
-
 
     void PrintAsm(AsmWriterPtr out) override;
 
@@ -144,8 +129,7 @@ protected:
     CompareInstruction(TypePtr type, ValuePtr lhs, ValuePtr rhs,
                        CompareOpType opType)
         : BinaryInstruction(ValueType::CompareInstTy, type, lhs, rhs),
-          _opType(opType) {
-    }
+          _opType(opType) {}
 
 private:
     CompareOpType _opType;

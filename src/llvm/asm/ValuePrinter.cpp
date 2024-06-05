@@ -15,16 +15,13 @@
 
 #include <algorithm>
 
-
 void Value::PrintAsm(AsmWriterPtr out) {
     TOLANG_DIE("Operation not supported.");
 }
 
-
 void Value::PrintName(AsmWriterPtr out) {
     TOLANG_DIE("Operation not supported.");
 }
-
 
 void Value::PrintUse(AsmWriterPtr out) {
     GetType()->PrintAsm(out);
@@ -32,13 +29,11 @@ void Value::PrintUse(AsmWriterPtr out) {
     PrintName(out);
 }
 
-
 void ConstantData::PrintAsm(AsmWriterPtr out) {
     GetType()->PrintAsm(out);
     out->PushSpace();
     PrintName(out);
 }
-
 
 void ConstantData::PrintName(AsmWriterPtr out) {
     if (GetType()->IsFloatTy()) {
@@ -50,11 +45,9 @@ void ConstantData::PrintName(AsmWriterPtr out) {
     }
 }
 
-
 void GlobalValue::PrintName(AsmWriterPtr out) {
     out->Push('@').Push(GetName());
 }
-
 
 void Function::PrintAsm(AsmWriterPtr out) {
     // First, we trace all the slot.
@@ -99,16 +92,13 @@ void Function::PrintAsm(AsmWriterPtr out) {
     out->Push('}').PushNewLine();
 }
 
-
 void Argument::PrintAsm(AsmWriterPtr out) {
     GetType()->PrintAsm(out);
     out->PushNext('%').Push(
         std::to_string(Parent()->GetSlotTracker()->Slot(this)));
 }
 
-
 void Argument::PrintUse(AsmWriterPtr out) { PrintAsm(out); }
-
 
 void BasicBlock::PrintAsm(AsmWriterPtr out) {
     // We don't print the first basic block.
@@ -143,18 +133,15 @@ void BasicBlock::PrintAsm(AsmWriterPtr out) {
     }
 }
 
-
 void BasicBlock::PrintName(AsmWriterPtr out) {
     out->Push('%').Push(std::to_string(Parent()->GetSlotTracker()->Slot(this)));
 }
-
 
 void BasicBlock::PrintUse(AsmWriterPtr out) {
     GetType()->PrintAsm(out);
     out->PushSpace();
     PrintName(out);
 }
-
 
 void Instruction::PrintName(AsmWriterPtr out) {
     TOLANG_DIE_IF_NOT(!GetType()->IsVoidTy(),
@@ -163,7 +150,6 @@ void Instruction::PrintName(AsmWriterPtr out) {
     out->Push('%').Push(
         std::to_string(Parent()->Parent()->GetSlotTracker()->Slot(this)));
 }
-
 
 void Instruction::PrintUse(AsmWriterPtr out) {
     TOLANG_DIE_IF_NOT(!GetType()->IsVoidTy(),
@@ -174,7 +160,6 @@ void Instruction::PrintUse(AsmWriterPtr out) {
         std::to_string(Parent()->Parent()->GetSlotTracker()->Slot(this)));
 }
 
-
 void AllocaInst::PrintAsm(AsmWriterPtr out) {
     PrintName(out);
 
@@ -182,7 +167,6 @@ void AllocaInst::PrintAsm(AsmWriterPtr out) {
     AllocatedType()->PrintAsm(out);
     out->PushNewLine();
 }
-
 
 void StoreInst::PrintAsm(AsmWriterPtr out) {
     out->Push("store").PushSpace();
@@ -193,7 +177,6 @@ void StoreInst::PrintAsm(AsmWriterPtr out) {
     out->PushNewLine();
 }
 
-
 void LoadInst::PrintAsm(AsmWriterPtr out) {
     PrintName(out);
 
@@ -203,7 +186,6 @@ void LoadInst::PrintAsm(AsmWriterPtr out) {
     Address()->PrintUse(out);
     out->PushNewLine();
 }
-
 
 void BranchInst::PrintAsm(AsmWriterPtr out) {
     out->Push("br").PushSpace();
@@ -216,13 +198,11 @@ void BranchInst::PrintAsm(AsmWriterPtr out) {
     out->PushNewLine();
 }
 
-
 void JumpInst::PrintAsm(AsmWriterPtr out) {
     out->Push("br").PushSpace();
     Target()->PrintUse(out);
     out->PushNewLine();
 }
-
 
 void ReturnInst::PrintAsm(AsmWriterPtr out) {
     out->Push("ret");
@@ -235,7 +215,6 @@ void ReturnInst::PrintAsm(AsmWriterPtr out) {
     }
     out->PushNewLine();
 }
-
 
 void CallInst::PrintAsm(AsmWriterPtr out) {
     if (!GetType()->IsVoidTy()) {
@@ -262,7 +241,6 @@ void CallInst::PrintAsm(AsmWriterPtr out) {
     }
     out->Push(')').PushNewLine();
 }
-
 
 /*
  * %2 = add nsw i32 0, %1
@@ -303,7 +281,6 @@ void UnaryOperator::PrintAsm(AsmWriterPtr out) {
 
     out->PushNewLine();
 }
-
 
 /*
  * %11 = add nsw i32 %9, %10
@@ -347,7 +324,6 @@ void BinaryOperator::PrintAsm(AsmWriterPtr out) {
     out->PushNewLine();
 }
 
-
 void CompareInstruction::PrintAsm(AsmWriterPtr out) {
     const char *op;
     bool isFloat = LeftOperand()->GetType()->IsFloatTy();
@@ -389,14 +365,12 @@ void CompareInstruction::PrintAsm(AsmWriterPtr out) {
     out->PushNewLine();
 }
 
-
 void InputInst::PrintAsm(AsmWriterPtr out) {
     PrintName(out);
     out->PushNext('=').PushNext("call").PushSpace();
     GetType()->PrintAsm(out);
     out->PushNext('@').Push(GetName()).Push("()").PushNewLine();
 }
-
 
 void OutputInst::PrintAsm(AsmWriterPtr out) {
     out->Push("call").PushSpace();

@@ -22,7 +22,6 @@ public:
         PointerTyID
     };
 
-
     // Always use virtual destructor for base class.
     virtual ~Type() = default;
 
@@ -47,14 +46,12 @@ public:
 protected:
     // Prohibit direct instantiation.
     Type(LlvmContextPtr context, TypeID typeId)
-        : _typeId(typeId), _context(context) {
-    }
+        : _typeId(typeId), _context(context) {}
 
 private:
     TypeID _typeId;
     LlvmContextPtr _context;
 };
-
 
 /*
  * Represent an integer. In tolang, it is the only type used
@@ -74,13 +71,11 @@ public:
 
 protected:
     IntegerType(LlvmContextPtr context, unsigned bitWidth)
-        : Type(context, IntegerTyID), _bitWidth(bitWidth) {
-    }
+        : Type(context, IntegerTyID), _bitWidth(bitWidth) {}
 
 private:
     unsigned _bitWidth;
 };
-
 
 class FloatType : public Type {
     friend class LlvmContext;
@@ -96,13 +91,10 @@ public:
 
 private:
     FloatType(LlvmContextPtr context, unsigned bitWidth)
-        : Type(context, FloatTyID), _bitWidth(bitWidth) {
-    }
-
+        : Type(context, FloatTyID), _bitWidth(bitWidth) {}
 
     unsigned _bitWidth;
 };
-
 
 /*
  * A function's type consists of a return type and a list of parameter
@@ -134,7 +126,6 @@ private:
     TypePtr _returnType;
     std::vector<TypePtr> _paramTypes;
 };
-
 
 /*
  * A pointer type represents a pointer to another type.
