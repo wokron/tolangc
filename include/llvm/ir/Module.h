@@ -4,7 +4,6 @@
 #include "llvm/ir/LlvmContext.h"
 #include <string>
 
-
 class Module final {
 public:
     static ModulePtr New(const std::string &name);

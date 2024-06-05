@@ -19,5 +19,4 @@ private:
     std::unordered_map<ValuePtr, int> _slot;
 };
 
-
 using SlotTrackerPtr = SlotTracker *;

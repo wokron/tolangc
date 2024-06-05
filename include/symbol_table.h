@@ -47,11 +47,11 @@ struct FunctionSymbol : public Symbol {
 };
 
 class SymbolTable : public std::enable_shared_from_this<SymbolTable> {
-  private:
+private:
     std::unordered_map<std::string, std::shared_ptr<Symbol>> _symbols;
     std::shared_ptr<SymbolTable> _father;
 
-  public:
+public:
     SymbolTable() : _father(nullptr) {}
 
     SymbolTable(std::shared_ptr<SymbolTable> father) : _father(father) {}

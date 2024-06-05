@@ -4,16 +4,13 @@
 #include "llvm/ir/value/GlobalValue.h"
 #include <list>
 
-
 class Function final : public GlobalValue {
 public:
     ~Function() override = default;
 
-
     static bool classof(const ValueType type) {
         return type == ValueType::FunctionTy;
     }
-
 
     void PrintAsm(AsmWriterPtr out) override;
 
@@ -35,11 +32,9 @@ public:
     argument_iterator ArgBegin() { return _args.begin(); }
     argument_iterator ArgEnd() { return _args.end(); }
 
-
     int BasicBlockCount() const {
         return static_cast<int>(_basicBlocks.size());
     }
-
 
     // Insert a basic block at the end of the function.
     FunctionPtr InsertBasicBlock(BasicBlockPtr block);

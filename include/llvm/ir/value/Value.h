@@ -6,7 +6,6 @@
 
 #include "llvm/asm/AsmWriter.h"
 
-
 // All types used in LLVM for tolang.
 enum class ValueType {
     // Value
@@ -35,7 +34,6 @@ enum class ValueType {
     LoadInstTy,
     UnaryOperatorTy,
 };
-
 
 /// <summary>
 /// Base class for all values in LLVM.
@@ -92,13 +90,10 @@ protected:
 
 protected:
     Value(ValueType valueType, TypePtr type)
-        : _type(type), _valueType(valueType) {
-    }
-
+        : _type(type), _valueType(valueType) {}
 
     Value(ValueType ValueType, TypePtr type, const std::string &name)
-        : _type(type), _name(name), _valueType(ValueType) {
-    }
+        : _type(type), _name(name), _valueType(ValueType) {}
 
 protected:
     TypePtr _type;

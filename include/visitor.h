@@ -5,7 +5,7 @@
 #include "llvm/ir/Module.h"
 
 class Visitor {
-  public:
+public:
     Visitor(ModulePtr module)
         : _ir_module(module), _cur_scope(std::make_shared<SymbolTable>()) {}
     Visitor(ModulePtr module, std::shared_ptr<SymbolTable> cur_scope)
@@ -35,7 +35,7 @@ class Visitor {
 
     std::vector<ValuePtr> visitFuncRParams(const FuncRParams &node);
 
-  private:
+private:
     std::shared_ptr<SymbolTable> _cur_scope;
     ModulePtr _ir_module;
     FunctionPtr _cur_func = nullptr;

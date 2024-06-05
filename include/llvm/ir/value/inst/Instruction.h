@@ -2,7 +2,6 @@
 
 #include "llvm/ir/value/User.h"
 
-
 class Instruction : public User, public HasParent<BasicBlock> {
 public:
     ~Instruction() override = default;
@@ -11,6 +10,5 @@ public:
     void PrintUse(AsmWriterPtr out) override;
 
 protected:
-    Instruction(ValueType valueType, TypePtr type) : User(valueType, type) {
-    }
+    Instruction(ValueType valueType, TypePtr type) : User(valueType, type) {}
 };

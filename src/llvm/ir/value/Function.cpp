@@ -4,12 +4,10 @@
 #include "llvm/ir/value/Argument.h"
 #include "llvm/ir/value/BasicBlock.h"
 
-
 FunctionPtr Function::New(TypePtr returnType, const std::string &name) {
     return returnType->Context()->SaveValue(
         new Function(FunctionType::Get(returnType), name));
 }
-
 
 FunctionPtr Function::New(TypePtr returnType, const std::string &name,
                           std::vector<ArgumentPtr> args) {
@@ -21,11 +19,8 @@ FunctionPtr Function::New(TypePtr returnType, const std::string &name,
         new Function(FunctionType::Get(returnType, argTypes), name, args));
 }
 
-
 Function::Function(TypePtr type, const std::string &name)
-    : GlobalValue(ValueType::FunctionTy, type, name) {
-}
-
+    : GlobalValue(ValueType::FunctionTy, type, name) {}
 
 Function::Function(TypePtr type, const std::string &name,
                    std::vector<ArgumentPtr> args)
@@ -35,31 +30,26 @@ Function::Function(TypePtr type, const std::string &name,
     }
 }
 
-
 BasicBlockPtr Function::NewBasicBlock() {
     auto block = BasicBlock::New(this);
     InsertBasicBlock(block);
     return block;
 }
 
-
 TypePtr Function::ReturnType() const {
     return GetType()->As<FunctionType>()->ReturnType();
 }
-
 
 FunctionPtr Function::InsertBasicBlock(BasicBlockPtr block) {
     _basicBlocks.push_back(block);
     return this;
 }
 
-
 FunctionPtr Function::InsertBasicBlock(block_iterator iter,
                                        BasicBlockPtr block) {
     _basicBlocks.insert(iter, block);
     return this;
 }
-
 
 FunctionPtr Function::RemoveBasicBlock(BasicBlockPtr block) {
     _basicBlocks.remove(block);

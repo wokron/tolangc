@@ -4,7 +4,6 @@
 #include "llvm/ir/IrForward.h"
 #include <iostream>
 
-
 class AsmPrinter {
 public:
     void Print(ModulePtr module, std::ostream &out);

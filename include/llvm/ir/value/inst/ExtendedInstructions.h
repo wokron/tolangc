@@ -10,11 +10,9 @@ class InputInst final : public Instruction {
 public:
     ~InputInst() override = default;
 
-
     static bool classof(const ValueType type) {
         return type == ValueType::InputInstTy;
     }
-
 
     void PrintAsm(AsmWriterPtr out) override;
 
@@ -35,7 +33,6 @@ public:
     static OutputInstPtr New(ValuePtr value);
 
     void PrintAsm(AsmWriterPtr out) override;
-
 
     static bool classof(const ValueType type) {
         return type == ValueType::OutputInstTy;
