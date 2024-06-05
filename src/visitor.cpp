@@ -11,7 +11,7 @@ void Visitor::visit(const CompUnit &node) {
 
     // create main function
     auto context = _ir_module->Context();
-    _cur_func = Function::New(context->GetVoidTy(), "main");
+    _cur_func = Function::New(context->GetInt32Ty(), "main");
     _ir_module->AddMainFunction(_cur_func);
     _cur_block = _cur_func->NewBasicBlock();
 
@@ -24,6 +24,9 @@ void Visitor::visit(const CompUnit &node) {
     }
     _cur_scope = _cur_scope->popScope();
 
+    _cur_block->InsertInstruction(
+        ReturnInst::New(ConstantData::New(context->GetInt32Ty(), 0)));
+
     _cur_block = nullptr;
     _cur_func = nullptr;
 }
@@ -35,12 +38,11 @@ void Visitor::visitFuncDef(const FuncDef &node) {
     auto context = _ir_module->Context();
     std::vector<ArgumentPtr> args;
     for (auto &param_symbol : param_symbols) {
-        auto arg = Argument::New(context->GetInt32Ty(), param_symbol->name);
+        auto arg = Argument::New(context->GetFloatTy(), param_symbol->name);
         args.push_back(arg);
         param_symbol->value = arg;
     }
-    _cur_func = Function::New(context->GetInt32Ty(), node.ident,
-                              args); // TODO: should be float, instead of int32
+    _cur_func = Function::New(context->GetFloatTy(), node.ident, args);
 
     // create function symbol
     auto symbol = std::make_shared<FunctionSymbol>(
@@ -67,7 +69,7 @@ void Visitor::visitFuncDef(const FuncDef &node) {
         }
 
         // alloca & store inst should be inserted at the first block
-        auto alloca = AllocaInst::New(context->GetInt32Ty());
+        auto alloca = AllocaInst::New(context->GetFloatTy());
         _cur_block->InsertInstruction(alloca);
         auto store = StoreInst::New(param_symbol->value, alloca);
         _cur_block->InsertInstruction(store);
@@ -96,7 +98,7 @@ Visitor::visitFuncFParams(const FuncFParams &node) {
 
 void Visitor::visitVarDecl(const VarDecl &node) {
     auto context = _ir_module->Context();
-    auto alloca = AllocaInst::New(context->GetInt32Ty());
+    auto alloca = AllocaInst::New(context->GetFloatTy());
     auto symbol =
         std::make_shared<VariableSymbol>(node.ident, alloca, node.line);
 
@@ -121,7 +123,14 @@ void Visitor::visitStmt(const Stmt &node) {
 }
 
 void Visitor::visitGetStmt(const GetStmt &node) {
-    _cur_block->InsertInstruction(InputInst::New(_ir_module->Context()));
+    auto symbol = _cur_scope->getSymbol(node.ident);
+    if (!symbol) {
+        error(node.line, "undefined symbol " + node.ident);
+    }
+    auto input = InputInst::New(_ir_module->Context());
+    _cur_block->InsertInstruction(input);
+    auto store = StoreInst::New(input, symbol->value);
+    _cur_block->InsertInstruction(store);
 }
 
 void Visitor::visitPutStmt(const PutStmt &node) {
@@ -338,9 +347,8 @@ ValuePtr Visitor::visitIdent(const Ident &node) {
 
 ValuePtr Visitor::visitNumber(const Number &node) {
     // return const value
-    auto val = ConstantData::New(
-        _ir_module->Context()->GetInt32Ty(),
-        (int)node.value); // TODO: should be float, instead of int32
+    auto val =
+        ConstantData::New(_ir_module->Context()->GetFloatTy(), node.value);
     return val;
 }
 

@@ -20,28 +20,35 @@ static constexpr char EXPECTED[] = R"(; tolang LLVM IR
 ; Module ID = 'tolang.c'
 source_filename = "tolang.c"
 
-declare i32 @get()
-declare void @put(i32)
+declare float @get()
+declare void @put(float)
 
 
-; Function type: i32 (i32, i32)
-define dso_local i32 @add(i32 %0, i32 %1) {
-    %3 = alloca i32
-    store i32 %0, i32* %3
-    %4 = alloca i32
-    store i32 %1, i32* %4
-    %5 = load i32, i32* %3
-    %6 = load i32, i32* %4
-    %7 = add nsw i32 %5, %6
-    ret i32 %7
+; Function type: float (float, float)
+define dso_local float @add(float %0, float %1) {
+    %3 = alloca float
+    store float %0, float* %3
+    %4 = alloca float
+    store float %1, float* %4
+    %5 = load float, float* %3
+    %6 = load float, float* %4
+    %7 = fadd float %5, %6
+    ret float %7
 }
 
-; Function type: void ()
-define dso_local void @main() {
-    %1 = alloca i32
-    %2 = alloca i32
-    %3 = call i32 @get()
-    %4 = call i32 @get()
+; Function type: i32 ()
+define dso_local i32 @main() {
+    %1 = alloca float
+    %2 = alloca float
+    %3 = call float @get()
+    store float %3, float* %1
+    %4 = call float @get()
+    store float %4, float* %2
+    %5 = load float, float* %1
+    %6 = load float, float* %2
+    %7 = call float @add(float %5, float %6)
+    call void @put(float %7)
+    ret i32 0
 }
 
 ; End of LLVM IR
@@ -80,6 +87,15 @@ TEST_CASE("testing visitor") {
     get_b.ident = "b";
     root->stmts.push_back(std::make_shared<Stmt>(get_b));
 
+    auto put_add = PutStmt();
+    auto add_call = CallExp();
+    add_call.ident = "add";
+    add_call.funcRParams = std::make_shared<FuncRParams>();
+    add_call.funcRParams->exps.push_back(std::make_shared<Exp>(Ident("a")));
+    add_call.funcRParams->exps.push_back(std::make_shared<Exp>(Ident("b")));
+    put_add.exp = std::make_shared<Exp>(add_call);
+    root->stmts.push_back(std::make_shared<Stmt>(put_add));
+
     // then, we use visitor to generate the LLVM IR
     ModulePtr module = Module::New("tolang.c");
     auto visitor = Visitor(module);
@@ -91,5 +107,6 @@ TEST_CASE("testing visitor") {
     printer.Print(module, ss);
 
     auto ir = ss.str();
+
     CHECK_EQ(ir, EXPECTED);
 }

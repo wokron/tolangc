@@ -38,3 +38,5 @@ build/
 out/
 .vs/
 *.user
+
+.vscode/
