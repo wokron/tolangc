@@ -35,6 +35,7 @@ public:
         GEQ,
         EQL,
         NEQ,
+        COMMA,
         ERR
     };
 
