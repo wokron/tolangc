@@ -51,11 +51,6 @@ void Lexer::_deal_with_line() {
 }
 
 Token *Lexer::_next_token(std::string line) {
-    std::regex number("^(0|[1-9][0-9]*)(\\.[0-9]+)?");
-    std::regex ident("^[a-zA-Z_][0-9a-zA-Z_]*");
-
-    std::smatch match;
-
     while (_word_index < line.size()) {
         // match blank
         while (isspace(line[_word_index])) {
