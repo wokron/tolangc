@@ -1,8 +1,11 @@
+#pragma once
+
 #include <iostream>
 #include <memory>
 #include <string>
 #include <variant>
 #include <vector>
+#include <front/lexer/token.h>
 
 struct Node {
     int line;
@@ -10,7 +13,9 @@ struct Node {
     virtual void print(std::ostream &out) = 0;
 };
 
-using Ident = std::string;
+//using Ident = std::string;
+struct Ident;
+
 
 struct GetStmt;
 struct PutStmt;
@@ -25,9 +30,15 @@ struct CallExp;
 struct UnaryExp;
 struct Number;
 using Exp = std::variant<BinaryExp, CallExp, UnaryExp, Ident, Number>;
-
 struct FuncDef;
 struct VarDecl;
+
+
+struct Ident : public Node {
+    std::string ident;
+
+    void print(std::ostream &out) override;
+};
 
 struct CompUnit : public Node {
     std::vector<std::shared_ptr<FuncDef>> funcDefs;
@@ -101,13 +112,7 @@ struct ToStmt : public Node {
 
 struct BinaryExp : public Node {
     std::shared_ptr<Exp> lexp;
-    enum {
-        PLUS,
-        MINU,
-        MULT,
-        DIV,
-        MOD,
-    } op;
+    enum Token::TokenType op;
     std::shared_ptr<Exp> rexp;
 
     void print(std::ostream &out) override;
@@ -123,12 +128,9 @@ struct CallExp : public Node {
 };
 
 struct UnaryExp : public Node {
-    enum {
-        PLUS,
-        MINU,
-    } op;
+    enum Token::TokenType op;
     std::shared_ptr<Exp> exp;
-
+    bool hasOp;
     void print(std::ostream &out) override;
 };
 
@@ -140,14 +142,7 @@ struct FuncRParams : public Node {
 
 struct Cond : public Node {
     std::shared_ptr<Exp> left;
-    enum {
-        LSS,
-        GRE,
-        LEQ,
-        GEQ,
-        EQL,
-        NEQ,
-    } op;
+    enum Token::TokenType op;
     std::shared_ptr<Exp> right;
 
     void print(std::ostream &out) override;

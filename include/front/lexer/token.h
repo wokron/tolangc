@@ -41,7 +41,6 @@ class Token {
     TokenType token_type;
     std::string content;
     int line;
-
     Token(TokenType type, std::string cont, int line)
         : token_type(type), content(cont), line(line) {}
 };
