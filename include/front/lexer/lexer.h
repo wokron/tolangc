@@ -23,4 +23,8 @@ private:
     Token *_is_keyword(const std::string &line);
 
     Token *_is_symbol(const std::string &line);
+
+    Token *_is_number(const std::string &line);
+
+    Token *_is_ident(const std::string &line);
 };

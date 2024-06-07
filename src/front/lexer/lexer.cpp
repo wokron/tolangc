@@ -2,6 +2,7 @@
 #include "front/lexer/token.h"
 #include <fstream>
 #include <regex>
+#include <string>
 
 bool Lexer::next(Token &token) {
     while (_cur_line.size() == _word_index) {
@@ -50,22 +51,16 @@ void Lexer::_deal_with_line() {
 }
 
 Token *Lexer::_next_token(std::string line) {
-
-    std::regex blank("^\\s+");
-    std::regex number("^[1-9][0-9]*(\\.[0-9]+)?");
-    std::regex ident("^[a-zA-Z_][0-9a-zA-Z_]*");
-
-    std::smatch match;
-
     while (_word_index < line.size()) {
         // match blank
-        std::string s = line.substr(_word_index);
-        if (std::regex_search(s, match, blank)) {
-            _word_index += match.length();
+        while (isspace(line[_word_index])) {
+            _word_index++;
             continue;
         }
 
+        std::string s = line.substr(_word_index);
         Token *token;
+
         // match keyword
         token = _is_keyword(s);
         if (token != nullptr) {
@@ -85,21 +80,17 @@ Token *Lexer::_next_token(std::string line) {
         }
 
         // match number
-        if (std::regex_search(s, match, number)) {
-            _word_index += match.length();
-            return new Token(
-                Token::NUMBER,
-                line.substr(_word_index - match.length(), match.length()),
-                _line_number);
+        token = _is_number(s);
+        if (token != nullptr) {
+            _word_index += token->content.length();
+            return token;
         }
 
         // match ident
-        if (std::regex_search(s, match, ident)) {
-            _word_index += match.length();
-            return new Token(
-                Token::IDENFR,
-                line.substr(_word_index - match.length(), match.length()),
-                _line_number);
+        token = _is_ident(s);
+        if (token != nullptr) {
+            _word_index += token->content.length();
+            return token;
         }
 
         _word_index = _cur_line.size();
@@ -109,21 +100,21 @@ Token *Lexer::_next_token(std::string line) {
 }
 
 Token *Lexer::_is_keyword(const std::string &line) {
-    if (line.rfind("fn") == 0) {
+    if (line.find("fn") == 0) {
         return new Token(Token::FN, "fn", _line_number);
-    } else if (line.rfind("var") == 0) {
+    } else if (line.find("var") == 0) {
         return new Token(Token::VARTK, "var", _line_number);
-    } else if (line.rfind("get") == 0) {
+    } else if (line.find("get") == 0) {
         return new Token(Token::GETTK, "get", _line_number);
-    } else if (line.rfind("put") == 0) {
+    } else if (line.find("put") == 0) {
         return new Token(Token::PUTTK, "put", _line_number);
-    } else if (line.rfind("tag") == 0) {
+    } else if (line.find("tag") == 0) {
         return new Token(Token::TAGTK, "tag", _line_number);
-    } else if (line.rfind("let") == 0) {
+    } else if (line.find("let") == 0) {
         return new Token(Token::LETTK, "let", _line_number);
-    } else if (line.rfind("if") == 0) {
+    } else if (line.find("if") == 0) {
         return new Token(Token::IFTK, "if", _line_number);
-    } else if (line.rfind("to") == 0) {
+    } else if (line.find("to") == 0) {
         return new Token(Token::TOTK, "to", _line_number);
     } else {
         return nullptr;
@@ -131,39 +122,82 @@ Token *Lexer::_is_keyword(const std::string &line) {
 }
 
 Token *Lexer::_is_symbol(const std::string &line) {
-    if (line.rfind('+') == 0) {
+    if (line.find('+') == 0) {
         return new Token(Token::PLUS, "+", _line_number);
-    } else if (line.rfind('-') == 0) {
+    } else if (line.find('-') == 0) {
         return new Token(Token::MINU, "-", _line_number);
-    } else if (line.rfind('*') == 0) {
+    } else if (line.find('*') == 0) {
         return new Token(Token::MULT, "*", _line_number);
-    } else if (line.rfind('/') == 0) {
+    } else if (line.find('/') == 0) {
         return new Token(Token::DIV, "/", _line_number);
-    } else if (line.rfind('%') == 0) {
+    } else if (line.find('%') == 0) {
         return new Token(Token::MOD, "%", _line_number);
-    } else if (line.rfind("<=") == 0) {
+    } else if (line.find("<=") == 0) {
         return new Token(Token::LEQ, "<=", _line_number);
-    } else if (line.rfind(">=") == 0) {
+    } else if (line.find(">=") == 0) {
         return new Token(Token::GEQ, ">=", _line_number);
-    } else if (line.rfind('<') == 0) {
+    } else if (line.find('<') == 0) {
         return new Token(Token::LSS, "<", _line_number);
-    } else if (line.rfind('>') == 0) {
+    } else if (line.find('>') == 0) {
         return new Token(Token::GRE, ">", _line_number);
-    } else if (line.rfind("==") == 0) {
+    } else if (line.find("==") == 0) {
         return new Token(Token::EQL, "==", _line_number);
-    } else if (line.rfind("=>") == 0) {
+    } else if (line.find("=>") == 0) {
         return new Token(Token::RARROW, "=>", _line_number);
-    } else if (line.rfind("!=") == 0) {
+    } else if (line.find("!=") == 0) {
         return new Token(Token::NEQ, "!=", _line_number);
-    } else if (line.rfind('=') == 0) {
+    } else if (line.find('=') == 0) {
         return new Token(Token::ASSIGN, "=", _line_number);
-    } else if (line.rfind('(') == 0) {
+    } else if (line.find('(') == 0) {
         return new Token(Token::LPARENT, "(", _line_number);
-    } else if (line.rfind(')') == 0) {
+    } else if (line.find(')') == 0) {
         return new Token(Token::RPARENT, ")", _line_number);
-    } else if (line.rfind(';') == 0) {
+    } else if (line.find(';') == 0) {
         return new Token(Token::SEMINCN, ";", _line_number);
+    } else if (line.find(',') == 0) {
+        return new Token(Token::COMMA, ",", _line_number);
     } else {
         return nullptr;
     }
+}
+
+Token *Lexer::_is_number(const std::string &line) {
+    int index = 0;
+    if (line[0] == '0') {
+        index++;
+        if (index < line.size() && isdigit(line[index])) {
+            return nullptr;
+        }
+    } else {
+        while (index < line.size() && isdigit(line[index])) {
+            index++;
+        }
+    }
+
+    if (index < line.size() && line[index] == '.') {
+        index++;
+        while (index < line.size() && isdigit(line[index])) {
+            index++;
+        }
+    }
+
+    if (index != 0) {
+        return new Token(Token::NUMBER, line.substr(0, index), _line_number);
+    } else {
+        return nullptr;
+    }
+}
+
+Token *Lexer::_is_ident(const std::string &line) {
+    int index = 0;
+    if (isalpha(line[0]) || line[0] == '_') {
+        index++;
+    } else {
+        return nullptr;
+    }
+
+    while (isalpha(line[index]) || isdigit(line[index]) || line[index] == '_') {
+        index++;
+    }
+    return new Token(Token::IDENFR, line.substr(0, index), _line_number);
 }
