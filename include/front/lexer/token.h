@@ -7,7 +7,7 @@
 #include "vector"
 
 class Token {
-  public:
+public:
     enum TokenType {
         IDENFR,
         NUMBER,
@@ -35,6 +35,7 @@ class Token {
         GEQ,
         EQL,
         NEQ,
+        COMMA,
         ERR
     };
 

@@ -35,3 +35,8 @@ cmake-build-debug
 tests/cmake-build-debug
 .idea
 build/
+out/
+.vs/
+*.user
+
+.vscode/
