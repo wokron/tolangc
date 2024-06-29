@@ -70,7 +70,7 @@ void compile(const char *name, const Options &options,
 
     if (options.emit_ir) {
         if (output.length() == 0) {
-            output = "out.ssa";
+            output = "out.ll";
         }
         outfile.open(output, std::ios::out);
 
