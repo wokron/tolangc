@@ -6,15 +6,15 @@
 #include <variant>
 #include <vector>
 
-
 struct Node {
     int line;
 
+    Node() = default;
+    Node(int line) : line(line) {}
     virtual void print(std::ostream &out) = 0;
 };
 
 struct Ident;
-
 
 struct GetStmt;
 struct PutStmt;
@@ -32,11 +32,13 @@ using Exp = std::variant<BinaryExp, CallExp, UnaryExp, Ident, Number>;
 struct FuncDef;
 struct VarDecl;
 
-
 struct Ident : public Node {
-    std::string ident;
+    std::string value;
 
     void print(std::ostream &out) override;
+
+    Ident() = default;
+    Ident(int line, const std::string &value) : Node(line), value(value) {}
 };
 
 struct CompUnit : public Node {

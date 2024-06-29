@@ -1,6 +1,3 @@
-//
-// Created by Zengyuankun on 2024/6/5.
-//
 #include<ast.h>
 
 
@@ -8,7 +5,7 @@
 using namespace std;
 
 void Ident::print(std::ostream &out) {
-    out << "IDENFR " << ident << endl;
+    out << "IDENFR " << value << endl;
     out << "<Ident>" << endl;
 }
 
