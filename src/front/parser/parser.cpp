@@ -35,6 +35,10 @@ struct Ident Parser::parseIdent() {
 struct FuncFParams Parser::parseFuncFParams() {
     struct FuncFParams funcFParams;
     funcFParams.idents.push_back(parseIdent());
+    while (getToken().token_type == Token::COMMA) {
+        pos++;
+        funcFParams.idents.push_back(parseIdent());
+    }
     return funcFParams;
 };
 
@@ -149,7 +153,13 @@ struct ToStmt Parser::parseToStmt(){
 struct Cond Parser::parseCond(){
     struct Cond cond;
     cond.left = make_shared<Exp>(parseExp());
-    cond.op = getToken().token_type;
+    Token::TokenType t = getToken().token_type;
+    cond.op = t == Token::GRE ? Cond::GRE :
+        t == Token::LSS ? Cond::LSS:
+        t == Token::GEQ ? Cond::GEQ:
+        t == Token::LEQ ? Cond::LEQ:
+        t == Token::EQL ? Cond::EQL:
+        Cond::NEQ;
     pos++;
     cond.right = make_shared<Exp>(parseExp());
     return cond;
@@ -161,10 +171,10 @@ Exp Parser::parseExp() {
 
 struct BinaryExp Parser::parseAddExp() {
     BinaryExp binaryExp;
-    binaryExp.op = Token::PLUS;
+    binaryExp.op = BinaryExp::PLUS;
     binaryExp.lexp = make_shared<Exp>(parseMulExp());
     if (getToken().token_type == Token::PLUS || getToken().token_type == Token::MINU) {
-        binaryExp.op = getToken().token_type;
+        binaryExp.op = getToken().token_type == Token::PLUS ? BinaryExp::PLUS : BinaryExp::MINU;
         pos++;
         binaryExp.rexp = make_shared<Exp>(parseAddExp());
     } else {
@@ -175,12 +185,14 @@ struct BinaryExp Parser::parseAddExp() {
 
 struct BinaryExp Parser::parseMulExp() {
     BinaryExp binaryExp;
-    binaryExp.op = Token::MULT;
+    binaryExp.op = BinaryExp::MULT;
     binaryExp.lexp = make_shared<Exp>(parseUnaryExp());
     if (getToken().token_type == Token::MULT
         || getToken().token_type == Token::DIV
         || getToken().token_type == Token::MOD) {
-        binaryExp.op = getToken().token_type;
+        binaryExp.op = getToken().token_type == Token::MULT ? BinaryExp::MULT :
+                       getToken().token_type == Token::DIV ? BinaryExp::DIV:
+                        BinaryExp::MOD;
         pos++;
         binaryExp.rexp = make_shared<Exp>(parseMulExp());
     } else {
@@ -194,7 +206,7 @@ struct BinaryExp Parser::parseMulExp() {
 struct UnaryExp Parser::parseUnaryExp(){
     UnaryExp unaryExp;
     if (getToken().token_type == Token::PLUS || getToken().token_type == Token::MINU) {
-        unaryExp.op = getToken().token_type;
+        unaryExp.op = getToken().token_type == Token::PLUS ? UnaryExp::PLUS : UnaryExp::MINU;
         unaryExp.hasOp = true;
         pos++;
     } else {
@@ -239,6 +251,10 @@ struct CallExp Parser::parseCallExp(){
 struct FuncRParams Parser::parseFuncRParams(){
     struct FuncRParams funcRParams;
     funcRParams.exps.push_back(make_shared<Exp>(parseExp()));
+    while (getToken().token_type == Token::COMMA) {
+        pos++;
+        funcRParams.exps.push_back(make_shared<Exp>(parseExp()));
+    }
     return funcRParams;
 };
 

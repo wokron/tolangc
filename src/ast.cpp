@@ -47,6 +47,10 @@ void FuncDef::print(std::ostream &out) {
 
 void FuncFParams::print(std::ostream &out) {
     idents[0].print(out);
+    for (int i = 1;i < idents.size();i++) {
+        out << "COMMA ," << endl;
+        idents[i].print(out);
+    }
     out << "<FuncFParams>" << endl;
 }
 
@@ -115,7 +119,7 @@ void BinaryExp::print(std::ostream &out) {
         Node& node_ref = static_cast<Node&>(s);
         node_ref.print(out);
     }, (*lexp));
-    bool isAdd = op == Token::PLUS || op == Token::MINU;
+    bool isAdd = op == PLUS || op == MINU;
     if (rexp == nullptr) {
         if (isAdd) {
             out << "<AddExp>" << endl;
@@ -125,23 +129,23 @@ void BinaryExp::print(std::ostream &out) {
         return;
     }
     switch (op) {
-    case Token::PLUS: {
+    case PLUS: {
         out << "PLUS +" << endl;
         break;
     }
-    case Token::MINU: {
+    case MINU: {
         out << "MINU -" << endl;
         break;
     }
-    case Token::MULT: {
+    case MULT: {
         out << "MULT *" << endl;
         break;
     }
-    case Token::DIV: {
+    case DIV: {
         out << "DIV /" << endl;
         break;
     }
-    case Token::MOD: {
+    case MOD: {
         out << "MOD %" << endl;
         break;
     }
@@ -170,7 +174,7 @@ void CallExp::print(std::ostream &out) {
 
 void UnaryExp::print(std::ostream &out) {
     if (hasOp) {
-        if (op == Token::PLUS)
+        if (op == PLUS)
             out << "PLUS +" << endl;
         else
             out << "MINUS -" << endl;
@@ -187,6 +191,13 @@ void FuncRParams::print(std::ostream &out) {
         Node& node_ref = static_cast<Node&>(s);
         node_ref.print(out);
     }, (*(exps[0])));
+    for (int i = 1;i < exps.size();i++) {
+        out << "COMMA ," << endl;
+        std::visit([&out](auto& s) {
+            Node& node_ref = static_cast<Node&>(s);
+            node_ref.print(out);
+        }, (*(exps[i])));
+    }
     out << "<FuncRParams>" << endl;
 }
 
@@ -196,27 +207,27 @@ void Cond::print(std::ostream &out) {
             node_ref.print(out);
         },*left);
     switch (op) {
-    case Token::LSS: {
+    case LSS: {
         out << "LSS <" << endl;
         break;
     }
-    case Token::GRE: {
+    case GRE: {
         out << "GRE >" << endl;
         break;
     }
-    case Token::LEQ: {
+    case LEQ: {
         out << "LEQ <=" << endl;
         break;
     }
-    case Token::GEQ: {
+    case GEQ: {
         out << "GEQ >=" << endl;
         break;
     }
-    case Token::EQL: {
+    case EQL: {
         out << "EQL ==" << endl;
         break;
     }
-    case Token::NEQ: {
+    case NEQ: {
         out << "NEQ !=" << endl;
         break;
     }

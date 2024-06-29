@@ -9,11 +9,10 @@
 
 struct Node {
     int line;
-    // TODO: implement print method, maybe in json format?
+
     virtual void print(std::ostream &out) = 0;
 };
 
-//using Ident = std::string;
 struct Ident;
 
 
@@ -112,7 +111,13 @@ struct ToStmt : public Node {
 
 struct BinaryExp : public Node {
     std::shared_ptr<Exp> lexp;
-    enum Token::TokenType op;
+    enum {
+        PLUS,
+        MINU,
+        MULT,
+        DIV,
+        MOD,
+    } op;
     std::shared_ptr<Exp> rexp;
 
     void print(std::ostream &out) override;
@@ -128,7 +133,10 @@ struct CallExp : public Node {
 };
 
 struct UnaryExp : public Node {
-    enum Token::TokenType op;
+    enum {
+        PLUS,
+        MINU,
+    } op;
     std::shared_ptr<Exp> exp;
     bool hasOp;
     void print(std::ostream &out) override;
@@ -142,7 +150,14 @@ struct FuncRParams : public Node {
 
 struct Cond : public Node {
     std::shared_ptr<Exp> left;
-    enum Token::TokenType op;
+    enum {
+        LSS,
+        GRE,
+        LEQ,
+        GEQ,
+        EQL,
+        NEQ,
+    } op;
     std::shared_ptr<Exp> right;
 
     void print(std::ostream &out) override;
