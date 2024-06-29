@@ -11,199 +11,199 @@ using namespace std;
 Token Parser::getToken() { return tokens[pos]; }
 
 bool Parser::hasNext() { return pos < tokens.size(); }
-struct CompUnit Parser::parseCompUnit() {
+shared_ptr<CompUnit> Parser::parseCompUnit() {
     struct CompUnit compUnit;
     while (hasNext() && getToken().token_type == Token::FN) {
-        compUnit.funcDefs.push_back(make_shared<FuncDef>(parseFuncDef()));
+        compUnit.funcDefs.push_back(make_shared<FuncDef>(*parseFuncDef()));
     }
     while (hasNext() && getToken().token_type == Token::VARTK) {
-        compUnit.varDecls.push_back(make_shared<VarDecl>(parseVarDecl()));
+        compUnit.varDecls.push_back(make_shared<VarDecl>(*parseVarDecl()));
     }
     while (hasNext()) {
-        compUnit.stmts.push_back(make_shared<Stmt>(parseStmt()));
+        compUnit.stmts.push_back(make_shared<Stmt>(*parseStmt()));
     }
-    return compUnit;
+    return make_shared<CompUnit>(compUnit);
 }
 
-struct Ident Parser::parseIdent() {
+shared_ptr<Ident> Parser::parseIdent() {
     struct Ident ident;
     ident.ident = getToken().content;
     pos++;
-    return ident;
+    return make_shared<Ident>(ident);
 }
 
-struct FuncFParams Parser::parseFuncFParams() {
+shared_ptr<FuncFParams> Parser::parseFuncFParams() {
     struct FuncFParams funcFParams;
-    funcFParams.idents.push_back(parseIdent());
+    funcFParams.idents.push_back(*parseIdent());
     while (getToken().token_type == Token::COMMA) {
         pos++;
-        funcFParams.idents.push_back(parseIdent());
+        funcFParams.idents.push_back(*parseIdent());
     }
-    return funcFParams;
+    return make_shared<FuncFParams>(funcFParams);
 };
 
-struct FuncDef Parser::parseFuncDef() {
+shared_ptr<FuncDef> Parser::parseFuncDef() {
     struct FuncDef funcDef;
     pos++;
-    funcDef.ident = parseIdent();
+    funcDef.ident = *parseIdent();
     pos++;
     if (getToken().token_type == Token::RPARENT) {
-        funcDef.funcFParams = nullptr;
+        funcDef.funcFParams = make_shared<FuncFParams>(FuncFParams());
     } else {
-        funcDef.funcFParams = make_shared<FuncFParams>(parseFuncFParams());
+        funcDef.funcFParams = make_shared<FuncFParams>(*parseFuncFParams());
     }
     pos++;
     pos++;
-    funcDef.exp = make_shared<Exp>(parseExp());
+    funcDef.exp = make_shared<Exp>(*parseExp());
     pos++;
-    return funcDef;
+    return make_shared<FuncDef>(funcDef);
 };
 
-struct VarDecl Parser::parseVarDecl() {
+shared_ptr<VarDecl> Parser::parseVarDecl() {
     struct VarDecl varDecl;
     pos++;
-    varDecl.ident = parseIdent();
+    varDecl.ident = *parseIdent();
     pos++;
-    return varDecl;
+    return make_shared<VarDecl>(varDecl);
 };
 
-Stmt Parser::parseStmt() {
+shared_ptr<Stmt> Parser::parseStmt() {
     Stmt stmt;
     switch (getToken().token_type) {
     case Token::GETTK: {
-        stmt = parseGetStmt();
+        stmt = *parseGetStmt();
         break;
     }
     case Token::PUTTK: {
-        stmt = parsePutStmt();
+        stmt = *parsePutStmt();
         break;
     }
     case Token::TAGTK: {
-        stmt = parseTagStmt();
+        stmt = *parseTagStmt();
         break;
     }
     case Token::LETTK: {
-        stmt = parseLetStmt();
+        stmt = *parseLetStmt();
         break;
     }
     case Token::IFTK: {
-        stmt = parseIfStmt();
+        stmt = *parseIfStmt();
         break;
     }
     case Token::TOTK: {
-        stmt = parseToStmt();
+        stmt = *parseToStmt();
         break;
     }
     }
-    return stmt;
+    return make_shared<Stmt>(stmt);
 }
-struct GetStmt Parser::parseGetStmt(){
+shared_ptr<GetStmt> Parser::parseGetStmt(){
     struct GetStmt getStmt;
     pos++;
-    getStmt.ident = parseIdent();
+    getStmt.ident = *parseIdent();
     pos++;
-    return getStmt;
+    return make_shared<GetStmt>(getStmt);
 };
 
-struct PutStmt Parser::parsePutStmt(){
+shared_ptr<PutStmt> Parser::parsePutStmt(){
     struct PutStmt putStmt;
     pos++;
-    putStmt.exp = make_shared<Exp>(parseExp());
+    putStmt.exp = make_shared<Exp>(*parseExp());
     pos++;
-    return putStmt;
+    return make_shared<PutStmt>(putStmt);
 };
 
-struct TagStmt Parser::parseTagStmt(){
+shared_ptr<TagStmt> Parser::parseTagStmt(){
     struct TagStmt tagStmt;
     pos++;
-    tagStmt.ident = parseIdent();
+    tagStmt.ident = *parseIdent();
     pos++;
-    return tagStmt;
+    return make_shared<TagStmt>(tagStmt);
 };
 
-struct LetStmt Parser::parseLetStmt(){
+shared_ptr<LetStmt> Parser::parseLetStmt(){
     struct LetStmt letStmt;
     pos++;
-    letStmt.ident = parseIdent();
+    letStmt.ident = *parseIdent();
     pos++;
-    letStmt.exp = make_shared<Exp>(parseExp());
+    letStmt.exp = make_shared<Exp>(*parseExp());
     pos++;
-    return letStmt;
+    return make_shared<LetStmt>(letStmt);
 };
 
 
-struct IfStmt Parser::parseIfStmt(){
+shared_ptr<IfStmt> Parser::parseIfStmt(){
     struct IfStmt ifStmt;
     pos++;
-    ifStmt.cond = make_shared<Cond>(parseCond());
+    ifStmt.cond = make_shared<Cond>(*parseCond());
     pos++;
-    ifStmt.ident = parseIdent();
+    ifStmt.ident = *parseIdent();
     pos++;
-    return ifStmt;
+    return make_shared<IfStmt>(ifStmt);
 };
 
-struct ToStmt Parser::parseToStmt(){
+shared_ptr<ToStmt> Parser::parseToStmt(){
     struct ToStmt toStmt;
     pos++;
-    toStmt.ident = parseIdent();
+    toStmt.ident = *parseIdent();
     pos++;
-    return toStmt;
+    return make_shared<ToStmt>(toStmt);
 };
 
-struct Cond Parser::parseCond(){
+shared_ptr<Cond> Parser::parseCond(){
     struct Cond cond;
-    cond.left = make_shared<Exp>(parseExp());
+    cond.left = make_shared<Exp>(*parseExp());
     Token::TokenType t = getToken().token_type;
     cond.op = t == Token::GRE ? Cond::GRE :
-        t == Token::LSS ? Cond::LSS:
-        t == Token::GEQ ? Cond::GEQ:
-        t == Token::LEQ ? Cond::LEQ:
-        t == Token::EQL ? Cond::EQL:
-        Cond::NEQ;
+              t == Token::LSS ? Cond::LSS:
+              t == Token::GEQ ? Cond::GEQ:
+              t == Token::LEQ ? Cond::LEQ:
+              t == Token::EQL ? Cond::EQL:
+                              Cond::NEQ;
     pos++;
-    cond.right = make_shared<Exp>(parseExp());
-    return cond;
+    cond.right = make_shared<Exp>(*parseExp());
+    return make_shared<Cond>(cond);
 };
 
-Exp Parser::parseExp() {
-    return parseAddExp();
+shared_ptr<Exp> Parser::parseExp() {
+    return make_shared<Exp>(*parseAddExp());
 };
 
-struct BinaryExp Parser::parseAddExp() {
+shared_ptr<BinaryExp> Parser::parseAddExp() {
     BinaryExp binaryExp;
     binaryExp.op = BinaryExp::PLUS;
-    binaryExp.lexp = make_shared<Exp>(parseMulExp());
+    binaryExp.lexp = make_shared<Exp>(*parseMulExp());
     if (getToken().token_type == Token::PLUS || getToken().token_type == Token::MINU) {
         binaryExp.op = getToken().token_type == Token::PLUS ? BinaryExp::PLUS : BinaryExp::MINU;
         pos++;
-        binaryExp.rexp = make_shared<Exp>(parseAddExp());
+        binaryExp.rexp = make_shared<Exp>(*parseAddExp());
     } else {
         binaryExp.rexp = nullptr;
     }
-    return binaryExp;
+    return make_shared<BinaryExp>(binaryExp);
 }
 
-struct BinaryExp Parser::parseMulExp() {
+shared_ptr<BinaryExp> Parser::parseMulExp() {
     BinaryExp binaryExp;
     binaryExp.op = BinaryExp::MULT;
-    binaryExp.lexp = make_shared<Exp>(parseUnaryExp());
+    binaryExp.lexp = make_shared<Exp>(*parseUnaryExp());
     if (getToken().token_type == Token::MULT
         || getToken().token_type == Token::DIV
         || getToken().token_type == Token::MOD) {
         binaryExp.op = getToken().token_type == Token::MULT ? BinaryExp::MULT :
                        getToken().token_type == Token::DIV ? BinaryExp::DIV:
-                        BinaryExp::MOD;
+                                                           BinaryExp::MOD;
         pos++;
-        binaryExp.rexp = make_shared<Exp>(parseMulExp());
+        binaryExp.rexp = make_shared<Exp>(*parseMulExp());
     } else {
         binaryExp.rexp = nullptr;
     }
-    return binaryExp;
+    return make_shared<BinaryExp>(binaryExp);
 }
 
 
 
-struct UnaryExp Parser::parseUnaryExp(){
+shared_ptr<UnaryExp> Parser::parseUnaryExp(){
     UnaryExp unaryExp;
     if (getToken().token_type == Token::PLUS || getToken().token_type == Token::MINU) {
         unaryExp.op = getToken().token_type == Token::PLUS ? UnaryExp::PLUS : UnaryExp::MINU;
@@ -215,52 +215,52 @@ struct UnaryExp Parser::parseUnaryExp(){
     if (pos + 1 < tokens.size()
         && tokens[pos].token_type == Token::IDENFR
         && tokens[pos + 1].token_type == Token::LPARENT) {
-        struct CallExp callExp = parseCallExp();
+        struct CallExp callExp = *parseCallExp();
         Exp exp = callExp;
         unaryExp.exp = make_shared<Exp>(exp);
     } else if (tokens[pos].token_type == Token::LPARENT) {
         pos++;
-        Exp exp = parseExp();
+        Exp exp = *parseExp();
         pos++;
         unaryExp.exp = make_shared<Exp>(exp);
     } else if (tokens[pos].token_type == Token::IDENFR){
-        struct Ident ident = parseIdent();
+        struct Ident ident = *parseIdent();
         Exp exp = ident;
         unaryExp.exp = make_shared<Exp>(exp);
     } else {
-        struct Number number = parseNumber();
+        struct Number number = *parseNumber();
         Exp exp = number;
         unaryExp.exp = make_shared<Exp>(exp);
     }
-    return unaryExp;
+    return make_shared<UnaryExp>(unaryExp);
 };
 
-struct CallExp Parser::parseCallExp(){
+shared_ptr<CallExp> Parser::parseCallExp(){
     CallExp callExp;
-    callExp.ident = parseIdent();
+    callExp.ident = *parseIdent();
     pos++;
     if (getToken().token_type == Token::RPARENT) {
-        callExp.funcRParams = nullptr;
+        callExp.funcRParams = make_shared<FuncRParams>(FuncRParams());
     } else {
-        callExp.funcRParams = make_shared<FuncRParams>(parseFuncRParams());
+        callExp.funcRParams = make_shared<FuncRParams>(*parseFuncRParams());
     }
     pos++;
-    return callExp;
+    return make_shared<CallExp>(callExp);
 };
 
-struct FuncRParams Parser::parseFuncRParams(){
+shared_ptr<FuncRParams> Parser::parseFuncRParams(){
     struct FuncRParams funcRParams;
-    funcRParams.exps.push_back(make_shared<Exp>(parseExp()));
+    funcRParams.exps.push_back(make_shared<Exp>(*parseExp()));
     while (getToken().token_type == Token::COMMA) {
         pos++;
-        funcRParams.exps.push_back(make_shared<Exp>(parseExp()));
+        funcRParams.exps.push_back(make_shared<Exp>(*parseExp()));
     }
-    return funcRParams;
+    return make_shared<FuncRParams>(funcRParams);
 };
 
-struct Number Parser::parseNumber(){
+shared_ptr<Number> Parser::parseNumber(){
     struct Number number;
     number.value = stof(getToken().content);
     pos++;
-    return number;
+    return make_shared<Number>(number);
 };

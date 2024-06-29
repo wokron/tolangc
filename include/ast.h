@@ -1,170 +1,40 @@
+//
+// Created by Zengyuankun on 2024/5/31.
+//
 #pragma once
 
-#include <iostream>
-#include <memory>
-#include <string>
-#include <variant>
-#include <vector>
-#include <front/lexer/token.h>
+#include"front/lexer/token.h"
+#include"ast.h"
+#include<vector>
+using namespace std;
+class Parser {
+public:
+    shared_ptr<CompUnit> parseCompUnit();
+    Parser(vector<Token>& t):tokens(t){pos = 0;};
 
-struct Node {
-    int line;
+private:
+    vector<Token> tokens;
+    int pos;
+    Token getToken();
+    bool hasNext();
+    shared_ptr<Ident> parseIdent();
+    shared_ptr<FuncFParams> parseFuncFParams();
+    shared_ptr<FuncDef> parseFuncDef();
+    shared_ptr<VarDecl> parseVarDecl();
+    shared_ptr<Stmt> parseStmt();
+    shared_ptr<GetStmt> parseGetStmt();
+    shared_ptr<PutStmt> parsePutStmt();
+    shared_ptr<TagStmt> parseTagStmt();
+    shared_ptr<LetStmt> parseLetStmt();
+    shared_ptr<Cond> parseCond();
+    shared_ptr<IfStmt> parseIfStmt();
+    shared_ptr<ToStmt> parseToStmt();
+    shared_ptr<Exp> parseExp();
+    shared_ptr<BinaryExp> parseAddExp();
+    shared_ptr<BinaryExp> parseMulExp();
+    shared_ptr<CallExp> parseCallExp();
+    shared_ptr<UnaryExp> parseUnaryExp();
+    shared_ptr<FuncRParams> parseFuncRParams();
+    shared_ptr<Number> parseNumber();
 
-    virtual void print(std::ostream &out) = 0;
-};
-
-struct Ident;
-
-
-struct GetStmt;
-struct PutStmt;
-struct TagStmt;
-struct LetStmt;
-struct IfStmt;
-struct ToStmt;
-using Stmt = std::variant<GetStmt, PutStmt, TagStmt, LetStmt, IfStmt, ToStmt>;
-
-struct BinaryExp;
-struct CallExp;
-struct UnaryExp;
-struct Number;
-using Exp = std::variant<BinaryExp, CallExp, UnaryExp, Ident, Number>;
-struct FuncDef;
-struct VarDecl;
-
-
-struct Ident : public Node {
-    std::string ident;
-
-    void print(std::ostream &out) override;
-};
-
-struct CompUnit : public Node {
-    std::vector<std::shared_ptr<FuncDef>> funcDefs;
-    std::vector<std::shared_ptr<VarDecl>> varDecls;
-    std::vector<std::shared_ptr<Stmt>> stmts;
-
-    void print(std::ostream &out) override;
-};
-
-struct FuncFParams;
-
-struct FuncDef : public Node {
-    Ident ident;
-    std::shared_ptr<FuncFParams> funcFParams;
-    std::shared_ptr<Exp> exp;
-
-    void print(std::ostream &out) override;
-};
-
-struct FuncFParams : public Node {
-    std::vector<Ident> idents;
-
-    void print(std::ostream &out) override;
-};
-
-struct VarDecl : public Node {
-    Ident ident;
-
-    void print(std::ostream &out) override;
-};
-
-struct GetStmt : public Node {
-    Ident ident;
-
-    void print(std::ostream &out) override;
-};
-
-struct PutStmt : public Node {
-    std::shared_ptr<Exp> exp;
-
-    void print(std::ostream &out) override;
-};
-
-struct TagStmt : public Node {
-    Ident ident;
-
-    void print(std::ostream &out) override;
-};
-
-struct LetStmt : public Node {
-    Ident ident;
-    std::shared_ptr<Exp> exp;
-
-    void print(std::ostream &out) override;
-};
-
-struct Cond;
-
-struct IfStmt : public Node {
-    std::shared_ptr<Cond> cond;
-    Ident ident;
-
-    void print(std::ostream &out) override;
-};
-
-struct ToStmt : public Node {
-    Ident ident;
-
-    void print(std::ostream &out) override;
-};
-
-struct BinaryExp : public Node {
-    std::shared_ptr<Exp> lexp;
-    enum {
-        PLUS,
-        MINU,
-        MULT,
-        DIV,
-        MOD,
-    } op;
-    std::shared_ptr<Exp> rexp;
-
-    void print(std::ostream &out) override;
-};
-
-struct FuncRParams;
-
-struct CallExp : public Node {
-    Ident ident;
-    std::shared_ptr<FuncRParams> funcRParams;
-
-    void print(std::ostream &out) override;
-};
-
-struct UnaryExp : public Node {
-    enum {
-        PLUS,
-        MINU,
-    } op;
-    std::shared_ptr<Exp> exp;
-    bool hasOp;
-    void print(std::ostream &out) override;
-};
-
-struct FuncRParams : public Node {
-    std::vector<std::shared_ptr<Exp>> exps;
-
-    void print(std::ostream &out) override;
-};
-
-struct Cond : public Node {
-    std::shared_ptr<Exp> left;
-    enum {
-        LSS,
-        GRE,
-        LEQ,
-        GEQ,
-        EQL,
-        NEQ,
-    } op;
-    std::shared_ptr<Exp> right;
-
-    void print(std::ostream &out) override;
-};
-
-struct Number : public Node {
-    float value;
-
-    void print(std::ostream &out) override;
 };

@@ -3,38 +3,38 @@
 //
 #pragma once
 
-#include <front/lexer/token.h>
-#include <ast.h>
+#include"front/lexer/token.h"
+#include"ast.h"
 #include<vector>
 using namespace std;
 class Parser {
-  public:
-    struct CompUnit parseCompUnit();
+public:
+    shared_ptr<CompUnit> parseCompUnit();
     Parser(vector<Token>& t):tokens(t){pos = 0;};
 
-  private:
+private:
     vector<Token> tokens;
     int pos;
     Token getToken();
     bool hasNext();
-    struct Ident parseIdent();
-    struct FuncFParams parseFuncFParams();
-    struct FuncDef parseFuncDef();
-    struct VarDecl parseVarDecl();
-    Stmt parseStmt();
-    struct GetStmt parseGetStmt();
-    struct PutStmt parsePutStmt();
-    struct TagStmt parseTagStmt();
-    struct LetStmt parseLetStmt();
-    struct Cond parseCond();
-    struct IfStmt parseIfStmt();
-    struct ToStmt parseToStmt();
-    Exp parseExp();
-    struct BinaryExp parseAddExp();
-    struct BinaryExp parseMulExp();
-    struct CallExp parseCallExp();
-    struct UnaryExp parseUnaryExp();
-    struct FuncRParams parseFuncRParams();
-    struct Number parseNumber();
+    shared_ptr<Ident> parseIdent();
+    shared_ptr<FuncFParams> parseFuncFParams();
+    shared_ptr<FuncDef> parseFuncDef();
+    shared_ptr<VarDecl> parseVarDecl();
+    shared_ptr<Stmt> parseStmt();
+    shared_ptr<GetStmt> parseGetStmt();
+    shared_ptr<PutStmt> parsePutStmt();
+    shared_ptr<TagStmt> parseTagStmt();
+    shared_ptr<LetStmt> parseLetStmt();
+    shared_ptr<Cond> parseCond();
+    shared_ptr<IfStmt> parseIfStmt();
+    shared_ptr<ToStmt> parseToStmt();
+    shared_ptr<Exp> parseExp();
+    shared_ptr<BinaryExp> parseAddExp();
+    shared_ptr<BinaryExp> parseMulExp();
+    shared_ptr<CallExp> parseCallExp();
+    shared_ptr<UnaryExp> parseUnaryExp();
+    shared_ptr<FuncRParams> parseFuncRParams();
+    shared_ptr<Number> parseNumber();
 
 };

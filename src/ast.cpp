@@ -32,9 +32,7 @@ void FuncDef::print(std::ostream &out) {
     out << "FN fn" << endl;
     ident.print(out);
     out << "LPARENT (" << endl;
-    if (funcFParams != nullptr) {
-        (*funcFParams).print(out);
-    }
+    (*funcFParams).print(out);
     out << "RPARENT )" << endl;
     out << "RARROW =>" << endl;
     std::visit([&out](auto& s) {
@@ -46,10 +44,12 @@ void FuncDef::print(std::ostream &out) {
 }
 
 void FuncFParams::print(std::ostream &out) {
-    idents[0].print(out);
-    for (int i = 1;i < idents.size();i++) {
-        out << "COMMA ," << endl;
-        idents[i].print(out);
+    if (idents.size() > 0) {
+        idents[0].print(out);
+        for (int i = 1;i < idents.size();i++) {
+            out << "COMMA ," << endl;
+            idents[i].print(out);
+        }
     }
     out << "<FuncFParams>" << endl;
 }
@@ -164,9 +164,7 @@ void BinaryExp::print(std::ostream &out) {
 void CallExp::print(std::ostream &out) {
     ident.print(out);
     out << "LPARENT (" << endl;
-    if (funcRParams != nullptr) {
-        (*funcRParams).print(out);
-    }
+    (*funcRParams).print(out);
     out << "RPARENT )" << endl;
     out << "<CallExp>" << endl;
 }
@@ -179,33 +177,42 @@ void UnaryExp::print(std::ostream &out) {
         else
             out << "MINUS -" << endl;
     }
+    bool hasParent = false;
+    if (std::holds_alternative<BinaryExp>(*exp))
+        hasParent = true;
+    if (hasParent)
+        out << "LPARENT (" << endl;
     std::visit([&out](auto& s) {
         Node& node_ref = static_cast<Node&>(s);
         node_ref.print(out);
     }, (*exp));
+    if (hasParent)
+        out << "RPARENT )" << endl;
     out << "<UnaryExp>" << endl;
 }
 
 void FuncRParams::print(std::ostream &out) {
-    std::visit([&out](auto& s) {
-        Node& node_ref = static_cast<Node&>(s);
-        node_ref.print(out);
-    }, (*(exps[0])));
-    for (int i = 1;i < exps.size();i++) {
-        out << "COMMA ," << endl;
+    if (exps.size() > 0) {
         std::visit([&out](auto& s) {
             Node& node_ref = static_cast<Node&>(s);
             node_ref.print(out);
-        }, (*(exps[i])));
+        }, (*(exps[0])));
+        for (int i = 1;i < exps.size();i++) {
+            out << "COMMA ," << endl;
+            std::visit([&out](auto& s) {
+                Node& node_ref = static_cast<Node&>(s);
+                node_ref.print(out);
+            }, (*(exps[i])));
+        }
     }
     out << "<FuncRParams>" << endl;
 }
 
 void Cond::print(std::ostream &out) {
     std::visit([&out](auto &s) {
-            Node &node_ref = static_cast<Node &>(s);
-            node_ref.print(out);
-        },*left);
+        Node &node_ref = static_cast<Node &>(s);
+        node_ref.print(out);
+    },*left);
     switch (op) {
     case LSS: {
         out << "LSS <" << endl;
