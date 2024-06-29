@@ -3,7 +3,6 @@
 #include <front/parser/parser.h>
 #include <fstream>
 #include <vector>
-using namespace std;
 
 #include <iostream>
 int main() {

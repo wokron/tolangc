@@ -4,68 +4,66 @@
 #include <memory>
 #include <string>
 
-using namespace std;
-
 Token Parser::getToken() { return tokens[pos]; }
 
 bool Parser::hasNext() { return pos < tokens.size(); }
-shared_ptr<CompUnit> Parser::parseCompUnit() {
+std::shared_ptr<CompUnit> Parser::parseCompUnit() {
     struct CompUnit compUnit;
     while (hasNext() && getToken().token_type == Token::FN) {
-        compUnit.funcDefs.push_back(make_shared<FuncDef>(*parseFuncDef()));
+        compUnit.funcDefs.push_back(std::make_shared<FuncDef>(*parseFuncDef()));
     }
     while (hasNext() && getToken().token_type == Token::VARTK) {
-        compUnit.varDecls.push_back(make_shared<VarDecl>(*parseVarDecl()));
+        compUnit.varDecls.push_back(std::make_shared<VarDecl>(*parseVarDecl()));
     }
     while (hasNext()) {
-        compUnit.stmts.push_back(make_shared<Stmt>(*parseStmt()));
+        compUnit.stmts.push_back(std::make_shared<Stmt>(*parseStmt()));
     }
-    return make_shared<CompUnit>(compUnit);
+    return std::make_shared<CompUnit>(compUnit);
 }
 
-shared_ptr<Ident> Parser::parseIdent() {
+std::shared_ptr<Ident> Parser::parseIdent() {
     struct Ident ident;
     ident.value = getToken().content;
     pos++;
-    return make_shared<Ident>(ident);
+    return std::make_shared<Ident>(ident);
 }
 
-shared_ptr<FuncFParams> Parser::parseFuncFParams() {
+std::shared_ptr<FuncFParams> Parser::parseFuncFParams() {
     struct FuncFParams funcFParams;
     funcFParams.idents.push_back(*parseIdent());
     while (getToken().token_type == Token::COMMA) {
         pos++;
         funcFParams.idents.push_back(*parseIdent());
     }
-    return make_shared<FuncFParams>(funcFParams);
+    return std::make_shared<FuncFParams>(funcFParams);
 };
 
-shared_ptr<FuncDef> Parser::parseFuncDef() {
+std::shared_ptr<FuncDef> Parser::parseFuncDef() {
     struct FuncDef funcDef;
     pos++;
     funcDef.ident = *parseIdent();
     pos++;
     if (getToken().token_type == Token::RPARENT) {
-        funcDef.funcFParams = make_shared<FuncFParams>(FuncFParams());
+        funcDef.funcFParams = std::make_shared<FuncFParams>(FuncFParams());
     } else {
-        funcDef.funcFParams = make_shared<FuncFParams>(*parseFuncFParams());
+        funcDef.funcFParams = std::make_shared<FuncFParams>(*parseFuncFParams());
     }
     pos++;
     pos++;
-    funcDef.exp = make_shared<Exp>(*parseExp());
+    funcDef.exp = std::make_shared<Exp>(*parseExp());
     pos++;
-    return make_shared<FuncDef>(funcDef);
+    return std::make_shared<FuncDef>(funcDef);
 };
 
-shared_ptr<VarDecl> Parser::parseVarDecl() {
+std::shared_ptr<VarDecl> Parser::parseVarDecl() {
     struct VarDecl varDecl;
     pos++;
     varDecl.ident = *parseIdent();
     pos++;
-    return make_shared<VarDecl>(varDecl);
+    return std::make_shared<VarDecl>(varDecl);
 };
 
-shared_ptr<Stmt> Parser::parseStmt() {
+std::shared_ptr<Stmt> Parser::parseStmt() {
     Stmt stmt;
     auto token = getToken();
     switch (token.token_type) {
@@ -96,63 +94,63 @@ shared_ptr<Stmt> Parser::parseStmt() {
     default:
         error(token.line, "unexpected token");
     }
-    return make_shared<Stmt>(stmt);
+    return std::make_shared<Stmt>(stmt);
 }
-shared_ptr<GetStmt> Parser::parseGetStmt() {
+std::shared_ptr<GetStmt> Parser::parseGetStmt() {
     struct GetStmt getStmt;
     pos++;
     getStmt.ident = *parseIdent();
     pos++;
-    return make_shared<GetStmt>(getStmt);
+    return std::make_shared<GetStmt>(getStmt);
 };
 
-shared_ptr<PutStmt> Parser::parsePutStmt() {
+std::shared_ptr<PutStmt> Parser::parsePutStmt() {
     struct PutStmt putStmt;
     pos++;
-    putStmt.exp = make_shared<Exp>(*parseExp());
+    putStmt.exp = std::make_shared<Exp>(*parseExp());
     pos++;
-    return make_shared<PutStmt>(putStmt);
+    return std::make_shared<PutStmt>(putStmt);
 };
 
-shared_ptr<TagStmt> Parser::parseTagStmt() {
+std::shared_ptr<TagStmt> Parser::parseTagStmt() {
     struct TagStmt tagStmt;
     pos++;
     tagStmt.ident = *parseIdent();
     pos++;
-    return make_shared<TagStmt>(tagStmt);
+    return std::make_shared<TagStmt>(tagStmt);
 };
 
-shared_ptr<LetStmt> Parser::parseLetStmt() {
+std::shared_ptr<LetStmt> Parser::parseLetStmt() {
     struct LetStmt letStmt;
     pos++;
     letStmt.ident = *parseIdent();
     pos++;
-    letStmt.exp = make_shared<Exp>(*parseExp());
+    letStmt.exp = std::make_shared<Exp>(*parseExp());
     pos++;
-    return make_shared<LetStmt>(letStmt);
+    return std::make_shared<LetStmt>(letStmt);
 };
 
-shared_ptr<IfStmt> Parser::parseIfStmt() {
+std::shared_ptr<IfStmt> Parser::parseIfStmt() {
     struct IfStmt ifStmt;
     pos++;
-    ifStmt.cond = make_shared<Cond>(*parseCond());
+    ifStmt.cond = std::make_shared<Cond>(*parseCond());
     pos++;
     ifStmt.ident = *parseIdent();
     pos++;
-    return make_shared<IfStmt>(ifStmt);
+    return std::make_shared<IfStmt>(ifStmt);
 };
 
-shared_ptr<ToStmt> Parser::parseToStmt() {
+std::shared_ptr<ToStmt> Parser::parseToStmt() {
     struct ToStmt toStmt;
     pos++;
     toStmt.ident = *parseIdent();
     pos++;
-    return make_shared<ToStmt>(toStmt);
+    return std::make_shared<ToStmt>(toStmt);
 };
 
-shared_ptr<Cond> Parser::parseCond() {
+std::shared_ptr<Cond> Parser::parseCond() {
     struct Cond cond;
-    cond.left = make_shared<Exp>(*parseExp());
+    cond.left = std::make_shared<Exp>(*parseExp());
     Token::TokenType t = getToken().token_type;
     cond.op = t == Token::GRE   ? Cond::GRE
               : t == Token::LSS ? Cond::LSS
@@ -161,32 +159,32 @@ shared_ptr<Cond> Parser::parseCond() {
               : t == Token::EQL ? Cond::EQL
                                 : Cond::NEQ;
     pos++;
-    cond.right = make_shared<Exp>(*parseExp());
-    return make_shared<Cond>(cond);
+    cond.right = std::make_shared<Exp>(*parseExp());
+    return std::make_shared<Cond>(cond);
 };
 
-shared_ptr<Exp> Parser::parseExp() { return make_shared<Exp>(*parseAddExp()); };
+std::shared_ptr<Exp> Parser::parseExp() { return std::make_shared<Exp>(*parseAddExp()); };
 
-shared_ptr<BinaryExp> Parser::parseAddExp() {
+std::shared_ptr<BinaryExp> Parser::parseAddExp() {
     BinaryExp binaryExp;
     binaryExp.op = BinaryExp::PLUS;
-    binaryExp.lexp = make_shared<Exp>(*parseMulExp());
+    binaryExp.lexp = std::make_shared<Exp>(*parseMulExp());
     if (getToken().token_type == Token::PLUS ||
         getToken().token_type == Token::MINU) {
         binaryExp.op = getToken().token_type == Token::PLUS ? BinaryExp::PLUS
                                                             : BinaryExp::MINU;
         pos++;
-        binaryExp.rexp = make_shared<Exp>(*parseAddExp());
+        binaryExp.rexp = std::make_shared<Exp>(*parseAddExp());
     } else {
         binaryExp.rexp = nullptr;
     }
-    return make_shared<BinaryExp>(binaryExp);
+    return std::make_shared<BinaryExp>(binaryExp);
 }
 
-shared_ptr<BinaryExp> Parser::parseMulExp() {
+std::shared_ptr<BinaryExp> Parser::parseMulExp() {
     BinaryExp binaryExp;
     binaryExp.op = BinaryExp::MULT;
-    binaryExp.lexp = make_shared<Exp>(*parseUnaryExp());
+    binaryExp.lexp = std::make_shared<Exp>(*parseUnaryExp());
     if (getToken().token_type == Token::MULT ||
         getToken().token_type == Token::DIV ||
         getToken().token_type == Token::MOD) {
@@ -194,14 +192,14 @@ shared_ptr<BinaryExp> Parser::parseMulExp() {
                        : getToken().token_type == Token::DIV ? BinaryExp::DIV
                                                              : BinaryExp::MOD;
         pos++;
-        binaryExp.rexp = make_shared<Exp>(*parseMulExp());
+        binaryExp.rexp = std::make_shared<Exp>(*parseMulExp());
     } else {
         binaryExp.rexp = nullptr;
     }
-    return make_shared<BinaryExp>(binaryExp);
+    return std::make_shared<BinaryExp>(binaryExp);
 }
 
-shared_ptr<UnaryExp> Parser::parseUnaryExp() {
+std::shared_ptr<UnaryExp> Parser::parseUnaryExp() {
     UnaryExp unaryExp;
     if (getToken().token_type == Token::PLUS ||
         getToken().token_type == Token::MINU) {
@@ -216,50 +214,50 @@ shared_ptr<UnaryExp> Parser::parseUnaryExp() {
         tokens[pos + 1].token_type == Token::LPARENT) {
         struct CallExp callExp = *parseCallExp();
         Exp exp = callExp;
-        unaryExp.exp = make_shared<Exp>(exp);
+        unaryExp.exp = std::make_shared<Exp>(exp);
     } else if (tokens[pos].token_type == Token::LPARENT) {
         pos++;
         Exp exp = *parseExp();
         pos++;
-        unaryExp.exp = make_shared<Exp>(exp);
+        unaryExp.exp = std::make_shared<Exp>(exp);
     } else if (tokens[pos].token_type == Token::IDENFR) {
         struct Ident ident = *parseIdent();
         Exp exp = ident;
-        unaryExp.exp = make_shared<Exp>(exp);
+        unaryExp.exp = std::make_shared<Exp>(exp);
     } else {
         struct Number number = *parseNumber();
         Exp exp = number;
-        unaryExp.exp = make_shared<Exp>(exp);
+        unaryExp.exp = std::make_shared<Exp>(exp);
     }
-    return make_shared<UnaryExp>(unaryExp);
+    return std::make_shared<UnaryExp>(unaryExp);
 };
 
-shared_ptr<CallExp> Parser::parseCallExp() {
+std::shared_ptr<CallExp> Parser::parseCallExp() {
     CallExp callExp;
     callExp.ident = *parseIdent();
     pos++;
     if (getToken().token_type == Token::RPARENT) {
-        callExp.funcRParams = make_shared<FuncRParams>(FuncRParams());
+        callExp.funcRParams = std::make_shared<FuncRParams>(FuncRParams());
     } else {
-        callExp.funcRParams = make_shared<FuncRParams>(*parseFuncRParams());
+        callExp.funcRParams = std::make_shared<FuncRParams>(*parseFuncRParams());
     }
     pos++;
-    return make_shared<CallExp>(callExp);
+    return std::make_shared<CallExp>(callExp);
 };
 
-shared_ptr<FuncRParams> Parser::parseFuncRParams() {
+std::shared_ptr<FuncRParams> Parser::parseFuncRParams() {
     struct FuncRParams funcRParams;
-    funcRParams.exps.push_back(make_shared<Exp>(*parseExp()));
+    funcRParams.exps.push_back(std::make_shared<Exp>(*parseExp()));
     while (getToken().token_type == Token::COMMA) {
         pos++;
-        funcRParams.exps.push_back(make_shared<Exp>(*parseExp()));
+        funcRParams.exps.push_back(std::make_shared<Exp>(*parseExp()));
     }
-    return make_shared<FuncRParams>(funcRParams);
+    return std::make_shared<FuncRParams>(funcRParams);
 };
 
-shared_ptr<Number> Parser::parseNumber() {
+std::shared_ptr<Number> Parser::parseNumber() {
     struct Number number;
     number.value = stof(getToken().content);
     pos++;
-    return make_shared<Number>(number);
+    return std::make_shared<Number>(number);
 };

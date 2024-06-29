@@ -4,7 +4,6 @@
 #include <vector>
 #include <sstream>
 #include <cassert>
-using namespace std;
 
 /*
 fn f(a,b) => a + b;
@@ -28,22 +27,22 @@ tag L2;
 put a;
 */
 
-static void create_tokens(vector<Token>& tokens);
-static void create_ans(string& ans);
+static void create_tokens(std::vector<Token>& tokens);
+static void create_ans(std::string& ans);
 
 
 TEST_CASE("AST TEST") {
     // 词法分析
-    vector<Token> tokens;
+    std::vector<Token> tokens;
     create_tokens(tokens);
 
 
     // 语法分析
     Parser parser(tokens);
     CompUnit compUnit = *parser.parseCompUnit();
-    ostringstream out;
+    std::ostringstream out;
     compUnit.print(out);
-    string ans;
+    std::string ans;
     create_ans(ans);
 
     assert(out.str() == ans);
@@ -51,7 +50,7 @@ TEST_CASE("AST TEST") {
 
 }
 
-static void create_tokens(vector<Token>& tokens) {
+static void create_tokens(std::vector<Token>& tokens) {
 
     tokens.push_back(Token(Token::FN,"fn",0));
     tokens.push_back(Token(Token::IDENFR,"f",0));
@@ -174,7 +173,7 @@ static void create_tokens(vector<Token>& tokens) {
     tokens.push_back(Token(Token::SEMINCN,";",0));
 }
 
-static void create_ans(string& ans) {
+static void create_ans(std::string& ans) {
     ans =R"(FN fn
 IDENFR f
 <Ident>

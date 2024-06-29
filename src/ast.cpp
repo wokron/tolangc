@@ -2,11 +2,10 @@
 
 
 #include<iostream>
-using namespace std;
 
 void Ident::print(std::ostream &out) {
-    out << "IDENFR " << value << endl;
-    out << "<Ident>" << endl;
+    out << "IDENFR " << value << std::endl;
+    out << "<Ident>" << std::endl;
 }
 
 void CompUnit::print(std::ostream &out) {
@@ -22,93 +21,93 @@ void CompUnit::print(std::ostream &out) {
             node_ref.print(out);
         }, (*stmt));
     }
-    out << "<CompUnit>" << endl;
+    out << "<CompUnit>" << std::endl;
 }
 
 void FuncDef::print(std::ostream &out) {
-    out << "FN fn" << endl;
+    out << "FN fn" << std::endl;
     ident.print(out);
-    out << "LPARENT (" << endl;
+    out << "LPARENT (" << std::endl;
     (*funcFParams).print(out);
-    out << "RPARENT )" << endl;
-    out << "RARROW =>" << endl;
+    out << "RPARENT )" << std::endl;
+    out << "RARROW =>" << std::endl;
     std::visit([&out](auto& s) {
         Node& node_ref = static_cast<Node&>(s);
         node_ref.print(out);
     }, (*exp));
-    out << "SEMICN ;" << endl;
-    out << "<FuncDef>" << endl;
+    out << "SEMICN ;" << std::endl;
+    out << "<FuncDef>" << std::endl;
 }
 
 void FuncFParams::print(std::ostream &out) {
     if (idents.size() > 0) {
         idents[0].print(out);
         for (int i = 1;i < idents.size();i++) {
-            out << "COMMA ," << endl;
+            out << "COMMA ," << std::endl;
             idents[i].print(out);
         }
     }
-    out << "<FuncFParams>" << endl;
+    out << "<FuncFParams>" << std::endl;
 }
 
 void VarDecl::print(std::ostream &out) {
-    out << "VARTK var" << endl;
+    out << "VARTK var" << std::endl;
     ident.print(out);
-    out << "SEMICN ;" << endl;
-    out << "<VarDecl>" << endl;
+    out << "SEMICN ;" << std::endl;
+    out << "<VarDecl>" << std::endl;
 }
 
 void GetStmt::print(std::ostream &out) {
-    out << "GETTK get" << endl;
+    out << "GETTK get" << std::endl;
     ident.print(out);
-    out << "SEMICN ;" << endl;
-    out << "<Stmt>" << endl;
+    out << "SEMICN ;" << std::endl;
+    out << "<Stmt>" << std::endl;
 }
 
 void PutStmt::print(std::ostream &out) {
-    out << "PUTTK put" << endl;
+    out << "PUTTK put" << std::endl;
     std::visit([&out](auto& s) {
         Node& node_ref = static_cast<Node&>(s);
         node_ref.print(out);
     }, (*exp));
-    out << "SEMICN ;" << endl;
-    out << "<Stmt>" << endl;
+    out << "SEMICN ;" << std::endl;
+    out << "<Stmt>" << std::endl;
 }
 
 
 void TagStmt::print(std::ostream &out) {
-    out << "TAGTK tag" << endl;
+    out << "TAGTK tag" << std::endl;
     ident.print(out);
-    out << "SEMICN ;" << endl;
-    out << "<Stmt>" << endl;
+    out << "SEMICN ;" << std::endl;
+    out << "<Stmt>" << std::endl;
 }
 
 void LetStmt::print(std::ostream &out) {
-    out << "LETTK let" << endl;
+    out << "LETTK let" << std::endl;
     ident.print(out);
-    out << "ASSIGN =" << endl;
+    out << "ASSIGN =" << std::endl;
     std::visit([&out](auto& s) {
         Node& node_ref = static_cast<Node&>(s);
         node_ref.print(out);
     }, (*exp));
-    out << "SEMICN ;" << endl;
-    out << "<Stmt>" << endl;
+    out << "SEMICN ;" << std::endl;
+    out << "<Stmt>" << std::endl;
 }
 
 void IfStmt::print(std::ostream &out) {
-    out << "IFTK if" << endl;
+    out << "IFTK if" << std::endl;
     (*cond).print(out);
-    out << "TOTK to" << endl;
+    out << "TOTK to" << std::endl;
     ident.print(out);
-    out << "SEMICN ;" << endl;
-    out << "<Stmt>" << endl;
+    out << "SEMICN ;" << std::endl;
+    out << "<Stmt>" << std::endl;
 }
 
 void ToStmt::print(std::ostream &out) {
-    out << "TOTK to" << endl;
+    out << "TOTK to" << std::endl;
     ident.print(out);
-    out << "SEMICN ;" << endl;
-    out << "<Stmt>" << endl;
+    out << "SEMICN ;" << std::endl;
+    out << "<Stmt>" << std::endl;
 }
 
 void BinaryExp::print(std::ostream &out) {
@@ -119,31 +118,31 @@ void BinaryExp::print(std::ostream &out) {
     bool isAdd = op == PLUS || op == MINU;
     if (rexp == nullptr) {
         if (isAdd) {
-            out << "<AddExp>" << endl;
+            out << "<AddExp>" << std::endl;
         } else {
-            out << "<MulExp>" << endl;
+            out << "<MulExp>" << std::endl;
         }
         return;
     }
     switch (op) {
     case PLUS: {
-        out << "PLUS +" << endl;
+        out << "PLUS +" << std::endl;
         break;
     }
     case MINU: {
-        out << "MINU -" << endl;
+        out << "MINU -" << std::endl;
         break;
     }
     case MULT: {
-        out << "MULT *" << endl;
+        out << "MULT *" << std::endl;
         break;
     }
     case DIV: {
-        out << "DIV /" << endl;
+        out << "DIV /" << std::endl;
         break;
     }
     case MOD: {
-        out << "MOD %" << endl;
+        out << "MOD %" << std::endl;
         break;
     }
     }
@@ -152,40 +151,40 @@ void BinaryExp::print(std::ostream &out) {
         node_ref.print(out);
     }, (*rexp));
     if (isAdd) {
-        out << "<AddExp>" << endl;
+        out << "<AddExp>" << std::endl;
     } else {
-        out << "<MulExp>" << endl;
+        out << "<MulExp>" << std::endl;
     }
 }
 
 void CallExp::print(std::ostream &out) {
     ident.print(out);
-    out << "LPARENT (" << endl;
+    out << "LPARENT (" << std::endl;
     (*funcRParams).print(out);
-    out << "RPARENT )" << endl;
-    out << "<CallExp>" << endl;
+    out << "RPARENT )" << std::endl;
+    out << "<CallExp>" << std::endl;
 }
 
 
 void UnaryExp::print(std::ostream &out) {
     if (hasOp) {
         if (op == PLUS)
-            out << "PLUS +" << endl;
+            out << "PLUS +" << std::endl;
         else
-            out << "MINUS -" << endl;
+            out << "MINUS -" << std::endl;
     }
     bool hasParent = false;
     if (std::holds_alternative<BinaryExp>(*exp))
         hasParent = true;
     if (hasParent)
-        out << "LPARENT (" << endl;
+        out << "LPARENT (" << std::endl;
     std::visit([&out](auto& s) {
         Node& node_ref = static_cast<Node&>(s);
         node_ref.print(out);
     }, (*exp));
     if (hasParent)
-        out << "RPARENT )" << endl;
-    out << "<UnaryExp>" << endl;
+        out << "RPARENT )" << std::endl;
+    out << "<UnaryExp>" << std::endl;
 }
 
 void FuncRParams::print(std::ostream &out) {
@@ -195,14 +194,14 @@ void FuncRParams::print(std::ostream &out) {
             node_ref.print(out);
         }, (*(exps[0])));
         for (int i = 1;i < exps.size();i++) {
-            out << "COMMA ," << endl;
+            out << "COMMA ," << std::endl;
             std::visit([&out](auto& s) {
                 Node& node_ref = static_cast<Node&>(s);
                 node_ref.print(out);
             }, (*(exps[i])));
         }
     }
-    out << "<FuncRParams>" << endl;
+    out << "<FuncRParams>" << std::endl;
 }
 
 void Cond::print(std::ostream &out) {
@@ -212,27 +211,27 @@ void Cond::print(std::ostream &out) {
     },*left);
     switch (op) {
     case LSS: {
-        out << "LSS <" << endl;
+        out << "LSS <" << std::endl;
         break;
     }
     case GRE: {
-        out << "GRE >" << endl;
+        out << "GRE >" << std::endl;
         break;
     }
     case LEQ: {
-        out << "LEQ <=" << endl;
+        out << "LEQ <=" << std::endl;
         break;
     }
     case GEQ: {
-        out << "GEQ >=" << endl;
+        out << "GEQ >=" << std::endl;
         break;
     }
     case EQL: {
-        out << "EQL ==" << endl;
+        out << "EQL ==" << std::endl;
         break;
     }
     case NEQ: {
-        out << "NEQ !=" << endl;
+        out << "NEQ !=" << std::endl;
         break;
     }
     }
@@ -240,10 +239,10 @@ void Cond::print(std::ostream &out) {
         Node &node_ref = static_cast<Node &>(s);
         node_ref.print(out);
     },*right);
-    out << "<Cond>" << endl;
+    out << "<Cond>" << std::endl;
 }
 
 void Number::print(std::ostream &out) {
-    out << "Number " << value << endl;
-    out << "<Number>" << endl;
+    out << "Number " << value << std::endl;
+    out << "<Number>" << std::endl;
 }
