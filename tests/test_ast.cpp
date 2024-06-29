@@ -1,6 +1,4 @@
-#include "ast.h"
 #include "doctest.h"
-#include "front/lexer/lexer.h"
 #include "front/parser/parser.h"
 #include <iostream>
 #include <vector>
@@ -33,6 +31,7 @@ put a;
 static void create_tokens(vector<Token>& tokens);
 static void create_ans(string& ans);
 
+
 TEST_CASE("AST TEST") {
     // 词法分析
     vector<Token> tokens;
@@ -42,7 +41,6 @@ TEST_CASE("AST TEST") {
     // 语法分析
     Parser parser(tokens);
     CompUnit compUnit = *parser.parseCompUnit();
-    ofstream outFile("output.txt", ios::out);
     ostringstream out;
     compUnit.print(out);
     string ans;
@@ -53,7 +51,7 @@ TEST_CASE("AST TEST") {
 
 }
 
-void create_tokens(vector<Token>& tokens) {
+static void create_tokens(vector<Token>& tokens) {
 
     tokens.push_back(Token(Token::FN,"fn",0));
     tokens.push_back(Token(Token::IDENFR,"f",0));
@@ -176,7 +174,7 @@ void create_tokens(vector<Token>& tokens) {
     tokens.push_back(Token(Token::SEMINCN,";",0));
 }
 
-void create_ans(string& ans) {
+static void create_ans(string& ans) {
     ans =R"(FN fn
 IDENFR f
 <Ident>
