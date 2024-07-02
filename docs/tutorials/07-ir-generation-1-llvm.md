@@ -879,56 +879,56 @@ define dso_local i32 @func3() {
 }
 
 define dso_local i32 @main() {
-%1 = call i32 @func()
-%2 = icmp ne i32 %1, 0
-br i1 %2, label %3, label %6
+    %1 = call i32 @func()
+    %2 = icmp ne i32 %1, 0
+    br i1 %2, label %3, label %6
 
 3:
-%4 = call i32 @func3()
-%5 = icmp ne i32 %4, 0
-br i1 %5, label %9, label %6
+    %4 = call i32 @func3()
+    %5 = icmp ne i32 %4, 0
+    br i1 %5, label %9, label %6
 
 6:
-%7 = call i32 @func2()
-%8 = icmp ne i32 %7, 0
-br i1 %8, label %9, label %11
+    %7 = call i32 @func2()
+    %8 = icmp ne i32 %7, 0
+    br i1 %8, label %9, label %11
 
 9:
-%10 = load i32, i32 * @a
-call void @putint(i32 %10)
-call void @putch(i32 45)
-call void @putch(i32 45)
-call void @putch(i32 49)
-br label %11
+    %10 = load i32, i32 * @a
+    call void @putint(i32 %10)
+    call void @putch(i32 45)
+    call void @putch(i32 45)
+    call void @putch(i32 49)
+    br label %11
 
 11:
-%12 = load i32, i32 * @a
-call void @putint(i32 %12)
-call void @putch(i32 45)
-call void @putch(i32 45)
-call void @putch(i32 50) 
-%13 = call i32 @func3()
-%14 = icmp ne i32 %13, 0
-br i1 %14, label %21, label %15
+    %12 = load i32, i32 * @a
+    call void @putint(i32 %12)
+    call void @putch(i32 45)
+    call void @putch(i32 45)
+    call void @putch(i32 50) 
+    %13 = call i32 @func3()
+    %14 = icmp ne i32 %13, 0
+    br i1 %14, label %21, label %15
 
 15:
-%16 = call i32 @func()
-%17 = call i32 @func2()
-%18 = icmp slt i32 %16, %17
-%19 = zext i1 %18 to i32
-%20 = icmp ne i32 %19, 0
-br i1 %20, label %21, label %23
+    %16 = call i32 @func()
+    %17 = call i32 @func2()
+    %18 = icmp slt i32 %16, %17
+    %19 = zext i1 %18 to i32
+    %20 = icmp ne i32 %19, 0
+    br i1 %20, label %21, label %23
 
 21:
-%22 = load i32, i32 * @a
-call void @putint(i32 %22)
-call void @putch(i32 45)
-call void @putch(i32 45)
-call void @putch(i32 51)
-br label %23
+    %22 = load i32, i32 * @a
+    call void @putint(i32 %22)
+    call void @putch(i32 45)
+    call void @putch(i32 45)
+    call void @putch(i32 51)
+    br label %23
 
 23:
-ret i32 0
+    ret i32 0
 }
 ```
 
