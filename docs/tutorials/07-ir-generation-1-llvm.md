@@ -1,15 +1,21 @@
 # LLVM指导手册
 
-**`LLVM`** 可能看上去上手比较困难，毕竟相信大部分同学是第一次接触，而在往年的编译原理课程中，LLVM的代码生成是软件学院的课程要求，指导书也是针对往届软件学院的编译原理实验。在2022年与计算机学院合并之后，课程组虽然也添加了LLVM的代码生成通道，但是由于课程合并后，例如**文法，实验过程，实现要求**等的不同，课程组同学在去年实验中收到了许许多多同届同学关于LLVM的问题，包括**看不懂指导书，无从下手**等问题，所以在今年的指导书中将作出以下改进：
-
-- 根据今年的实验顺序，**重新编排**每一个小实验部分的顺序，使得同学们在实验过程中更加顺畅。
-- 对每一个部分进行**相关的说明**，帮助同学们更好地理解LLVM的代码生成过程。
-- 会在指导书的每一个章节结束给出一些相对**较强的测试样例**，方便同学们做一个部分就测试一个部分。
+**`LLVM`** 可能大部分同学是第一次接触，看上去上手比较困难。本教程将分模块为大家讲解llvm主要特点和语法结构，实验文法、C语言函数与 LLVM IR 之间的对应转换关系，以及如何使用llvm进行代码生成。可以结合**语法分析**和**中间代码生成**部分教程进行学习。
 
 ## 1. 简单介绍
 
+### （1）LLVM是什么
 
-### （1）三端设计
+**`LLVM`** 最早叫底层虚拟机 (Low Level Virtual Machine) ，最初是伊利诺伊大学的一个研究项目，目的是提供一种现代的、基于SSA（静态单一赋值）的编译策略，能够支持任意编程语言的静态和动态编译。从那时起，LLVM已经发展成为一个由多个子项目组成的伞式项目，其中许多子项目被各种各样的商业和开源项目用于生产，并被广泛用于学术研究。
+
+现在，LLVM被用作实现各种静态和运行时编译语言的通用基础设施（例如，GCC、Java、.NET、Python、Ruby、Scheme、Haskell、D以及无数鲜为人知的语言所支持的语言族）。
+
+一些参考资料：
+
+- [https://aosabook.org/en/v1/llvm.html#footnote-1](https://aosabook.org/en/v1/llvm.html#footnote-1)
+- [https://llvm.org/](https://llvm.org/)
+
+### （2）三端设计
 
 传统静态编译器，例如大多数C语言的编译器，最主流的设计是**三端设计**，其主要组件是前端、优化器和后端。前端解析源代码，检查其错误，并构建特定语言的**抽象语法树 `AST`**(Abstract Syntax Tree)来表示输入代码。AST可以选择转换为新的目标码进行优化，优化器和后端在代码上运行。
 
@@ -22,18 +28,9 @@
 
 官网对这张设计图的描述只有一个单词 **Retargetablity**，译为**可重定向性**或**可移植性**。通俗理解，如果需要移植编译器以支持新的源语言，只需要实现一个新的前端，但现有的优化器和后端可以重用。如果不将这些部分分开，实现一种新的源语言将需要从头开始，因此，不难发现，支持 $N$ 个目标和 $M$ 种源语言需要 $N×M$ 个编译器，而采用三端设计后，中端优化器可以复用，所以只需要 $N+M$ 个编译器。例如同学们熟悉的Java中的 **`JIT`** ， **`GCC`** 都是采用这种设计。
 
-**`IR`** (Intermediate Representation) 的翻译即为中间表示，在基于LLVM的编译器中，前端负责解析、验证和诊断输入代码中的错误，然后将解析的代码转换为LLVM IR，中端（此处即LLVM优化器）对LLVM IR进行优化，后端则负责将LLVM IR转换为目标语言。
+**`IR`** (Intermediate Representation) 的翻译即为中间表示。
 
-### （2）LLVM是什么
-
-**`LLVM`** 最早叫底层虚拟机 (Low Level Virtual Machine) ，最初是伊利诺伊大学的一个研究项目，目的是提供一种现代的、基于SSA（静态单一赋值）的编译策略，能够支持任意编程语言的静态和动态编译。从那时起，LLVM已经发展成为一个由多个子项目组成的伞式项目，其中许多子项目被各种各样的商业和开源项目用于生产，并被广泛用于学术研究。
-
-现在，LLVM被用作实现各种静态和运行时编译语言的通用基础设施（例如，GCC、Java、.NET、Python、Ruby、Scheme、Haskell、D以及无数鲜为人知的语言所支持的语言族）。
-
-一些参考资料：
-
-- [https://aosabook.org/en/v1/llvm.html#footnote-1](https://aosabook.org/en/v1/llvm.html#footnote-1)
-- [https://llvm.org/](https://llvm.org/)
+LLVM 编译器采用三段设计。在基于LLVM的编译器中，前端负责解析、验证和诊断输入代码中的错误，然后将解析的代码转换为LLVM IR，中端（此处即LLVM优化器）对LLVM IR进行优化，后端则负责将LLVM IR转换为目标语言。
 
 ### （3）工具介绍
 
@@ -194,7 +191,7 @@ $ llvm-link main.ll lib.ll -S -o out.ll
 $ lli out.ll
 ```
 
-LLVM IR 仔细看是一种特殊的三元式，使用的是**三地址码**。下面对上述代码进行简要注释。
+LLVM IR 使用的是**三地址码**。下面对上述代码进行简要注释。
 
 - Module ID：指明 **`Module`** 的标识
 - source_filename：表明该Module是从什么文件编译得到的。如果是通过链接得到的，此处会显示 `llvm-link`
@@ -207,7 +204,7 @@ LLVM IR 仔细看是一种特殊的三元式，使用的是**三地址码**。�
 >
 > -  `#0` 指出了函数的`attribute group`。在文件的最后，也能找到对应的attributes #0。因为attribute group可能很包含很多attribute且复用到多个函数，所以IR使用attribute group ID(即#0)的形式指明函数的attribute，这样既简洁又清晰。
 
-- 而在大括号中间的函数体，是由一系列 **`BasicBlock`** 组成的。每个BasicBlock都有一个**label**，label使得该BasicBlock有一个符号表的入口点，其以terminator instruction(ret、br等)结尾的。每个BasicBlock由一系列 **`Instruction`** 组成。Instruction是LLVM IR的基本指令。
+- 而在大括号中间的函数体，是由一系列 **`BasicBlock`** 组成的。每个BasicBlock都有一个**label**，label使得该BasicBlock有一个符号表的入口点。BasicBlock 以 terminator instruction(ret、br等)结尾。每个BasicBlock由一系列 **`Instruction`** 组成。Instruction是LLVM IR的基本指令。
 - %7 = add i32 %5, %6：随便拿上面一条指令来说，%7是一个临时寄存器，是Instruction的实例，它的操作数里面有两个值，一个是%5，一个是%6。%5和%6也是临时寄存器，即前两条Instruction的实例。
 
 对于一些常用的Instructions，下面给出示例。对于一些没有给出的，可以参考[LLVM IR指令集](https://llvm.org/docs/LangRef.html#instruction-reference)。
@@ -244,18 +241,18 @@ B: %add1 = add nsw i32 %a, %b
 C: %add2 = add nsw i32 %add, %add1
 ```
 
-比如，以上这段实例代码中，A 这一条语句被看作是一个Instruction，这个 Instruction（继承自User）是一个 User（继承自Value，在这条Instruction中这个Value就是 %add），他Use了a和b这两个Value，与此同时他又被C这条Instruction所Use。
+比如，以上这段实例代码中，A 这一条语句被看作是一个Instruction，这个 Instruction（继承自User）是一个 User（继承自Value，在这条Instruction中这个Value就是 %add），它与a和b这两个Value构成了Use关系；与此同时，Instruction 本身与其结果 %add 等价，作为一个Value变量，又被C这条Instruction所Use。
 
 这其中架构的设计，是为了方便 LLVM 的优化和分析，然后根据优化过后的Module生成后端代码。比如，公共子表达式删除优化，对于上述代码中的变量 %add 和 %add1计算的其实是同一个值，那么我就可以把所有用到 %add1 的地方直接用 %add 替换。这时，就可以直接获取 %add1 的所有 Use 关系，使替换过程更简单。
 
-同学们可以根据自己的需要自行设计数据类型。但**如果对代码优化效果要求不高的同学，这部分内容其实没有那么重要，可以直接面向AST生成代码。**
+同学们可以根据自己的需要自行设计数据类型。但**如果对代码优化效果要求不高，这部分内容其实没有那么重要，可以直接面向AST生成代码。**
 
 ### （5）一些说明
 
 - 这一部分的代码生成的目标，即输入 **`AST`**（或者**四元式**） ，输出一个 **`Module`**（便于继续生成到MIPS） 或直接输出 **`LLVM IR`** 代码。想通过LLVM IR生成到MIPS的同学可以根据对应的 **`Module`** 结构自行存储数据，然后根据Module生成对应的LLVM IR代码自测正确性。
 - 目标生成到LLVM语言的同学请注意，clang 默认生成的虚拟寄存器是**按数字顺序**命名的，LLVM 限制了所有数字命名的虚拟寄存器必须严格地**从 0 开始递增**，且每个函数**参数和基本块**都会占用一个编号。如果不能确定怎样用数字命名虚拟寄存器，请使用**字符串命名**虚拟寄存器。
-- 本章主要讲述通过 **AST** 生成对应的代码，这也是LLVM官网的默认推荐逻辑，当然同学们也可以通过自行设计的**四元式**生成LLVM。本质上LLVM其实是个**三地址码**，其指令其实就是一个**四元组**（**结果，运算符，操作数1，操作数2**，例如%3=add i32 %1, %2）。所以从四元式生成LLVM可以直接一步到位，本章也就不作过多赘述。
-- 以下几个小节将分模块介绍实验文法、C语言函数与 LLVM IR 之间的对应转换关系
+- 本章主要讲述通过 **AST** 生成对应的代码，这也是LLVM官网的默认推荐逻辑。当然，没有使用AST而是自行设计的**四元式**的同学也可以生成LLVM。本质上LLVM其实是个**三地址码**，其指令其实就是一个**四元组**（**结果，运算符，操作数1，操作数2**，例如%3=add i32 %1, %2）。所以从四元式生成LLVM可以直接一步到位，本章也就不作过多赘述。
+- LLVM 架构复杂，为方便同学们了解，我们在 tolangc 编译器中参考 LLVM 的设计设计了一套相对简单的 LLVM IR 数据结构，详见……”
 
 
 ## 2. 主函数与常量表达式
@@ -882,90 +879,58 @@ define dso_local i32 @func3() {
 }
 
 define dso_local i32 @main() {
-    br label %1
-
-1:
-    %2 = icmp ne i32 0, 0
-    br i1 %2, label %12, label %3
+%1 = call i32 @func()
+%2 = icmp ne i32 %1, 0
+br i1 %2, label %3, label %6
 
 3:
-    %4 = call i32 @func()
-    %5 = icmp ne i32 0, %4
-    br i1 %5, label %6, label %9
+%4 = call i32 @func3()
+%5 = icmp ne i32 %4, 0
+br i1 %5, label %9, label %6
 
 6:
-    %7 = call i32 @func3()
-    %8 = icmp ne i32 0, %7
-    br i1 %8, label %12, label %9
+%7 = call i32 @func2()
+%8 = icmp ne i32 %7, 0
+br i1 %8, label %9, label %11
 
 9:
-    %10 = call i32 @func2()
-    %11 = icmp ne i32 0, %10
-    br i1 %11, label %12, label %14
+%10 = load i32, i32 * @a
+call void @putint(i32 %10)
+call void @putch(i32 45)
+call void @putch(i32 45)
+call void @putch(i32 49)
+br label %11
 
-12:
-    %13 = load i32, i32* @a
-    call void @putint(i32 %13)
-    call void @putch(i32 45)
-    call void @putch(i32 45)
-    call void @putch(i32 49)
-    br label %14
-
-14:
-    br label %15
+11:
+%12 = load i32, i32 * @a
+call void @putint(i32 %12)
+call void @putch(i32 45)
+call void @putch(i32 45)
+call void @putch(i32 50) 
+%13 = call i32 @func3()
+%14 = icmp ne i32 %13, 0
+br i1 %14, label %21, label %15
 
 15:
-    %16 = icmp ne i32 0, 1
-    br i1 %16, label %20, label %17
+%16 = call i32 @func()
+%17 = call i32 @func2()
+%18 = icmp slt i32 %16, %17
+%19 = zext i1 %18 to i32
+%20 = icmp ne i32 %19, 0
+br i1 %20, label %21, label %23
 
-17:
-    %18 = call i32 @func3()
-    %19 = icmp ne i32 0, %18
-    br i1 %19, label %20, label %22
-
-20:
-    %21 = load i32, i32* @a
-    call void @putint(i32 %21)
-    call void @putch(i32 45)
-    call void @putch(i32 45)
-    call void @putch(i32 50)
-    br label %22
-
-22:
-    br label %23
+21:
+%22 = load i32, i32 * @a
+call void @putint(i32 %22)
+call void @putch(i32 45)
+call void @putch(i32 45)
+call void @putch(i32 51)
+br label %23
 
 23:
-    %24 = icmp ne i32 0, 0
-    br i1 %24, label %34, label %25
-
-25:
-    %26 = call i32 @func3()
-    %27 = icmp ne i32 0, %26
-    br i1 %27, label %34, label %28
-
-28:
-    %29 = call i32 @func()
-    %30 = call i32 @func2()
-    %31 = icmp slt i32 %29, %30
-    %32 = zext i1 %31 to i32
-    %33 = icmp ne i32 0, %32
-    br i1 %33, label %34, label %36
-
-34:
-    %35 = load i32, i32* @a
-    call void @putint(i32 %35)
-    call void @putch(i32 45)
-    call void @putch(i32 45)
-    call void @putch(i32 51)
-    br label %36
-
-36:
-    ret i32 0
+ret i32 0
 }
-
 ```
-
-> 注：由于历史遗留问题，跳转参考代码较乱，参考价值不大，同学们可以自行设计，仅需要保证短路求值正确性即可。
 
 - 输出：4--14--24--3
 
