@@ -197,37 +197,38 @@ std::shared_ptr<Exp> Parser::parseMulExp() {
     return exp;
 }
 
-std::shared_ptr<UnaryExp> Parser::parseUnaryExp() {
-    UnaryExp unaryExp;
+std::shared_ptr<Exp> Parser::parseUnaryExp() {
+    bool hasOp = false;
+    bool isPlus;
     if (getToken().token_type == Token::PLUS ||
         getToken().token_type == Token::MINU) {
-        unaryExp.op = getToken().token_type == Token::PLUS ? UnaryExp::PLUS
-                                                           : UnaryExp::MINU;
-        unaryExp.hasOp = true;
+        hasOp = true;
+        isPlus = getToken().token_type == Token::PLUS;
         pos++;
-    } else {
-        unaryExp.hasOp = false;
     }
+    std::shared_ptr<Exp> exp;
     if (pos + 1 < tokens.size() && tokens[pos].token_type == Token::IDENFR &&
         tokens[pos + 1].token_type == Token::LPARENT) {
         struct CallExp callExp = *parseCallExp();
-        Exp exp = callExp;
-        unaryExp.exp = std::make_shared<Exp>(exp);
+        exp = std::make_shared<Exp>(callExp);
     } else if (tokens[pos].token_type == Token::LPARENT) {
         pos++;
-        Exp exp = *parseExp();
+        exp = parseExp();
         pos++;
-        unaryExp.exp = std::make_shared<Exp>(exp);
     } else if (tokens[pos].token_type == Token::IDENFR) {
         struct Ident ident = *parseIdent();
-        Exp exp = ident;
-        unaryExp.exp = std::make_shared<Exp>(exp);
+        exp = std::make_shared<Exp>(ident);
     } else {
         struct Number number = *parseNumber();
-        Exp exp = number;
-        unaryExp.exp = std::make_shared<Exp>(exp);
+        exp = std::make_shared<Exp>(number);
     }
-    return std::make_shared<UnaryExp>(unaryExp);
+    if (hasOp) {
+        UnaryExp unaryExp;
+        unaryExp.op = isPlus ? UnaryExp::PLUS : UnaryExp::MINU;
+        unaryExp.exp = exp;
+        return std::make_shared<Exp>(unaryExp);
+    }
+    return exp;
 };
 
 std::shared_ptr<CallExp> Parser::parseCallExp() {

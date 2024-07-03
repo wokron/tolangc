@@ -167,12 +167,6 @@ void CallExp::print(std::ostream &out) {
 
 
 void UnaryExp::print(std::ostream &out) {
-    if (hasOp) {
-        if (op == PLUS)
-            out << "PLUS +" << std::endl;
-        else
-            out << "MINUS -" << std::endl;
-    }
     bool hasParent = false;
     if (std::holds_alternative<BinaryExp>(*exp))
         hasParent = true;

@@ -140,7 +140,6 @@ struct UnaryExp : public Node {
         MINU,
     } op;
     std::shared_ptr<Exp> exp;
-    bool hasOp;
     void print(std::ostream &out) override;
 };
 
