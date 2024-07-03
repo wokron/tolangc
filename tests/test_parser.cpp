@@ -41,11 +41,9 @@ RPARENT )
 RARROW =>
 IDENFR a
 <Ident>
-<UnaryExp>
 PLUS +
 IDENFR b
 <Ident>
-<UnaryExp>
 <AddExp>
 SEMICN ;
 <FuncDef>
@@ -80,7 +78,6 @@ IDENFR i
 ASSIGN =
 Number 0
 <Number>
-<UnaryExp>
 SEMICN ;
 <Stmt>
 TAGTK tag
@@ -91,11 +88,9 @@ SEMICN ;
 IFTK if
 IDENFR i
 <Ident>
-<UnaryExp>
 GEQ >=
 IDENFR n
 <Ident>
-<UnaryExp>
 <Cond>
 TOTK to
 IDENFR done
@@ -123,15 +118,12 @@ IDENFR add
 LPARENT (
 IDENFR a
 <Ident>
-<UnaryExp>
 COMMA ,
 IDENFR b
 <Ident>
-<UnaryExp>
 <FuncRParams>
 RPARENT )
 <CallExp>
-<UnaryExp>
 SEMICN ;
 <Stmt>
 LETTK let
@@ -140,11 +132,9 @@ IDENFR i
 ASSIGN =
 IDENFR i
 <Ident>
-<UnaryExp>
 PLUS +
 Number 1
 <Number>
-<UnaryExp>
 <AddExp>
 SEMICN ;
 <Stmt>

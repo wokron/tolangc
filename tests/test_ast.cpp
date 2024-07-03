@@ -70,7 +70,7 @@ static void create_tokens(std::vector<Token>& tokens) {
     tokens.push_back(Token(Token::LPARENT,"(",0));
     tokens.push_back(Token(Token::RPARENT,")",0));
     tokens.push_back(Token(Token::RARROW,"=>",0));
-    tokens.push_back(Token(Token::IDENFR,"3",0));
+    tokens.push_back(Token(Token::NUMBER,"3",0));
     tokens.push_back(Token(Token::SEMINCN,";",0));
 
     tokens.push_back(Token(Token::VARTK,"var",0));
@@ -188,11 +188,9 @@ RPARENT )
 RARROW =>
 IDENFR a
 <Ident>
-<UnaryExp>
 PLUS +
 IDENFR b
 <Ident>
-<UnaryExp>
 <AddExp>
 SEMICN ;
 <FuncDef>
@@ -203,9 +201,8 @@ LPARENT (
 <FuncFParams>
 RPARENT )
 RARROW =>
-IDENFR 3
-<Ident>
-<UnaryExp>
+Number 3
+<Number>
 SEMICN ;
 <FuncDef>
 VARTK var
@@ -235,7 +232,6 @@ LPARENT (
 <FuncRParams>
 RPARENT )
 <CallExp>
-<UnaryExp>
 SEMICN ;
 <Stmt>
 GETTK get
@@ -259,15 +255,12 @@ IDENFR f
 LPARENT (
 IDENFR x
 <Ident>
-<UnaryExp>
 COMMA ,
 Number 1
 <Number>
-<UnaryExp>
 <FuncRParams>
 RPARENT )
 <CallExp>
-<UnaryExp>
 SEMICN ;
 <Stmt>
 LETTK let
@@ -276,7 +269,6 @@ IDENFR x
 ASSIGN =
 IDENFR y
 <Ident>
-<UnaryExp>
 SEMICN ;
 <Stmt>
 TAGTK tag
@@ -288,55 +280,40 @@ LETTK let
 IDENFR x
 <Ident>
 ASSIGN =
-LPARENT (
 IDENFR x
 <Ident>
-<UnaryExp>
 MULT *
 Number 2
 <Number>
-<UnaryExp>
 <MulExp>
 PLUS +
 IDENFR y
 <Ident>
-<UnaryExp>
 MULT *
-LPARENT (
 IDENFR z
 <Ident>
-<UnaryExp>
 MINU -
 Number 1
 <Number>
-<UnaryExp>
 MULT *
 Number 2
 <Number>
-<UnaryExp>
 <MulExp>
 <AddExp>
-RPARENT )
-<UnaryExp>
 <MulExp>
 <AddExp>
-RPARENT )
-<UnaryExp>
 PLUS +
 IDENFR y
 <Ident>
-<UnaryExp>
 <AddExp>
 SEMICN ;
 <Stmt>
 IFTK if
 IDENFR x
 <Ident>
-<UnaryExp>
 LSS <
 Number 2
 <Number>
-<UnaryExp>
 <Cond>
 TOTK to
 IDENFR L1
@@ -361,7 +338,6 @@ SEMICN ;
 PUTTK put
 IDENFR a
 <Ident>
-<UnaryExp>
 SEMICN ;
 <Stmt>
 <CompUnit>
