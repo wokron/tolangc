@@ -1,5 +1,5 @@
 ﻿#include "utils.h"
-#include "llvm/asm/AsmWriter.h"
+#include "asm/AsmWriter.h"
 #include "llvm/ir/Type.h"
 #include "llvm/ir/value/Argument.h"
 #include "llvm/ir/value/BasicBlock.h"
@@ -15,15 +15,15 @@
 
 #include <algorithm>
 
-void Value::PrintAsm(AsmWriterPtr out) {
+void ValueRegTy::PrintAsm(AsmWriterPtr out) {
     TOLANG_DIE("Operation not supported.");
 }
 
-void Value::PrintName(AsmWriterPtr out) {
+void ValueRegTy::PrintName(AsmWriterPtr out) {
     TOLANG_DIE("Operation not supported.");
 }
 
-void Value::PrintUse(AsmWriterPtr out) {
+void ValueRegTy::PrintUse(AsmWriterPtr out) {
     GetType()->PrintAsm(out);
     out->PushSpace();
     PrintName(out);
@@ -92,13 +92,13 @@ void Function::PrintAsm(AsmWriterPtr out) {
     out->Push('}').PushNewLine();
 }
 
-void Argument::PrintAsm(AsmWriterPtr out) {
+void ArgRegTy::PrintAsm(AsmWriterPtr out) {
     GetType()->PrintAsm(out);
     out->PushNext('%').Push(
         std::to_string(Parent()->GetSlotTracker()->Slot(this)));
 }
 
-void Argument::PrintUse(AsmWriterPtr out) { PrintAsm(out); }
+void ArgRegTy::PrintUse(AsmWriterPtr out) { PrintAsm(out); }
 
 void BasicBlock::PrintAsm(AsmWriterPtr out) {
     // We don't print the first basic block.
