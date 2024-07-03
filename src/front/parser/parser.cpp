@@ -165,38 +165,38 @@ std::shared_ptr<Cond> Parser::parseCond() {
 
 std::shared_ptr<Exp> Parser::parseExp() { return std::make_shared<Exp>(*parseAddExp()); };
 
-std::shared_ptr<BinaryExp> Parser::parseAddExp() {
-    BinaryExp binaryExp;
-    binaryExp.op = BinaryExp::PLUS;
-    binaryExp.lexp = std::make_shared<Exp>(*parseMulExp());
+std::shared_ptr<Exp> Parser::parseAddExp() {
+
+    std::shared_ptr<Exp> exp = parseMulExp();
     if (getToken().token_type == Token::PLUS ||
         getToken().token_type == Token::MINU) {
+        BinaryExp binaryExp;
+        binaryExp.lexp = exp;
         binaryExp.op = getToken().token_type == Token::PLUS ? BinaryExp::PLUS
                                                             : BinaryExp::MINU;
         pos++;
-        binaryExp.rexp = std::make_shared<Exp>(*parseAddExp());
+        binaryExp.rexp = parseAddExp();
+        return std::make_shared<Exp>(binaryExp);
     } else {
-        binaryExp.rexp = nullptr;
+        return exp;
     }
-    return std::make_shared<BinaryExp>(binaryExp);
 }
 
-std::shared_ptr<BinaryExp> Parser::parseMulExp() {
-    BinaryExp binaryExp;
-    binaryExp.op = BinaryExp::MULT;
-    binaryExp.lexp = std::make_shared<Exp>(*parseUnaryExp());
+std::shared_ptr<Exp> Parser::parseMulExp() {
+    std::shared_ptr<Exp> exp = std::make_shared<Exp>(*parseUnaryExp());
     if (getToken().token_type == Token::MULT ||
         getToken().token_type == Token::DIV ||
         getToken().token_type == Token::MOD) {
+        BinaryExp binaryExp;
         binaryExp.op = getToken().token_type == Token::MULT  ? BinaryExp::MULT
                        : getToken().token_type == Token::DIV ? BinaryExp::DIV
                                                              : BinaryExp::MOD;
         pos++;
-        binaryExp.rexp = std::make_shared<Exp>(*parseMulExp());
+        binaryExp.lexp = exp;
+        binaryExp.rexp = parseMulExp();
     } else {
-        binaryExp.rexp = nullptr;
+        return exp;
     }
-    return std::make_shared<BinaryExp>(binaryExp);
 }
 
 std::shared_ptr<UnaryExp> Parser::parseUnaryExp() {

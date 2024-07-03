@@ -27,8 +27,8 @@ private:
     std::shared_ptr<IfStmt> parseIfStmt();
     std::shared_ptr<ToStmt> parseToStmt();
     std::shared_ptr<Exp> parseExp();
-    std::shared_ptr<BinaryExp> parseAddExp();
-    std::shared_ptr<BinaryExp> parseMulExp();
+    std::shared_ptr<Exp> parseAddExp();
+    std::shared_ptr<Exp> parseMulExp();
     std::shared_ptr<CallExp> parseCallExp();
     std::shared_ptr<UnaryExp> parseUnaryExp();
     std::shared_ptr<FuncRParams> parseFuncRParams();
