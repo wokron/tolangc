@@ -27,8 +27,139 @@ to cond;
 tag done;
 )";
 
-// TODO: write the expected output
-const char EXPECTED[] = "";
+const char EXPECTED[] = R"(FN fn
+IDENFR add
+<Ident>
+LPARENT (
+IDENFR a
+<Ident>
+COMMA ,
+IDENFR b
+<Ident>
+<FuncFParams>
+RPARENT )
+RARROW =>
+IDENFR a
+<Ident>
+<UnaryExp>
+PLUS +
+IDENFR b
+<Ident>
+<UnaryExp>
+<AddExp>
+SEMICN ;
+<FuncDef>
+VARTK var
+IDENFR n
+<Ident>
+SEMICN ;
+<VarDecl>
+VARTK var
+IDENFR i
+<Ident>
+SEMICN ;
+<VarDecl>
+VARTK var
+IDENFR a
+<Ident>
+SEMICN ;
+<VarDecl>
+VARTK var
+IDENFR b
+<Ident>
+SEMICN ;
+<VarDecl>
+GETTK get
+IDENFR n
+<Ident>
+SEMICN ;
+<Stmt>
+LETTK let
+IDENFR i
+<Ident>
+ASSIGN =
+Number 0
+<Number>
+<UnaryExp>
+SEMICN ;
+<Stmt>
+TAGTK tag
+IDENFR cond
+<Ident>
+SEMICN ;
+<Stmt>
+IFTK if
+IDENFR i
+<Ident>
+<UnaryExp>
+GEQ >=
+IDENFR n
+<Ident>
+<UnaryExp>
+<Cond>
+TOTK to
+IDENFR done
+<Ident>
+SEMICN ;
+<Stmt>
+TAGTK tag
+IDENFR do
+<Ident>
+SEMICN ;
+<Stmt>
+GETTK get
+IDENFR a
+<Ident>
+SEMICN ;
+<Stmt>
+GETTK get
+IDENFR b
+<Ident>
+SEMICN ;
+<Stmt>
+PUTTK put
+IDENFR add
+<Ident>
+LPARENT (
+IDENFR a
+<Ident>
+<UnaryExp>
+COMMA ,
+IDENFR b
+<Ident>
+<UnaryExp>
+<FuncRParams>
+RPARENT )
+<CallExp>
+<UnaryExp>
+SEMICN ;
+<Stmt>
+LETTK let
+IDENFR i
+<Ident>
+ASSIGN =
+IDENFR i
+<Ident>
+<UnaryExp>
+PLUS +
+Number 1
+<Number>
+<UnaryExp>
+<AddExp>
+SEMICN ;
+<Stmt>
+TOTK to
+IDENFR cond
+<Ident>
+SEMICN ;
+<Stmt>
+TAGTK tag
+IDENFR done
+<Ident>
+SEMICN ;
+<Stmt>
+<CompUnit>
+)";
 
 TEST_CASE("testing parser") {
     std::istringstream iss(INPUT);
@@ -46,6 +177,5 @@ TEST_CASE("testing parser") {
     std::ostringstream oss;
     root->print(oss);
 
-    // TODO: check the output
-    // CHECK(oss.str() == EXPECTED);
+    CHECK(oss.str() == EXPECTED);
 }

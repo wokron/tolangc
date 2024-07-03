@@ -31,7 +31,7 @@ static void create_tokens(std::vector<Token>& tokens);
 static void create_ans(std::string& ans);
 
 
-TEST_CASE("AST TEST") {
+TEST_CASE("testing ast") {
     // 词法分析
     std::vector<Token> tokens;
     create_tokens(tokens);
@@ -189,13 +189,10 @@ RARROW =>
 IDENFR a
 <Ident>
 <UnaryExp>
-<MulExp>
 PLUS +
 IDENFR b
 <Ident>
 <UnaryExp>
-<MulExp>
-<AddExp>
 <AddExp>
 SEMICN ;
 <FuncDef>
@@ -209,8 +206,6 @@ RARROW =>
 IDENFR 3
 <Ident>
 <UnaryExp>
-<MulExp>
-<AddExp>
 SEMICN ;
 <FuncDef>
 VARTK var
@@ -241,8 +236,6 @@ LPARENT (
 RPARENT )
 <CallExp>
 <UnaryExp>
-<MulExp>
-<AddExp>
 SEMICN ;
 <Stmt>
 GETTK get
@@ -267,20 +260,14 @@ LPARENT (
 IDENFR x
 <Ident>
 <UnaryExp>
-<MulExp>
-<AddExp>
 COMMA ,
 Number 1
 <Number>
 <UnaryExp>
-<MulExp>
-<AddExp>
 <FuncRParams>
 RPARENT )
 <CallExp>
 <UnaryExp>
-<MulExp>
-<AddExp>
 SEMICN ;
 <Stmt>
 LETTK let
@@ -290,8 +277,6 @@ ASSIGN =
 IDENFR y
 <Ident>
 <UnaryExp>
-<MulExp>
-<AddExp>
 SEMICN ;
 <Stmt>
 TAGTK tag
@@ -312,7 +297,6 @@ Number 2
 <Number>
 <UnaryExp>
 <MulExp>
-<MulExp>
 PLUS +
 IDENFR y
 <Ident>
@@ -322,7 +306,6 @@ LPARENT (
 IDENFR z
 <Ident>
 <UnaryExp>
-<MulExp>
 MINU -
 Number 1
 <Number>
@@ -332,24 +315,17 @@ Number 2
 <Number>
 <UnaryExp>
 <MulExp>
-<MulExp>
-<AddExp>
 <AddExp>
 RPARENT )
 <UnaryExp>
 <MulExp>
-<MulExp>
-<AddExp>
 <AddExp>
 RPARENT )
 <UnaryExp>
-<MulExp>
 PLUS +
 IDENFR y
 <Ident>
 <UnaryExp>
-<MulExp>
-<AddExp>
 <AddExp>
 SEMICN ;
 <Stmt>
@@ -357,14 +333,10 @@ IFTK if
 IDENFR x
 <Ident>
 <UnaryExp>
-<MulExp>
-<AddExp>
 LSS <
 Number 2
 <Number>
 <UnaryExp>
-<MulExp>
-<AddExp>
 <Cond>
 TOTK to
 IDENFR L1
@@ -390,8 +362,6 @@ PUTTK put
 IDENFR a
 <Ident>
 <UnaryExp>
-<MulExp>
-<AddExp>
 SEMICN ;
 <Stmt>
 <CompUnit>

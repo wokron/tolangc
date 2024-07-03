@@ -166,7 +166,6 @@ std::shared_ptr<Cond> Parser::parseCond() {
 std::shared_ptr<Exp> Parser::parseExp() { return std::make_shared<Exp>(*parseAddExp()); };
 
 std::shared_ptr<Exp> Parser::parseAddExp() {
-
     std::shared_ptr<Exp> exp = parseMulExp();
     if (getToken().token_type == Token::PLUS ||
         getToken().token_type == Token::MINU) {
@@ -177,9 +176,8 @@ std::shared_ptr<Exp> Parser::parseAddExp() {
         pos++;
         binaryExp.rexp = parseAddExp();
         return std::make_shared<Exp>(binaryExp);
-    } else {
-        return exp;
     }
+    return exp;
 }
 
 std::shared_ptr<Exp> Parser::parseMulExp() {
@@ -194,9 +192,9 @@ std::shared_ptr<Exp> Parser::parseMulExp() {
         pos++;
         binaryExp.lexp = exp;
         binaryExp.rexp = parseMulExp();
-    } else {
-        return exp;
+        return std::make_shared<Exp>(binaryExp);
     }
+    return exp;
 }
 
 std::shared_ptr<UnaryExp> Parser::parseUnaryExp() {
