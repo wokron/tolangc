@@ -4,6 +4,8 @@
 #include <memory>
 #include <string>
 
+// TODO: error handling
+
 std::shared_ptr<CompUnit> Parser::parse() {
     _lexer.next(_token);
     _lexer.next(_pre_read);

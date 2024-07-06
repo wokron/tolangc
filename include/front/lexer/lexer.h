@@ -11,8 +11,8 @@ public:
 
 class Lexer : public AbstractLexer {
 public:
-    bool next(Token &) override;
-    Lexer(std::istream &);
+    bool next(Token &token) override;
+    Lexer(std::istream &in) : _input(in) {}
 
 private:
     static const std::unordered_map<std::string, Token::TokenType>

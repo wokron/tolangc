@@ -125,5 +125,3 @@ bool Lexer::next(Token &token) {
     }
     return true;
 }
-
-Lexer::Lexer(std::istream &in) : _input(in) {}
