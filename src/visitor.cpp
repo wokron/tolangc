@@ -276,7 +276,7 @@ ValuePtr Visitor::visitExp(const Exp &node) {
             [this](const BinaryExp &node) { return visitBinaryExp(node); },
             [this](const CallExp &node) { return visitCallExp(node); },
             [this](const UnaryExp &node) { return visitUnaryExp(node); },
-            [this](const Ident &node) { return visitIdent(node); },
+            [this](const IdentExp &node) { return visitIdentExp(node); },
             [this](const Number &node) { return visitNumber(node); },
         },
         node);
@@ -366,15 +366,15 @@ ValuePtr Visitor::visitUnaryExp(const UnaryExp &node) {
     return val;
 }
 
-ValuePtr Visitor::visitIdent(const Ident &node) {
-    auto symbol = _cur_scope->getSymbol(node.value);
+ValuePtr Visitor::visitIdentExp(const IdentExp &node) {
+    auto symbol = _cur_scope->getSymbol(node.ident->value);
     if (!symbol) {
         error(-1, "undefined symbol " +
-                      node.value); // TODO: Ident should record lineno too
+                      node.ident->value); // TODO: Ident should record lineno too
         return nullptr;
     }
     if (symbol->type != SymbolType::Variable) {
-        error(-1, node.value + " is not a variable");
+        error(-1, node.ident->value + " is not a variable");
         return nullptr;
     }
 

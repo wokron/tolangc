@@ -121,9 +121,18 @@ std::shared_ptr<CompUnit> build_ast() {
     add->funcFParams->idents.push_back(std::make_shared<Ident>(-1, "a"));
     add->funcFParams->idents.push_back(std::make_shared<Ident>(-1, "b"));
 
-    auto add_exp = BinaryExp();
-    add_exp.lexp = std::make_shared<Exp>(Ident(-1, "a"));
-    add_exp.rexp = std::make_shared<Exp>(Ident(-1, "b"));
+    BinaryExp add_exp;
+
+    IdentExp lexp;
+    lexp.ident = std::make_shared<Ident>(-1, "a");
+    add_exp.lexp = std::make_shared<Exp>(lexp);
+    
+    add_exp.op = BinaryExp::PLUS;
+
+    IdentExp rexp;
+    rexp.ident = std::make_shared<Ident>(-1, "b");
+    add_exp.rexp = std::make_shared<Exp>(rexp);
+
     add->exp = std::make_shared<Exp>(add_exp);
 
     root->funcDefs.push_back(add);
@@ -169,9 +178,17 @@ std::shared_ptr<CompUnit> build_ast() {
     // if i >= n to done;
     auto if_stmt = IfStmt();
     auto cond = Cond();
-    cond.left = std::make_shared<Exp>(Ident(-1, "i"));
+
+    IdentExp cond_left;
+    cond_left.ident = std::make_shared<Ident>(-1, "i");
+    cond.left = std::make_shared<Exp>(cond_left);
+
     cond.op = Cond::GE;
-    cond.right = std::make_shared<Exp>(Ident(-1, "n"));
+
+    IdentExp cond_right;
+    cond_right.ident = std::make_shared<Ident>(-1, "n");
+    cond.right = std::make_shared<Exp>(cond_right);
+
     if_stmt.cond = std::make_shared<Cond>(cond);
     if_stmt.ident = std::make_shared<Ident>(-1, "done");
     root->stmts.push_back(std::make_shared<Stmt>(if_stmt));
@@ -196,8 +213,15 @@ std::shared_ptr<CompUnit> build_ast() {
     auto add_call = CallExp();
     add_call.ident = std::make_shared<Ident>(-1, "add");
     add_call.funcRParams = std::make_shared<FuncRParams>();
-    add_call.funcRParams->exps.push_back(std::make_shared<Exp>(Ident(-1, "a")));
-    add_call.funcRParams->exps.push_back(std::make_shared<Exp>(Ident(-1, "b")));
+
+    IdentExp add_call_a;
+    add_call_a.ident = std::make_shared<Ident>(-1, "a");
+    add_call.funcRParams->exps.push_back(std::make_shared<Exp>(add_call_a));
+
+    IdentExp add_call_b;
+    add_call_b.ident = std::make_shared<Ident>(-1, "b");
+    add_call.funcRParams->exps.push_back(std::make_shared<Exp>(add_call_b));
+
     put_add.exp = std::make_shared<Exp>(add_call);
     root->stmts.push_back(std::make_shared<Stmt>(put_add));
 
@@ -205,7 +229,10 @@ std::shared_ptr<CompUnit> build_ast() {
     auto let_i2 = LetStmt();
     let_i2.ident = std::make_shared<Ident>(-1, "i");
     auto i_plus_1 = BinaryExp();
-    i_plus_1.lexp = std::make_shared<Exp>(Ident(-1, "i"));
+
+    IdentExp i;
+    i.ident = std::make_shared<Ident>(-1, "i");
+    i_plus_1.lexp = std::make_shared<Exp>(i);
     i_plus_1.op = BinaryExp::PLUS;
     auto one = Number();
     one.value = 1.0;

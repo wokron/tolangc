@@ -294,7 +294,9 @@ std::shared_ptr<Exp> Parser::_parse_primary_exp() {
         _next_token();
         return exp;
     } else if (_token.type == Token::TK_IDENT) {
-        return std::make_shared<Exp>(*_parse_ident()); // TODO: need ident exp
+        IdentExp lval_exp;
+        lval_exp.ident = _parse_ident();
+        return std::make_shared<Exp>(lval_exp);
     } else if (_token.type == Token::TK_NUMBER) {
         return _parse_number();
     } else {

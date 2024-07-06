@@ -27,8 +27,10 @@ using Stmt = std::variant<GetStmt, PutStmt, TagStmt, LetStmt, IfStmt, ToStmt>;
 struct BinaryExp;
 struct CallExp;
 struct UnaryExp;
+struct IdentExp;
 struct Number;
-using Exp = std::variant<BinaryExp, CallExp, UnaryExp, Ident, Number>;
+using Exp = std::variant<BinaryExp, CallExp, UnaryExp, IdentExp, Number>;
+
 struct FuncDef;
 struct VarDecl;
 
@@ -145,6 +147,12 @@ struct UnaryExp : public Node {
         MINU,
     } op;
     std::shared_ptr<Exp> exp;
+    void print(std::ostream &out) override;
+};
+
+struct IdentExp : public Node {
+    std::shared_ptr<Ident> ident;
+
     void print(std::ostream &out) override;
 };
 

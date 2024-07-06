@@ -240,3 +240,7 @@ void Number::print(std::ostream &out) {
     out << "Number " << value << std::endl;
     out << "<Number>" << std::endl;
 }
+
+void IdentExp::print(std::ostream &out) {
+    ident->print(out);
+}

@@ -29,7 +29,7 @@ public:
     ValuePtr visitBinaryExp(const BinaryExp &node);
     ValuePtr visitCallExp(const CallExp &node);
     ValuePtr visitUnaryExp(const UnaryExp &node);
-    ValuePtr visitIdent(const Ident &node);
+    ValuePtr visitIdentExp(const IdentExp &node);
     ValuePtr visitNumber(const Number &node);
     ValuePtr visitCond(const Cond &node);
 
