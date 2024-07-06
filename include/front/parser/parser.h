@@ -1,13 +1,21 @@
 #pragma once
 
 #include "ast.h"
-#include "front/lexer/token.h"
+#include "front/lexer/lexer.h"
 #include <vector>
 
 class Parser {
 public:
-    std::shared_ptr<CompUnit> parseCompUnit();
+    Parser(AbstractLexer &lexer) : pos(0) {
+        Token cur(Token::TokenType::TK_ASSIGN, "s", 0);
+        while (lexer.next(cur)) {
+            tokens.push_back(cur);
+        }
+    };
+
     Parser(std::vector<Token> &t) : tokens(t) { pos = 0; };
+
+    std::shared_ptr<CompUnit> parseCompUnit();
 
 private:
     std::vector<Token> tokens;
