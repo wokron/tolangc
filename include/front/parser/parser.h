@@ -13,15 +13,15 @@ public:
         }
     };
 
-    Parser(std::vector<Token> &t) : tokens(t) { pos = 0; };
+    std::shared_ptr<CompUnit> parse();
 
-    std::shared_ptr<CompUnit> parseCompUnit();
 
 private:
     std::vector<Token> tokens;
     int pos;
     Token getToken();
     bool hasNext();
+    std::shared_ptr<CompUnit> parseCompUnit();
     std::shared_ptr<Ident> parseIdent();
     std::shared_ptr<FuncFParams> parseFuncFParams();
     std::shared_ptr<FuncDef> parseFuncDef();

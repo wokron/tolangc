@@ -42,14 +42,8 @@ void compile(const char *name, const Options &options,
     std::ifstream infile(input, std::ios::in);
 
     Lexer lexer(infile);
-    Token cur(Token::TokenType::TK_ASSIGN, "s", 0);
-    std::vector<Token> tokens;
-    while (lexer.next(cur)) {
-        tokens.push_back(cur);
-    }
-
-    Parser parser(tokens);
-    auto root = parser.parseCompUnit();
+    Parser parser(lexer);
+    auto root = parser.parse();
 
     if (options.emit_ast) {
         if (output.length() == 0) {

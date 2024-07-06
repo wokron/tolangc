@@ -3,6 +3,24 @@
 #include "front/parser/parser.h"
 #include <sstream>
 
+class MockLexer : public AbstractLexer {
+public:
+    MockLexer(std::vector<Token> &tokens) : _tokens(tokens), _pos(0) {}
+
+    bool next(Token &token) override {
+        if (_pos >= _tokens.size()) {
+            token = Token(Token::TK_EOF, "", 0);
+            return false;
+        }
+        token = _tokens[_pos++];
+        return true;
+    }
+
+private:
+    std::vector<Token> &_tokens;
+    int _pos;
+};
+
 constexpr char INPUT[] = R"(
 fn add(a, b) => a + b;
 
@@ -155,14 +173,9 @@ TEST_CASE("testing parser") {
     std::istringstream iss(INPUT);
 
     Lexer lexer(iss);
-    Token cur(Token::TokenType::TK_ASSIGN, "s", 0);
-    std::vector<Token> tokens;
-    while (lexer.next(cur)) {
-        tokens.push_back(cur);
-    }
 
-    Parser parser(tokens);
-    auto root = parser.parseCompUnit();
+    Parser parser(lexer);
+    auto root = parser.parse();
 
     std::ostringstream oss;
     root->print(oss);

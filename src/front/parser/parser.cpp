@@ -6,6 +6,10 @@
 
 Token Parser::getToken() { return tokens[pos]; }
 
+std::shared_ptr<CompUnit> Parser::parse() {
+    return parseCompUnit();
+}
+
 bool Parser::hasNext() { return pos < tokens.size(); }
 std::shared_ptr<CompUnit> Parser::parseCompUnit() {
     struct CompUnit compUnit;
