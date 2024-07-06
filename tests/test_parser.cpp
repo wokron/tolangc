@@ -155,7 +155,7 @@ TEST_CASE("testing parser") {
     std::istringstream iss(INPUT);
 
     Lexer lexer(iss);
-    Token cur(Token::TokenType::ASSIGN, "s", 0);
+    Token cur(Token::TokenType::TK_ASSIGN, "s", 0);
     std::vector<Token> tokens;
     while (lexer.next(cur)) {
         tokens.push_back(cur);

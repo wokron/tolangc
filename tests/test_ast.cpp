@@ -52,125 +52,125 @@ TEST_CASE("testing ast") {
 
 static void create_tokens(std::vector<Token>& tokens) {
 
-    tokens.push_back(Token(Token::FN,"fn",0));
-    tokens.push_back(Token(Token::IDENFR,"f",0));
-    tokens.push_back(Token(Token::LPARENT,"(",0));
-    tokens.push_back(Token(Token::IDENFR,"a",0));
-    tokens.push_back(Token(Token::COMMA,",",0));
-    tokens.push_back(Token(Token::IDENFR,"b",0));
-    tokens.push_back(Token(Token::RPARENT,")",0));
-    tokens.push_back(Token(Token::RARROW,"=>",0));
-    tokens.push_back(Token(Token::IDENFR,"a",0));
-    tokens.push_back(Token(Token::PLUS,"+",0));
-    tokens.push_back(Token(Token::IDENFR,"b",0));
-    tokens.push_back(Token(Token::SEMINCN,";",0));
+    tokens.push_back(Token(Token::TK_FN,"fn",0));
+    tokens.push_back(Token(Token::TK_IDENT,"f",0));
+    tokens.push_back(Token(Token::TK_LPARENT,"(",0));
+    tokens.push_back(Token(Token::TK_IDENT,"a",0));
+    tokens.push_back(Token(Token::TK_COMMA,",",0));
+    tokens.push_back(Token(Token::TK_IDENT,"b",0));
+    tokens.push_back(Token(Token::TK_RPARENT,")",0));
+    tokens.push_back(Token(Token::TK_RARROW,"=>",0));
+    tokens.push_back(Token(Token::TK_IDENT,"a",0));
+    tokens.push_back(Token(Token::TK_PLUS,"+",0));
+    tokens.push_back(Token(Token::TK_IDENT,"b",0));
+    tokens.push_back(Token(Token::TK_SEMINCN,";",0));
 
-    tokens.push_back(Token(Token::FN,"fn",0));
-    tokens.push_back(Token(Token::IDENFR,"g",0));
-    tokens.push_back(Token(Token::LPARENT,"(",0));
-    tokens.push_back(Token(Token::RPARENT,")",0));
-    tokens.push_back(Token(Token::RARROW,"=>",0));
-    tokens.push_back(Token(Token::NUMBER,"3",0));
-    tokens.push_back(Token(Token::SEMINCN,";",0));
+    tokens.push_back(Token(Token::TK_FN,"fn",0));
+    tokens.push_back(Token(Token::TK_IDENT,"g",0));
+    tokens.push_back(Token(Token::TK_LPARENT,"(",0));
+    tokens.push_back(Token(Token::TK_RPARENT,")",0));
+    tokens.push_back(Token(Token::TK_RARROW,"=>",0));
+    tokens.push_back(Token(Token::TK_NUMBER,"3",0));
+    tokens.push_back(Token(Token::TK_SEMINCN,";",0));
 
-    tokens.push_back(Token(Token::VARTK,"var",0));
-    tokens.push_back(Token(Token::IDENFR,"x",0));
-    tokens.push_back(Token(Token::SEMINCN,";",0));
+    tokens.push_back(Token(Token::TK_VAR,"var",0));
+    tokens.push_back(Token(Token::TK_IDENT,"x",0));
+    tokens.push_back(Token(Token::TK_SEMINCN,";",0));
 
-    tokens.push_back(Token(Token::VARTK,"var",0));
-    tokens.push_back(Token(Token::IDENFR,"y",0));
-    tokens.push_back(Token(Token::SEMINCN,";",0));
+    tokens.push_back(Token(Token::TK_VAR,"var",0));
+    tokens.push_back(Token(Token::TK_IDENT,"y",0));
+    tokens.push_back(Token(Token::TK_SEMINCN,";",0));
 
-    tokens.push_back(Token(Token::VARTK,"var",0));
-    tokens.push_back(Token(Token::IDENFR,"z",0));
-    tokens.push_back(Token(Token::SEMINCN,";",0));
+    tokens.push_back(Token(Token::TK_VAR,"var",0));
+    tokens.push_back(Token(Token::TK_IDENT,"z",0));
+    tokens.push_back(Token(Token::TK_SEMINCN,";",0));
 
-    tokens.push_back(Token(Token::VARTK,"var",0));
-    tokens.push_back(Token(Token::IDENFR,"w",0));
-    tokens.push_back(Token(Token::SEMINCN,";",0));
+    tokens.push_back(Token(Token::TK_VAR,"var",0));
+    tokens.push_back(Token(Token::TK_IDENT,"w",0));
+    tokens.push_back(Token(Token::TK_SEMINCN,";",0));
 
-    tokens.push_back(Token(Token::PUTTK,"put",0));
-    tokens.push_back(Token(Token::IDENFR,"g",0));
-    tokens.push_back(Token(Token::LPARENT,"(",0));
-    tokens.push_back(Token(Token::RPARENT,")",0));
-    tokens.push_back(Token(Token::SEMINCN,";",0));
+    tokens.push_back(Token(Token::TK_PUT,"put",0));
+    tokens.push_back(Token(Token::TK_IDENT,"g",0));
+    tokens.push_back(Token(Token::TK_LPARENT,"(",0));
+    tokens.push_back(Token(Token::TK_RPARENT,")",0));
+    tokens.push_back(Token(Token::TK_SEMINCN,";",0));
 
-    tokens.push_back(Token(Token::GETTK,"get",0));
-    tokens.push_back(Token(Token::IDENFR,"x",0));
-    tokens.push_back(Token(Token::SEMINCN,";",0));
+    tokens.push_back(Token(Token::TK_GET,"get",0));
+    tokens.push_back(Token(Token::TK_IDENT,"x",0));
+    tokens.push_back(Token(Token::TK_SEMINCN,";",0));
 
-    tokens.push_back(Token(Token::GETTK,"get",0));
-    tokens.push_back(Token(Token::IDENFR,"y",0));
-    tokens.push_back(Token(Token::SEMINCN,";",0));
+    tokens.push_back(Token(Token::TK_GET,"get",0));
+    tokens.push_back(Token(Token::TK_IDENT,"y",0));
+    tokens.push_back(Token(Token::TK_SEMINCN,";",0));
 
-    tokens.push_back(Token(Token::GETTK,"get",0));
-    tokens.push_back(Token(Token::IDENFR,"z",0));
-    tokens.push_back(Token(Token::SEMINCN,";",0));
+    tokens.push_back(Token(Token::TK_GET,"get",0));
+    tokens.push_back(Token(Token::TK_IDENT,"z",0));
+    tokens.push_back(Token(Token::TK_SEMINCN,";",0));
 
-    tokens.push_back(Token(Token::PUTTK,"put",0));
-    tokens.push_back(Token(Token::IDENFR,"f",0));
-    tokens.push_back(Token(Token::LPARENT,"(",0));
-    tokens.push_back(Token(Token::IDENFR,"x",0));
-    tokens.push_back(Token(Token::COMMA,",",0));
-    tokens.push_back(Token(Token::NUMBER,"1",0));
-    tokens.push_back(Token(Token::RPARENT,")",0));
-    tokens.push_back(Token(Token::SEMINCN,";",0));
+    tokens.push_back(Token(Token::TK_PUT,"put",0));
+    tokens.push_back(Token(Token::TK_IDENT,"f",0));
+    tokens.push_back(Token(Token::TK_LPARENT,"(",0));
+    tokens.push_back(Token(Token::TK_IDENT,"x",0));
+    tokens.push_back(Token(Token::TK_COMMA,",",0));
+    tokens.push_back(Token(Token::TK_NUMBER,"1",0));
+    tokens.push_back(Token(Token::TK_RPARENT,")",0));
+    tokens.push_back(Token(Token::TK_SEMINCN,";",0));
 
-    tokens.push_back(Token(Token::LETTK,"let",0));
-    tokens.push_back(Token(Token::IDENFR,"x",0));
-    tokens.push_back(Token(Token::ASSIGN,"=",0));
-    tokens.push_back(Token(Token::IDENFR,"y",0));
-    tokens.push_back(Token(Token::SEMINCN,";",0));
+    tokens.push_back(Token(Token::TK_LET,"let",0));
+    tokens.push_back(Token(Token::TK_IDENT,"x",0));
+    tokens.push_back(Token(Token::TK_ASSIGN,"=",0));
+    tokens.push_back(Token(Token::TK_IDENT,"y",0));
+    tokens.push_back(Token(Token::TK_SEMINCN,";",0));
 
-    tokens.push_back(Token(Token::TAGTK,"tag",0));
-    tokens.push_back(Token(Token::IDENFR,"L1",0));
-    tokens.push_back(Token(Token::SEMINCN,";",0));
+    tokens.push_back(Token(Token::TK_TAG,"tag",0));
+    tokens.push_back(Token(Token::TK_IDENT,"L1",0));
+    tokens.push_back(Token(Token::TK_SEMINCN,";",0));
 
-    tokens.push_back(Token(Token::LETTK,"let",0));
-    tokens.push_back(Token(Token::IDENFR,"x",0));
-    tokens.push_back(Token(Token::ASSIGN,"=",0));
-    tokens.push_back(Token(Token::LPARENT,"(",0));
-    tokens.push_back(Token(Token::IDENFR,"x",0));
-    tokens.push_back(Token(Token::MULT,"*",0));
-    tokens.push_back(Token(Token::NUMBER,"2",0));
-    tokens.push_back(Token(Token::PLUS,"+",0));
-    tokens.push_back(Token(Token::IDENFR,"y",0));
-    tokens.push_back(Token(Token::MULT,"*",0));
-    tokens.push_back(Token(Token::LPARENT,"(",0));
-    tokens.push_back(Token(Token::IDENFR,"z",0));
-    tokens.push_back(Token(Token::MINU,"-",0));
-    tokens.push_back(Token(Token::NUMBER,"1",0));
-    tokens.push_back(Token(Token::MULT,"*",0));
-    tokens.push_back(Token(Token::NUMBER,"2",0));
-    tokens.push_back(Token(Token::RPARENT,")",0));
-    tokens.push_back(Token(Token::RPARENT,")",0));
-    tokens.push_back(Token(Token::PLUS,"+",0));
-    tokens.push_back(Token(Token::IDENFR,"y",0));
-    tokens.push_back(Token(Token::SEMINCN,";",0));
+    tokens.push_back(Token(Token::TK_LET,"let",0));
+    tokens.push_back(Token(Token::TK_IDENT,"x",0));
+    tokens.push_back(Token(Token::TK_ASSIGN,"=",0));
+    tokens.push_back(Token(Token::TK_LPARENT,"(",0));
+    tokens.push_back(Token(Token::TK_IDENT,"x",0));
+    tokens.push_back(Token(Token::TK_MULT,"*",0));
+    tokens.push_back(Token(Token::TK_NUMBER,"2",0));
+    tokens.push_back(Token(Token::TK_PLUS,"+",0));
+    tokens.push_back(Token(Token::TK_IDENT,"y",0));
+    tokens.push_back(Token(Token::TK_MULT,"*",0));
+    tokens.push_back(Token(Token::TK_LPARENT,"(",0));
+    tokens.push_back(Token(Token::TK_IDENT,"z",0));
+    tokens.push_back(Token(Token::TK_MINU,"-",0));
+    tokens.push_back(Token(Token::TK_NUMBER,"1",0));
+    tokens.push_back(Token(Token::TK_MULT,"*",0));
+    tokens.push_back(Token(Token::TK_NUMBER,"2",0));
+    tokens.push_back(Token(Token::TK_RPARENT,")",0));
+    tokens.push_back(Token(Token::TK_RPARENT,")",0));
+    tokens.push_back(Token(Token::TK_PLUS,"+",0));
+    tokens.push_back(Token(Token::TK_IDENT,"y",0));
+    tokens.push_back(Token(Token::TK_SEMINCN,";",0));
 
-    tokens.push_back(Token(Token::IFTK,"if",0));
-    tokens.push_back(Token(Token::IDENFR,"x",0));
-    tokens.push_back(Token(Token::LSS,"<",0));
-    tokens.push_back(Token(Token::NUMBER,"2",0));
-    tokens.push_back(Token(Token::TOTK,"to",0));
-    tokens.push_back(Token(Token::IDENFR,"L1",0));
-    tokens.push_back(Token(Token::SEMINCN,";",0));
+    tokens.push_back(Token(Token::TK_IF,"if",0));
+    tokens.push_back(Token(Token::TK_IDENT,"x",0));
+    tokens.push_back(Token(Token::TK_LT,"<",0));
+    tokens.push_back(Token(Token::TK_NUMBER,"2",0));
+    tokens.push_back(Token(Token::TK_TO,"to",0));
+    tokens.push_back(Token(Token::TK_IDENT,"L1",0));
+    tokens.push_back(Token(Token::TK_SEMINCN,";",0));
 
-    tokens.push_back(Token(Token::TOTK,"to",0));
-    tokens.push_back(Token(Token::IDENFR,"L2",0));
-    tokens.push_back(Token(Token::SEMINCN,";",0));
+    tokens.push_back(Token(Token::TK_TO,"to",0));
+    tokens.push_back(Token(Token::TK_IDENT,"L2",0));
+    tokens.push_back(Token(Token::TK_SEMINCN,";",0));
 
-    tokens.push_back(Token(Token::GETTK,"get",0));
-    tokens.push_back(Token(Token::IDENFR,"w",0));
-    tokens.push_back(Token(Token::SEMINCN,";",0));
+    tokens.push_back(Token(Token::TK_GET,"get",0));
+    tokens.push_back(Token(Token::TK_IDENT,"w",0));
+    tokens.push_back(Token(Token::TK_SEMINCN,";",0));
 
-    tokens.push_back(Token(Token::TAGTK,"tag",0));
-    tokens.push_back(Token(Token::IDENFR,"L2",0));
-    tokens.push_back(Token(Token::SEMINCN,";",0));
+    tokens.push_back(Token(Token::TK_TAG,"tag",0));
+    tokens.push_back(Token(Token::TK_IDENT,"L2",0));
+    tokens.push_back(Token(Token::TK_SEMINCN,";",0));
 
-    tokens.push_back(Token(Token::PUTTK,"put",0));
-    tokens.push_back(Token(Token::IDENFR,"a",0));
-    tokens.push_back(Token(Token::SEMINCN,";",0));
+    tokens.push_back(Token(Token::TK_PUT,"put",0));
+    tokens.push_back(Token(Token::TK_IDENT,"a",0));
+    tokens.push_back(Token(Token::TK_SEMINCN,";",0));
 }
 
 static void create_ans(std::string& ans) {

@@ -1,8 +1,7 @@
 #pragma once
 
 #include "token.h"
-#include <fstream>
-#include <regex>
+#include <istream>
 #include <unordered_map>
 
 class Lexer {
@@ -11,8 +10,8 @@ public:
     Lexer(std::istream &);
 
 private:
-    static const std::unordered_map<std::string, Token::TokenType> _keywords;
+    static const std::unordered_map<std::string, Token::TokenType> _keywords_table;
 
-    int _line_number = 1;
+    int _lineno = 1;
     std::istream &_input;
 };

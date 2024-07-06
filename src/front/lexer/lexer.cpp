@@ -6,10 +6,11 @@
 #include <regex>
 #include <string>
 
-const std::unordered_map<std::string, Token::TokenType> Lexer::_keywords = {
-    {"fn", Token::FN},     {"var", Token::VARTK}, {"get", Token::GETTK},
-    {"put", Token::PUTTK}, {"tag", Token::TAGTK}, {"let", Token::LETTK},
-    {"if", Token::IFTK},   {"to", Token::TOTK},
+const std::unordered_map<std::string, Token::TokenType> Lexer::_keywords_table =
+    {
+        {"fn", Token::TK_FN},   {"var", Token::TK_VAR}, {"get", Token::TK_GET},
+        {"put", Token::TK_PUT}, {"tag", Token::TK_TAG}, {"let", Token::TK_LET},
+        {"if", Token::TK_IF},   {"to", Token::TK_TO},
 };
 
 bool Lexer::next(Token &token) {
@@ -23,9 +24,9 @@ bool Lexer::next(Token &token) {
             ch = _input.get();
         }
         _input.unget();
-        auto it = _keywords.find(content);
-        auto type = it == _keywords.end() ? Token::IDENFR : it->second;
-        token = Token(type, content, _line_number);
+        auto it = _keywords_table.find(content);
+        auto type = it == _keywords_table.end() ? Token::TK_IDENT : it->second;
+        token = Token(type, content, _lineno);
     } else if (isdigit(ch)) {
         if (ch != '0') {
             ch = _input.get();
@@ -45,65 +46,65 @@ bool Lexer::next(Token &token) {
             }
         }
         _input.unget();
-        token = Token(Token::NUMBER, content, _line_number);
+        token = Token(Token::TK_NUMBER, content, _lineno);
     } else if (ch == '+') {
-        token = Token(Token::PLUS, content, _line_number);
+        token = Token(Token::TK_PLUS, content, _lineno);
     } else if (ch == '-') {
-        token = Token(Token::MINU, content, _line_number);
+        token = Token(Token::TK_MINU, content, _lineno);
     } else if (ch == '*') {
-        token = Token(Token::MULT, content, _line_number);
+        token = Token(Token::TK_MULT, content, _lineno);
     } else if (ch == '/') {
-        token = Token(Token::DIV, content, _line_number);
+        token = Token(Token::TK_DIV, content, _lineno);
     } else if (ch == '%') {
-        token = Token(Token::MOD, content, _line_number);
+        token = Token(Token::TK_MOD, content, _lineno);
     } else if (ch == '<') {
         ch = _input.get();
         if (ch == '=') {
             content.append(1, ch);
-            token = Token(Token::LEQ, content, _line_number);
+            token = Token(Token::TK_LE, content, _lineno);
         } else {
             _input.unget();
-            token = Token(Token::LSS, content, _line_number);
+            token = Token(Token::TK_LT, content, _lineno);
         }
     } else if (ch == '>') {
         ch = _input.get();
         if (ch == '=') {
             content.append(1, ch);
-            token = Token(Token::GEQ, content, _line_number);
+            token = Token(Token::TK_GE, content, _lineno);
         } else {
             _input.unget();
-            token = Token(Token::GRE, content, _line_number);
+            token = Token(Token::TK_GT, content, _lineno);
         }
     } else if (ch == '=') {
         ch = _input.get();
         if (ch == '=') {
             content.append(1, ch);
-            token = Token(Token::EQL, content, _line_number);
+            token = Token(Token::TK_EQ, content, _lineno);
         } else if (ch == '>') {
             content.append(1, ch);
-            token = Token(Token::RARROW, content, _line_number);
+            token = Token(Token::TK_RARROW, content, _lineno);
         } else {
             _input.unget();
-            token = Token(Token::ASSIGN, content, _line_number);
+            token = Token(Token::TK_ASSIGN, content, _lineno);
         }
     } else if (ch == '!') {
         ch = _input.get();
         if (ch == '=') {
             content.append(1, ch);
-            token = Token(Token::NEQ, content, _line_number);
+            token = Token(Token::TK_NE, content, _lineno);
         } else {
             _input.unget();
-            token = Token(Token::ERR, content, _line_number);
-            error(_line_number, "invalid character '!'");
+            token = Token(Token::TK_ERR, content, _lineno);
+            error(_lineno, "invalid character '!'");
         }
     } else if (ch == ';') {
-        token = Token(Token::SEMINCN, content, _line_number);
+        token = Token(Token::TK_SEMINCN, content, _lineno);
     } else if (ch == ',') {
-        token = Token(Token::COMMA, content, _line_number);
+        token = Token(Token::TK_COMMA, content, _lineno);
     } else if (ch == '(') {
-        token = Token(Token::LPARENT, content, _line_number);
+        token = Token(Token::TK_LPARENT, content, _lineno);
     } else if (ch == ')') {
-        token = Token(Token::RPARENT, content, _line_number);
+        token = Token(Token::TK_RPARENT, content, _lineno);
     } else if (ch == '#') { // comment
         while (ch != '\n' && ch != EOF) {
             ch = _input.get();
@@ -111,16 +112,16 @@ bool Lexer::next(Token &token) {
         _input.unget();
         return next(token);
     } else if (ch == '\n') {
-        _line_number++;
+        _lineno++;
         return next(token);
     } else if (isblank(ch)) {
         return next(token);
     } else if (ch == EOF) {
-        token = Token(Token::EOFTK, content, _line_number);
+        token = Token(Token::TK_EOF, content, _lineno);
         return false;
     } else {
-        token = Token(Token::ERR, content, _line_number);
-        error(_line_number, "invalid character '" + content + "'");
+        token = Token(Token::TK_ERR, content, _lineno);
+        error(_lineno, "invalid character '" + content + "'");
     }
     return true;
 }
