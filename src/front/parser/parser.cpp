@@ -11,7 +11,7 @@ std::shared_ptr<CompUnit> Parser::parse() {
     _lexer.next(_pre_read);
     auto comp_unit = _parse_comp_unit();
     if (_token.type != Token::TK_EOF) {
-        error(_token.lineno, "expect EOF");
+        error(_token.lineno, "unexpected token");
     }
     return comp_unit;
 }
@@ -20,18 +20,44 @@ std::shared_ptr<CompUnit> Parser::_parse_comp_unit() {
     auto comp_unit = std::make_shared<CompUnit>();
     comp_unit->lineno = _token.lineno;
 
-    while (_token.type == Token::TK_FN) {
-        comp_unit->funcDefs.push_back(_parse_func_def());
+    while (_token.type != Token::TK_VAR) {
+        if (_token.type == Token::TK_FN) {
+            comp_unit->funcDefs.push_back(_parse_func_def());
+        } else {
+            error(_token.lineno, "expect function definition");
+            do {
+                _next_token();
+            } while (_token.type != Token::TK_SEMINCN && _token.type != Token::TK_EOF);
+            _next_token();
+        }
     }
 
-    while (_token.type == Token::TK_VAR) {
-        comp_unit->varDecls.push_back(_parse_var_decl());
+    while (_token.type != Token::TK_GET && _token.type != Token::TK_PUT &&
+           _token.type != Token::TK_TAG && _token.type != Token::TK_LET &&
+           _token.type != Token::TK_IF && _token.type != Token::TK_TO) {
+        if (_token.type == Token::TK_VAR) {
+            comp_unit->varDecls.push_back(_parse_var_decl());
+        } else {
+            error(_token.lineno, "expect variable declaration");
+            do {
+                _next_token();
+            } while (_token.type != Token::TK_SEMINCN && _token.type != Token::TK_EOF);
+            _next_token();
+        }
     }
 
-    while (_token.type == Token::TK_GET || _token.type == Token::TK_PUT ||
-           _token.type == Token::TK_TAG || _token.type == Token::TK_LET ||
-           _token.type == Token::TK_IF || _token.type == Token::TK_TO) {
-        comp_unit->stmts.push_back(_parse_stmt());
+    while (_token.type != Token::TK_EOF) {
+        if (_token.type == Token::TK_GET || _token.type == Token::TK_PUT ||
+            _token.type == Token::TK_TAG || _token.type == Token::TK_LET ||
+            _token.type == Token::TK_IF || _token.type == Token::TK_TO) {
+            comp_unit->stmts.push_back(_parse_stmt());
+        } else {
+            error(_token.lineno, "expect statement");
+            do {
+                _next_token();
+            } while (_token.type != Token::TK_SEMINCN && _token.type != Token::TK_EOF);
+            _next_token();
+        }
     }
 
     return comp_unit;
