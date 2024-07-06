@@ -400,22 +400,22 @@ ValuePtr Visitor::visitCond(const Cond &node) {
 
     CompareOpType ir_op;
     switch (node.op) {
-    case Cond::EQL:
+    case Cond::EQ:
         ir_op = CompareOpType::Equal;
         break;
-    case Cond::NEQ:
+    case Cond::NE:
         ir_op = CompareOpType::NotEqual;
         break;
-    case Cond::LSS:
+    case Cond::LT:
         ir_op = CompareOpType::LessThan;
         break;
-    case Cond::LEQ:
+    case Cond::LE:
         ir_op = CompareOpType::LessThanOrEqual;
         break;
-    case Cond::GRE:
+    case Cond::GT:
         ir_op = CompareOpType::GreaterThan;
         break;
-    case Cond::GEQ:
+    case Cond::GE:
         ir_op = CompareOpType::GreaterThanOrEqual;
         break;
     default:

@@ -204,27 +204,27 @@ void Cond::print(std::ostream &out) {
         node_ref.print(out);
     },*left);
     switch (op) {
-    case LSS: {
+    case LT: {
         out << "LSS <" << std::endl;
         break;
     }
-    case GRE: {
+    case GT: {
         out << "GRE >" << std::endl;
         break;
     }
-    case LEQ: {
+    case LE: {
         out << "LEQ <=" << std::endl;
         break;
     }
-    case GEQ: {
+    case GE: {
         out << "GEQ >=" << std::endl;
         break;
     }
-    case EQL: {
+    case EQ: {
         out << "EQL ==" << std::endl;
         break;
     }
-    case NEQ: {
+    case NE: {
         out << "NEQ !=" << std::endl;
         break;
     }

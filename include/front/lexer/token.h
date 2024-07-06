@@ -37,6 +37,8 @@ struct Token {
     std::string content;
     int lineno;
 
+    Token() = default;
+
     Token(TokenType type, std::string content, int lineno)
         : type(type), content(content), lineno(lineno) {}
 };

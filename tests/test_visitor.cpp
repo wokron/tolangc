@@ -169,7 +169,7 @@ std::shared_ptr<CompUnit> build_ast() {
     auto if_stmt = IfStmt();
     auto cond = Cond();
     cond.left = std::make_shared<Exp>(Ident(-1, "i"));
-    cond.op = Cond::GEQ;
+    cond.op = Cond::GE;
     cond.right = std::make_shared<Exp>(Ident(-1, "n"));
     if_stmt.cond = std::make_shared<Cond>(cond);
     if_stmt.ident = Ident(-1, "done");

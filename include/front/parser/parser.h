@@ -6,39 +6,26 @@
 
 class Parser {
 public:
-    Parser(AbstractLexer &lexer) : pos(0) {
-        Token cur(Token::TokenType::TK_ASSIGN, "s", 0);
-        while (lexer.next(cur)) {
-            tokens.push_back(cur);
-        }
-    };
+    Parser(AbstractLexer &lexer) : _lexer(lexer){};
 
     std::shared_ptr<CompUnit> parse();
 
-
 private:
-    std::vector<Token> tokens;
-    int pos;
-    Token getToken();
-    bool hasNext();
-    std::shared_ptr<CompUnit> parseCompUnit();
-    std::shared_ptr<Ident> parseIdent();
-    std::shared_ptr<FuncFParams> parseFuncFParams();
-    std::shared_ptr<FuncDef> parseFuncDef();
-    std::shared_ptr<VarDecl> parseVarDecl();
-    std::shared_ptr<Stmt> parseStmt();
-    std::shared_ptr<GetStmt> parseGetStmt();
-    std::shared_ptr<PutStmt> parsePutStmt();
-    std::shared_ptr<TagStmt> parseTagStmt();
-    std::shared_ptr<LetStmt> parseLetStmt();
-    std::shared_ptr<Cond> parseCond();
-    std::shared_ptr<IfStmt> parseIfStmt();
-    std::shared_ptr<ToStmt> parseToStmt();
-    std::shared_ptr<Exp> parseExp();
-    std::shared_ptr<Exp> parseAddExp();
-    std::shared_ptr<Exp> parseMulExp();
-    std::shared_ptr<CallExp> parseCallExp();
-    std::shared_ptr<Exp> parseUnaryExp();
-    std::shared_ptr<FuncRParams> parseFuncRParams();
-    std::shared_ptr<Number> parseNumber();
+    std::shared_ptr<CompUnit> _parse_comp_unit();
+    std::shared_ptr<FuncDef> _parse_func_def();
+    std::shared_ptr<FuncFParams> _parse_func_f_params();
+    std::shared_ptr<VarDecl> _parse_var_decl();
+    std::shared_ptr<Stmt> _parse_stmt();
+    std::shared_ptr<Exp> _parse_exp();
+    std::shared_ptr<Exp> _parse_add_exp();
+    std::shared_ptr<Exp> _parse_mul_exp();
+    std::shared_ptr<Exp> _parse_unary_exp();
+    std::shared_ptr<Exp> _parse_primary_exp();
+    std::shared_ptr<FuncRParams> _parse_func_r_params();
+    std::shared_ptr<Cond> _parse_cond();
+    std::shared_ptr<Ident> _parse_ident();
+    std::shared_ptr<Exp> _parse_number();
+
+    Token _token;
+    AbstractLexer &_lexer;
 };

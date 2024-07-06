@@ -113,7 +113,7 @@ struct ToStmt : public Node {
 
 struct BinaryExp : public Node {
     std::shared_ptr<Exp> lexp;
-    enum {
+    enum BinaryOp {
         PLUS,
         MINU,
         MULT,
@@ -121,6 +121,11 @@ struct BinaryExp : public Node {
         MOD,
     } op;
     std::shared_ptr<Exp> rexp;
+
+    BinaryExp() = default;
+
+    BinaryExp(BinaryOp op, std::shared_ptr<Exp> lexp, std::shared_ptr<Exp> rexp)
+        : lexp(lexp), op(op), rexp(rexp) {}
 
     void print(std::ostream &out) override;
 };
@@ -152,12 +157,12 @@ struct FuncRParams : public Node {
 struct Cond : public Node {
     std::shared_ptr<Exp> left;
     enum {
-        LSS,
-        GRE,
-        LEQ,
-        GEQ,
-        EQL,
-        NEQ,
+        LT,
+        GT,
+        LE,
+        GE,
+        EQ,
+        NE,
     } op;
     std::shared_ptr<Exp> right;
 
