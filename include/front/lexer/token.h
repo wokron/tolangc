@@ -36,7 +36,8 @@ public:
         EQL,
         NEQ,
         COMMA,
-        ERR
+        ERR,
+        EOFTK,
     };
 
     TokenType token_type;

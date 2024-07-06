@@ -34,17 +34,17 @@ static void AddSrc() {
           "fn paramOne(a) => a * 0.2;\n"
           "fn paramMore(a,b,_c,d) => a / (b + _c) % d;\n"
           "get a;\n"
-          "put a;// one line comment\n"
-          "let n = a - 2.000003;/* more line comment\n"
-          "another line\n"
-          "final line \n"
-          "*/\n"
+          "put a;# one line comment\n"
+          "let n = a - 2.000003;\n"
+          "# comment 2\n"
+          "# comment 3\n"
+          "# comment 4\n"
           "let i = 0;\n"
           "tag entry;\n"
           "a = - a;\n"
           "put a * i;\n"
           "let i = i + 1;\n"
-          "if i <= n to entry;/* maybe ok */\n";
+          "if i <= n to entry;# maybe ok\n";
 }
 
 static void AddResult() {
