@@ -26,7 +26,7 @@ void CompUnit::print(std::ostream &out) {
 
 void FuncDef::print(std::ostream &out) {
     out << "FN fn" << std::endl;
-    ident.print(out);
+    ident->print(out);
     out << "LPARENT (" << std::endl;
     (*funcFParams).print(out);
     out << "RPARENT )" << std::endl;
@@ -41,10 +41,10 @@ void FuncDef::print(std::ostream &out) {
 
 void FuncFParams::print(std::ostream &out) {
     if (idents.size() > 0) {
-        idents[0].print(out);
+        idents[0]->print(out);
         for (int i = 1;i < idents.size();i++) {
             out << "COMMA ," << std::endl;
-            idents[i].print(out);
+            idents[i]->print(out);
         }
     }
     out << "<FuncFParams>" << std::endl;
@@ -52,14 +52,14 @@ void FuncFParams::print(std::ostream &out) {
 
 void VarDecl::print(std::ostream &out) {
     out << "VARTK var" << std::endl;
-    ident.print(out);
+    ident->print(out);
     out << "SEMICN ;" << std::endl;
     out << "<VarDecl>" << std::endl;
 }
 
 void GetStmt::print(std::ostream &out) {
     out << "GETTK get" << std::endl;
-    ident.print(out);
+    ident->print(out);
     out << "SEMICN ;" << std::endl;
     out << "<Stmt>" << std::endl;
 }
@@ -77,14 +77,14 @@ void PutStmt::print(std::ostream &out) {
 
 void TagStmt::print(std::ostream &out) {
     out << "TAGTK tag" << std::endl;
-    ident.print(out);
+    ident->print(out);
     out << "SEMICN ;" << std::endl;
     out << "<Stmt>" << std::endl;
 }
 
 void LetStmt::print(std::ostream &out) {
     out << "LETTK let" << std::endl;
-    ident.print(out);
+    ident->print(out);
     out << "ASSIGN =" << std::endl;
     std::visit([&out](auto& s) {
         Node& node_ref = static_cast<Node&>(s);
@@ -98,14 +98,14 @@ void IfStmt::print(std::ostream &out) {
     out << "IFTK if" << std::endl;
     (*cond).print(out);
     out << "TOTK to" << std::endl;
-    ident.print(out);
+    ident->print(out);
     out << "SEMICN ;" << std::endl;
     out << "<Stmt>" << std::endl;
 }
 
 void ToStmt::print(std::ostream &out) {
     out << "TOTK to" << std::endl;
-    ident.print(out);
+    ident->print(out);
     out << "SEMICN ;" << std::endl;
     out << "<Stmt>" << std::endl;
 }
@@ -158,7 +158,7 @@ void BinaryExp::print(std::ostream &out) {
 }
 
 void CallExp::print(std::ostream &out) {
-    ident.print(out);
+    ident->print(out);
     out << "LPARENT (" << std::endl;
     (*funcRParams).print(out);
     out << "RPARENT )" << std::endl;

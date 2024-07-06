@@ -115,10 +115,11 @@ std::shared_ptr<CompUnit> build_ast() {
     auto root = std::make_shared<CompUnit>();
 
     auto add = std::make_shared<FuncDef>();
-    add->ident.value = "add";
+    add->ident = std::make_shared<Ident>();
+    add->ident->value = "add";
     add->funcFParams = std::make_shared<FuncFParams>();
-    add->funcFParams->idents.push_back(Ident(-1, "a"));
-    add->funcFParams->idents.push_back(Ident(-1, "b"));
+    add->funcFParams->idents.push_back(std::make_shared<Ident>(-1, "a"));
+    add->funcFParams->idents.push_back(std::make_shared<Ident>(-1, "b"));
 
     auto add_exp = BinaryExp();
     add_exp.lexp = std::make_shared<Exp>(Ident(-1, "a"));
@@ -129,32 +130,32 @@ std::shared_ptr<CompUnit> build_ast() {
 
     // var n;
     auto var_n = std::make_shared<VarDecl>();
-    var_n->ident = Ident(-1, "n");
+    var_n->ident = std::make_shared<Ident>(-1, "n");
     root->varDecls.push_back(var_n);
 
     // var i;
     auto var_i = std::make_shared<VarDecl>();
-    var_i->ident = Ident(-1, "i");
+    var_i->ident = std::make_shared<Ident>(-1, "i");
     root->varDecls.push_back(var_i);
 
     // var a;
     auto var_a = std::make_shared<VarDecl>();
-    var_a->ident = Ident(-1, "a");
+    var_a->ident = std::make_shared<Ident>(-1, "a");
     root->varDecls.push_back(var_a);
 
     // var b;
     auto var_b = std::make_shared<VarDecl>();
-    var_b->ident = Ident(-1, "b");
+    var_b->ident = std::make_shared<Ident>(-1, "b");
     root->varDecls.push_back(var_b);
 
     // get n;
     auto get_n = GetStmt();
-    get_n.ident = Ident(-1, "n");
+    get_n.ident = std::make_shared<Ident>(-1, "n");
     root->stmts.push_back(std::make_shared<Stmt>(get_n));
 
     // let i = 1;
     auto let_i = LetStmt();
-    let_i.ident = Ident(-1, "i");
+    let_i.ident = std::make_shared<Ident>(-1, "i");
     auto zero = Number();
     zero.value = 0.0;
     let_i.exp = std::make_shared<Exp>(zero);
@@ -162,7 +163,7 @@ std::shared_ptr<CompUnit> build_ast() {
 
     // tag cond;
     auto tag_cond = TagStmt();
-    tag_cond.ident = Ident(-1, "cond");
+    tag_cond.ident = std::make_shared<Ident>(-1, "cond");
     root->stmts.push_back(std::make_shared<Stmt>(tag_cond));
 
     // if i >= n to done;
@@ -172,28 +173,28 @@ std::shared_ptr<CompUnit> build_ast() {
     cond.op = Cond::GE;
     cond.right = std::make_shared<Exp>(Ident(-1, "n"));
     if_stmt.cond = std::make_shared<Cond>(cond);
-    if_stmt.ident = Ident(-1, "done");
+    if_stmt.ident = std::make_shared<Ident>(-1, "done");
     root->stmts.push_back(std::make_shared<Stmt>(if_stmt));
 
     // tag do;
     auto tag_do = TagStmt();
-    tag_do.ident = Ident(-1, "do");
+    tag_do.ident = std::make_shared<Ident>(-1, "do");
     root->stmts.push_back(std::make_shared<Stmt>(tag_do));
 
     // get a;
     auto get_a = GetStmt();
-    get_a.ident = Ident(-1, "a");
+    get_a.ident = std::make_shared<Ident>(-1, "a");
     root->stmts.push_back(std::make_shared<Stmt>(get_a));
 
     // get b;
     auto get_b = GetStmt();
-    get_b.ident = Ident(-1, "b");
+    get_b.ident = std::make_shared<Ident>(-1, "b");
     root->stmts.push_back(std::make_shared<Stmt>(get_b));
 
     // put add(a, b);
     auto put_add = PutStmt();
     auto add_call = CallExp();
-    add_call.ident = Ident(-1, "add");
+    add_call.ident = std::make_shared<Ident>(-1, "add");
     add_call.funcRParams = std::make_shared<FuncRParams>();
     add_call.funcRParams->exps.push_back(std::make_shared<Exp>(Ident(-1, "a")));
     add_call.funcRParams->exps.push_back(std::make_shared<Exp>(Ident(-1, "b")));
@@ -202,7 +203,7 @@ std::shared_ptr<CompUnit> build_ast() {
 
     // let i = i + 1;
     auto let_i2 = LetStmt();
-    let_i2.ident = Ident(-1, "i");
+    let_i2.ident = std::make_shared<Ident>(-1, "i");
     auto i_plus_1 = BinaryExp();
     i_plus_1.lexp = std::make_shared<Exp>(Ident(-1, "i"));
     i_plus_1.op = BinaryExp::PLUS;
@@ -214,12 +215,12 @@ std::shared_ptr<CompUnit> build_ast() {
 
     // to cond;
     auto to_cond = ToStmt();
-    to_cond.ident = Ident(-1, "cond");
+    to_cond.ident = std::make_shared<Ident>(-1, "cond");
     root->stmts.push_back(std::make_shared<Stmt>(to_cond));
 
     // tag done;
     auto tag_done = TagStmt();
-    tag_done.ident = Ident(-1, "done");
+    tag_done.ident = std::make_shared<Ident>(-1, "done");
     root->stmts.push_back(std::make_shared<Stmt>(tag_done));
 
     return root;

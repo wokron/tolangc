@@ -52,7 +52,7 @@ struct CompUnit : public Node {
 struct FuncFParams;
 
 struct FuncDef : public Node {
-    Ident ident;
+    std::shared_ptr<Ident> ident;
     std::shared_ptr<FuncFParams> funcFParams;
     std::shared_ptr<Exp> exp;
 
@@ -60,19 +60,19 @@ struct FuncDef : public Node {
 };
 
 struct FuncFParams : public Node {
-    std::vector<Ident> idents;
+    std::vector<std::shared_ptr<Ident>> idents;
 
     void print(std::ostream &out) override;
 };
 
 struct VarDecl : public Node {
-    Ident ident;
+    std::shared_ptr<Ident> ident;
 
     void print(std::ostream &out) override;
 };
 
 struct GetStmt : public Node {
-    Ident ident;
+    std::shared_ptr<Ident> ident;
 
     void print(std::ostream &out) override;
 };
@@ -84,13 +84,13 @@ struct PutStmt : public Node {
 };
 
 struct TagStmt : public Node {
-    Ident ident;
+    std::shared_ptr<Ident> ident;
 
     void print(std::ostream &out) override;
 };
 
 struct LetStmt : public Node {
-    Ident ident;
+    std::shared_ptr<Ident> ident;
     std::shared_ptr<Exp> exp;
 
     void print(std::ostream &out) override;
@@ -100,13 +100,13 @@ struct Cond;
 
 struct IfStmt : public Node {
     std::shared_ptr<Cond> cond;
-    Ident ident;
+    std::shared_ptr<Ident> ident;
 
     void print(std::ostream &out) override;
 };
 
 struct ToStmt : public Node {
-    Ident ident;
+    std::shared_ptr<Ident> ident;
 
     void print(std::ostream &out) override;
 };
@@ -133,7 +133,7 @@ struct BinaryExp : public Node {
 struct FuncRParams;
 
 struct CallExp : public Node {
-    Ident ident;
+    std::shared_ptr<Ident> ident;
     std::shared_ptr<FuncRParams> funcRParams;
 
     void print(std::ostream &out) override;

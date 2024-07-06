@@ -42,7 +42,7 @@ std::shared_ptr<FuncDef> Parser::_parse_func_def() {
     }
     _next_token();
 
-    func_def->ident = *_parse_ident();
+    func_def->ident = _parse_ident();
 
     if (_token.type != Token::TK_LPARENT) {
         error(_token.lineno, "expect '('");
@@ -78,11 +78,10 @@ std::shared_ptr<FuncDef> Parser::_parse_func_def() {
 std::shared_ptr<FuncFParams> Parser::_parse_func_f_params() {
     auto func_f_params = std::make_shared<FuncFParams>();
 
-    func_f_params->idents.push_back(
-        *_parse_ident()); // TODO: use ident ptr instead of ident
+    func_f_params->idents.push_back(_parse_ident());
     while (_token.type == Token::TK_COMMA) {
         _next_token();
-        func_f_params->idents.push_back(*_parse_ident());
+        func_f_params->idents.push_back(_parse_ident());
     }
 
     return func_f_params;
@@ -96,7 +95,7 @@ std::shared_ptr<VarDecl> Parser::_parse_var_decl() {
     }
     _next_token();
 
-    var_decl->ident = *_parse_ident();
+    var_decl->ident = _parse_ident();
 
     if (_token.type != Token::TK_SEMINCN) {
         error(_token.lineno, "expect ';'");
@@ -113,7 +112,7 @@ std::shared_ptr<Stmt> Parser::_parse_stmt() {
 
         GetStmt get_stmt;
 
-        get_stmt.ident = *_parse_ident();
+        get_stmt.ident = _parse_ident();
 
         if (_token.type != Token::TK_SEMINCN) {
             error(_token.lineno, "expect ';'");
@@ -140,7 +139,7 @@ std::shared_ptr<Stmt> Parser::_parse_stmt() {
         _next_token();
 
         TagStmt tag_stmt;
-        tag_stmt.ident = *_parse_ident();
+        tag_stmt.ident = _parse_ident();
 
         if (_token.type != Token::TK_SEMINCN) {
             error(_token.lineno, "expect ';'");
@@ -153,7 +152,7 @@ std::shared_ptr<Stmt> Parser::_parse_stmt() {
         _next_token();
 
         LetStmt let_stmt;
-        let_stmt.ident = *_parse_ident();
+        let_stmt.ident = _parse_ident();
 
         if (_token.type != Token::TK_ASSIGN) {
             error(_token.lineno, "expect '='");
@@ -181,7 +180,7 @@ std::shared_ptr<Stmt> Parser::_parse_stmt() {
         }
         _next_token();
 
-        if_stmt.ident = *_parse_ident();
+        if_stmt.ident = _parse_ident();
 
         if (_token.type != Token::TK_SEMINCN) {
             error(_token.lineno, "expect ';'");
@@ -195,7 +194,7 @@ std::shared_ptr<Stmt> Parser::_parse_stmt() {
 
         ToStmt to_stmt;
 
-        to_stmt.ident = *_parse_ident();
+        to_stmt.ident = _parse_ident();
 
         if (_token.type != Token::TK_SEMINCN) {
             error(_token.lineno, "expect ';'");
@@ -249,28 +248,29 @@ std::shared_ptr<Exp> Parser::_parse_mul_exp() {
 
 std::shared_ptr<Exp> Parser::_parse_unary_exp() {
     if (_token.type == Token::TK_IDENT && _pre_read.type == Token::TK_LPARENT) {
-        CallExp call_exp ;
-        call_exp.ident = *_parse_ident();
-        
+        CallExp call_exp;
+        call_exp.ident = _parse_ident();
+
         if (_token.type != Token::TK_LPARENT) {
             error(_token.lineno, "expect '('");
         }
         _next_token();
-        
+
         if (_token.type != Token::TK_RPARENT) {
             call_exp.funcRParams = _parse_func_r_params();
         } else {
             call_exp.funcRParams = std::make_shared<FuncRParams>();
         }
-        
+
         if (_token.type != Token::TK_RPARENT) {
             error(_token.lineno, "expect ')'");
         }
         _next_token();
 
         return std::make_shared<Exp>(call_exp);
-    } else if (_token.type == Token::TK_IDENT || _token.type == Token::TK_NUMBER ||
-        _token.type == Token::TK_LPARENT) {
+    } else if (_token.type == Token::TK_IDENT ||
+               _token.type == Token::TK_NUMBER ||
+               _token.type == Token::TK_LPARENT) {
         return _parse_primary_exp();
     } else if (_token.type == Token::TK_PLUS || _token.type == Token::TK_MINU) {
         UnaryExp unary_exp;
