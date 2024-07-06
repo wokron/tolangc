@@ -6,6 +6,7 @@
 
 std::shared_ptr<CompUnit> Parser::parse() {
     _lexer.next(_token);
+    _lexer.next(_pre_read);
     auto comp_unit = _parse_comp_unit();
     if (_token.type != Token::TK_EOF) {
         error(_token.lineno, "expect EOF");
@@ -39,14 +40,14 @@ std::shared_ptr<FuncDef> Parser::_parse_func_def() {
     if (_token.type != Token::TK_FN) {
         error(_token.lineno, "expect function definition");
     }
-    _lexer.next(_token);
+    _next_token();
 
     func_def->ident = *_parse_ident();
 
     if (_token.type != Token::TK_LPARENT) {
         error(_token.lineno, "expect '('");
     }
-    _lexer.next(_token);
+    _next_token();
 
     if (_token.type != Token::TK_RPARENT) {
         func_def->funcFParams = _parse_func_f_params();
@@ -57,19 +58,19 @@ std::shared_ptr<FuncDef> Parser::_parse_func_def() {
     if (_token.type != Token::TK_RPARENT) {
         error(_token.lineno, "expect ')'");
     }
-    _lexer.next(_token);
+    _next_token();
 
     if (_token.type != Token::TK_RARROW) {
         error(_token.lineno, "expect '->'");
     }
-    _lexer.next(_token);
+    _next_token();
 
     func_def->exp = _parse_exp();
 
     if (_token.type != Token::TK_SEMINCN) {
         error(_token.lineno, "expect ';'");
     }
-    _lexer.next(_token);
+    _next_token();
 
     return func_def;
 }
@@ -80,7 +81,7 @@ std::shared_ptr<FuncFParams> Parser::_parse_func_f_params() {
     func_f_params->idents.push_back(
         *_parse_ident()); // TODO: use ident ptr instead of ident
     while (_token.type == Token::TK_COMMA) {
-        _lexer.next(_token);
+        _next_token();
         func_f_params->idents.push_back(*_parse_ident());
     }
 
@@ -93,14 +94,14 @@ std::shared_ptr<VarDecl> Parser::_parse_var_decl() {
     if (_token.type != Token::TK_VAR) {
         error(_token.lineno, "expect variable declaration");
     }
-    _lexer.next(_token);
+    _next_token();
 
     var_decl->ident = *_parse_ident();
 
     if (_token.type != Token::TK_SEMINCN) {
         error(_token.lineno, "expect ';'");
     }
-    _lexer.next(_token);
+    _next_token();
 
     return var_decl;
 }
@@ -108,7 +109,7 @@ std::shared_ptr<VarDecl> Parser::_parse_var_decl() {
 std::shared_ptr<Stmt> Parser::_parse_stmt() {
     switch (_token.type) {
     case Token::TK_GET: {
-        _lexer.next(_token);
+        _next_token();
 
         GetStmt get_stmt;
 
@@ -117,12 +118,12 @@ std::shared_ptr<Stmt> Parser::_parse_stmt() {
         if (_token.type != Token::TK_SEMINCN) {
             error(_token.lineno, "expect ';'");
         }
-        _lexer.next(_token);
+        _next_token();
 
         return std::make_shared<Stmt>(get_stmt);
     } break;
     case Token::TK_PUT: {
-        _lexer.next(_token);
+        _next_token();
 
         PutStmt put_stmt;
 
@@ -131,12 +132,12 @@ std::shared_ptr<Stmt> Parser::_parse_stmt() {
         if (_token.type != Token::TK_SEMINCN) {
             error(_token.lineno, "expect ';'");
         }
-        _lexer.next(_token);
+        _next_token();
 
         return std::make_shared<Stmt>(put_stmt);
     } break;
     case Token::TK_TAG: {
-        _lexer.next(_token);
+        _next_token();
 
         TagStmt tag_stmt;
         tag_stmt.ident = *_parse_ident();
@@ -144,12 +145,12 @@ std::shared_ptr<Stmt> Parser::_parse_stmt() {
         if (_token.type != Token::TK_SEMINCN) {
             error(_token.lineno, "expect ';'");
         }
-        _lexer.next(_token);
+        _next_token();
 
         return std::make_shared<Stmt>(tag_stmt);
     } break;
     case Token::TK_LET: {
-        _lexer.next(_token);
+        _next_token();
 
         LetStmt let_stmt;
         let_stmt.ident = *_parse_ident();
@@ -157,19 +158,19 @@ std::shared_ptr<Stmt> Parser::_parse_stmt() {
         if (_token.type != Token::TK_ASSIGN) {
             error(_token.lineno, "expect '='");
         }
-        _lexer.next(_token);
+        _next_token();
 
         let_stmt.exp = _parse_exp();
 
         if (_token.type != Token::TK_SEMINCN) {
             error(_token.lineno, "expect ';'");
         }
-        _lexer.next(_token);
+        _next_token();
 
         return std::make_shared<Stmt>(let_stmt);
     } break;
     case Token::TK_IF: {
-        _lexer.next(_token);
+        _next_token();
 
         IfStmt if_stmt;
 
@@ -178,19 +179,19 @@ std::shared_ptr<Stmt> Parser::_parse_stmt() {
         if (_token.type != Token::TK_TO) {
             error(_token.lineno, "expect 'to'");
         }
-        _lexer.next(_token);
+        _next_token();
 
         if_stmt.ident = *_parse_ident();
 
         if (_token.type != Token::TK_SEMINCN) {
             error(_token.lineno, "expect ';'");
         }
-        _lexer.next(_token);
+        _next_token();
 
         return std::make_shared<Stmt>(if_stmt);
     } break;
     case Token::TK_TO: {
-        _lexer.next(_token);
+        _next_token();
 
         ToStmt to_stmt;
 
@@ -199,7 +200,7 @@ std::shared_ptr<Stmt> Parser::_parse_stmt() {
         if (_token.type != Token::TK_SEMINCN) {
             error(_token.lineno, "expect ';'");
         }
-        _lexer.next(_token);
+        _next_token();
 
         return std::make_shared<Stmt>(to_stmt);
     } break;
@@ -216,7 +217,7 @@ std::shared_ptr<Exp> Parser::_parse_add_exp() {
     while (_token.type == Token::TK_PLUS || _token.type == Token::TK_MINU) {
         auto op =
             _token.type == Token::TK_PLUS ? BinaryExp::PLUS : BinaryExp::MINU;
-        _lexer.next(_token);
+        _next_token();
         auto rhs = _parse_mul_exp();
         exp = std::make_shared<Exp>(BinaryExp(op, exp, rhs));
     }
@@ -239,7 +240,7 @@ std::shared_ptr<Exp> Parser::_parse_mul_exp() {
             op = BinaryExp::MOD;
             break;
         }
-        _lexer.next(_token);
+        _next_token();
         auto rhs = _parse_unary_exp();
         exp = std::make_shared<Exp>(BinaryExp(op, exp, rhs));
     }
@@ -247,29 +248,50 @@ std::shared_ptr<Exp> Parser::_parse_mul_exp() {
 }
 
 std::shared_ptr<Exp> Parser::_parse_unary_exp() {
-    if (_token.type == Token::TK_IDENT || _token.type == Token::TK_NUMBER ||
+    if (_token.type == Token::TK_IDENT && _pre_read.type == Token::TK_LPARENT) {
+        CallExp call_exp ;
+        call_exp.ident = *_parse_ident();
+        
+        if (_token.type != Token::TK_LPARENT) {
+            error(_token.lineno, "expect '('");
+        }
+        _next_token();
+        
+        if (_token.type != Token::TK_RPARENT) {
+            call_exp.funcRParams = _parse_func_r_params();
+        } else {
+            call_exp.funcRParams = std::make_shared<FuncRParams>();
+        }
+        
+        if (_token.type != Token::TK_RPARENT) {
+            error(_token.lineno, "expect ')'");
+        }
+        _next_token();
+
+        return std::make_shared<Exp>(call_exp);
+    } else if (_token.type == Token::TK_IDENT || _token.type == Token::TK_NUMBER ||
         _token.type == Token::TK_LPARENT) {
         return _parse_primary_exp();
     } else if (_token.type == Token::TK_PLUS || _token.type == Token::TK_MINU) {
         UnaryExp unary_exp;
         unary_exp.op =
             _token.type == Token::TK_PLUS ? UnaryExp::PLUS : UnaryExp::MINU;
-        _lexer.next(_token);
+        _next_token();
         unary_exp.exp = _parse_unary_exp();
         return std::make_shared<Exp>(unary_exp);
-    } else { // TODO: function call, need pre read
+    } else {
         error(_token.lineno, "expect unary expression");
     }
 }
 
 std::shared_ptr<Exp> Parser::_parse_primary_exp() {
     if (_token.type == Token::TK_LPARENT) {
-        _lexer.next(_token);
+        _next_token();
         auto exp = _parse_exp();
         if (_token.type != Token::TK_RPARENT) {
             error(_token.lineno, "expect ')'");
         }
-        _lexer.next(_token);
+        _next_token();
         return exp;
     } else if (_token.type == Token::TK_IDENT) {
         return std::make_shared<Exp>(*_parse_ident()); // TODO: need ident exp
@@ -284,7 +306,7 @@ std::shared_ptr<FuncRParams> Parser::_parse_func_r_params() {
     auto func_r_params = std::make_shared<FuncRParams>();
     func_r_params->exps.push_back(_parse_exp());
     while (_token.type == Token::TK_COMMA) {
-        _lexer.next(_token);
+        _next_token();
         func_r_params->exps.push_back(_parse_exp());
     }
     return func_r_params;
@@ -313,7 +335,7 @@ std::shared_ptr<Cond> Parser::_parse_cond() {
         cond->op = Cond::NE;
         break;
     }
-    _lexer.next(_token);
+    _next_token();
     cond->right = _parse_exp();
     return cond;
 }
@@ -322,7 +344,7 @@ std::shared_ptr<Ident> Parser::_parse_ident() {
     if (_token.type == Token::TK_IDENT) {
         auto ident = std::make_shared<Ident>();
         ident->value = _token.content;
-        _lexer.next(_token);
+        _next_token();
         return ident;
     } else {
         error(_token.lineno, "expect identifier");
@@ -334,7 +356,7 @@ std::shared_ptr<Exp> Parser::_parse_number() {
         Number number;
         // number is float, so use std::stof
         number.value = std::stof(_token.content);
-        _lexer.next(_token);
+        _next_token();
         return std::make_shared<Exp>(number);
     } else {
         error(_token.lineno, "expect number");

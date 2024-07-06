@@ -26,6 +26,11 @@ private:
     std::shared_ptr<Ident> _parse_ident();
     std::shared_ptr<Exp> _parse_number();
 
-    Token _token;
+    void _next_token() {
+        _token = _pre_read;
+        _lexer.next(_pre_read);
+    }
+
+    Token _token, _pre_read;
     AbstractLexer &_lexer;
 };
