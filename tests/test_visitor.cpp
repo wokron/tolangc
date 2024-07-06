@@ -125,13 +125,13 @@ std::shared_ptr<CompUnit> build_ast() {
 
     IdentExp lexp;
     lexp.ident = std::make_shared<Ident>(-1, "a");
-    add_exp.lexp = std::make_shared<Exp>(lexp);
+    add_exp.lhs = std::make_shared<Exp>(lexp);
     
     add_exp.op = BinaryExp::PLUS;
 
     IdentExp rexp;
     rexp.ident = std::make_shared<Ident>(-1, "b");
-    add_exp.rexp = std::make_shared<Exp>(rexp);
+    add_exp.rhs = std::make_shared<Exp>(rexp);
 
     add->exp = std::make_shared<Exp>(add_exp);
 
@@ -181,13 +181,13 @@ std::shared_ptr<CompUnit> build_ast() {
 
     IdentExp cond_left;
     cond_left.ident = std::make_shared<Ident>(-1, "i");
-    cond.left = std::make_shared<Exp>(cond_left);
+    cond.lhs = std::make_shared<Exp>(cond_left);
 
     cond.op = Cond::GE;
 
     IdentExp cond_right;
     cond_right.ident = std::make_shared<Ident>(-1, "n");
-    cond.right = std::make_shared<Exp>(cond_right);
+    cond.rhs = std::make_shared<Exp>(cond_right);
 
     if_stmt.cond = std::make_shared<Cond>(cond);
     if_stmt.ident = std::make_shared<Ident>(-1, "done");
@@ -232,11 +232,11 @@ std::shared_ptr<CompUnit> build_ast() {
 
     IdentExp i;
     i.ident = std::make_shared<Ident>(-1, "i");
-    i_plus_1.lexp = std::make_shared<Exp>(i);
+    i_plus_1.lhs = std::make_shared<Exp>(i);
     i_plus_1.op = BinaryExp::PLUS;
     auto one = Number();
     one.value = 1.0;
-    i_plus_1.rexp = std::make_shared<Exp>(one);
+    i_plus_1.rhs = std::make_shared<Exp>(one);
     let_i2.exp = std::make_shared<Exp>(i_plus_1);
     root->stmts.push_back(std::make_shared<Stmt>(let_i2));
 

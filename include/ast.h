@@ -7,14 +7,12 @@
 #include <vector>
 
 struct Node {
-    int line;
+    int lineno;
 
     Node() = default;
-    Node(int line) : line(line) {}
+    Node(int lineno) : lineno(lineno) {}
     virtual void print(std::ostream &out) = 0;
 };
-
-struct Ident;
 
 struct GetStmt;
 struct PutStmt;
@@ -40,7 +38,7 @@ struct Ident : public Node {
     void print(std::ostream &out) override;
 
     Ident() = default;
-    Ident(int line, const std::string &value) : Node(line), value(value) {}
+    Ident(int lineno, const std::string &value) : Node(lineno), value(value) {}
 };
 
 struct CompUnit : public Node {
@@ -114,7 +112,7 @@ struct ToStmt : public Node {
 };
 
 struct BinaryExp : public Node {
-    std::shared_ptr<Exp> lexp;
+    std::shared_ptr<Exp> lhs;
     enum BinaryOp {
         PLUS,
         MINU,
@@ -122,12 +120,12 @@ struct BinaryExp : public Node {
         DIV,
         MOD,
     } op;
-    std::shared_ptr<Exp> rexp;
+    std::shared_ptr<Exp> rhs;
 
     BinaryExp() = default;
 
-    BinaryExp(BinaryOp op, std::shared_ptr<Exp> lexp, std::shared_ptr<Exp> rexp)
-        : lexp(lexp), op(op), rexp(rexp) {}
+    BinaryExp(BinaryOp op, std::shared_ptr<Exp> lhs, std::shared_ptr<Exp> rhs)
+        : lhs(lhs), op(op), rhs(rhs) {}
 
     void print(std::ostream &out) override;
 };
@@ -163,7 +161,7 @@ struct FuncRParams : public Node {
 };
 
 struct Cond : public Node {
-    std::shared_ptr<Exp> left;
+    std::shared_ptr<Exp> lhs;
     enum {
         LT,
         GT,
@@ -172,7 +170,7 @@ struct Cond : public Node {
         EQ,
         NE,
     } op;
-    std::shared_ptr<Exp> right;
+    std::shared_ptr<Exp> rhs;
 
     void print(std::ostream &out) override;
 };

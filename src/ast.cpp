@@ -114,9 +114,9 @@ void BinaryExp::print(std::ostream &out) {
     std::visit([&out](auto& s) {
         Node& node_ref = static_cast<Node&>(s);
         node_ref.print(out);
-    }, (*lexp));
+    }, (*lhs));
     bool isAdd = op == PLUS || op == MINU;
-    if (rexp == nullptr) {
+    if (rhs == nullptr) {
         if (isAdd) {
             out << "<AddExp>" << std::endl;
         } else {
@@ -149,7 +149,7 @@ void BinaryExp::print(std::ostream &out) {
     std::visit([&out](auto& s) {
         Node& node_ref = static_cast<Node&>(s);
         node_ref.print(out);
-    }, (*rexp));
+    }, (*rhs));
     if (isAdd) {
         out << "<AddExp>" << std::endl;
     } else {
@@ -202,7 +202,7 @@ void Cond::print(std::ostream &out) {
     std::visit([&out](auto &s) {
         Node &node_ref = static_cast<Node &>(s);
         node_ref.print(out);
-    },*left);
+    },*lhs);
     switch (op) {
     case LT: {
         out << "LSS <" << std::endl;
@@ -232,7 +232,7 @@ void Cond::print(std::ostream &out) {
     std::visit([&out](auto &s) {
         Node &node_ref = static_cast<Node &>(s);
         node_ref.print(out);
-    },*right);
+    },*rhs);
     out << "<Cond>" << std::endl;
 }
 

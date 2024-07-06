@@ -316,7 +316,7 @@ std::shared_ptr<FuncRParams> Parser::_parse_func_r_params() {
 
 std::shared_ptr<Cond> Parser::_parse_cond() {
     auto cond = std::make_shared<Cond>();
-    cond->left = _parse_exp();
+    cond->lhs = _parse_exp();
     switch (_token.type) {
     case Token::TK_LT:
         cond->op = Cond::LT;
@@ -338,7 +338,7 @@ std::shared_ptr<Cond> Parser::_parse_cond() {
         break;
     }
     _next_token();
-    cond->right = _parse_exp();
+    cond->rhs = _parse_exp();
     return cond;
 }
 
