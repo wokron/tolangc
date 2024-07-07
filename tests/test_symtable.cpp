@@ -31,14 +31,15 @@ TEST_CASE("testing low symbol table") {
     CHECK(cur_symbol->name == "a");
 
     CHECK(cur_table->add_symbol(
-            std::make_shared<VariableSymbol>("a", nullptr, 40)));
+        std::make_shared<VariableSymbol>("a", nullptr, 40)));
 
     CHECK((cur_symbol = cur_table->get_symbol("a")) != nullptr);
     CHECK(cur_symbol->lineno == 40);
 
     CHECK(cur_table->add_symbol(std::make_shared<TagSymbol>("b", nullptr, 50)));
 
-    CHECK_FALSE(cur_table->add_symbol(std::make_shared<TagSymbol>("b", nullptr, 60)));
+    CHECK_FALSE(
+        cur_table->add_symbol(std::make_shared<TagSymbol>("b", nullptr, 60)));
 
     // pop scope
     cur_table = cur_table->pop_scope();
