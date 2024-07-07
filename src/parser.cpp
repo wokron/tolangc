@@ -295,10 +295,7 @@ std::shared_ptr<Exp> Parser::_parse_unary_exp() {
         _next_token();
 
         if (_token.type != Token::TK_RPARENT) {
-            call_exp.func_r_params = _parse_func_r_params();
-        } else {
-            call_exp.func_r_params = std::make_shared<FuncRParams>();
-            call_exp.func_r_params->lineno = _token.lineno;
+            _parse_func_r_params(call_exp.func_r_params);
         }
 
         if (_token.type != Token::TK_RPARENT) {
@@ -350,16 +347,13 @@ std::shared_ptr<Exp> Parser::_parse_primary_exp() {
     }
 }
 
-std::shared_ptr<FuncRParams> Parser::_parse_func_r_params() {
-    auto func_r_params = std::make_shared<FuncRParams>();
-    func_r_params->lineno = _token.lineno;
-
-    func_r_params->exps.push_back(_parse_exp());
+void Parser::_parse_func_r_params(
+    std::vector<std::shared_ptr<Exp>> &func_r_params) {
+    func_r_params.push_back(_parse_exp());
     while (_token.type == Token::TK_COMMA) {
         _next_token();
-        func_r_params->exps.push_back(_parse_exp());
+        func_r_params.push_back(_parse_exp());
     }
-    return func_r_params;
 }
 
 std::shared_ptr<Cond> Parser::_parse_cond() {

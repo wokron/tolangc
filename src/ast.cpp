@@ -156,7 +156,20 @@ void BinaryExp::print(std::ostream &out) {
 void CallExp::print(std::ostream &out) {
     ident->print(out);
     out << "LPARENT (" << std::endl;
-    (*func_r_params).print(out);
+    if (func_r_params.size() > 0) {
+        std::visit([&out](auto& s) {
+            Node& node_ref = static_cast<Node&>(s);
+            node_ref.print(out);
+        }, (*(func_r_params[0])));
+        for (int i = 1;i < func_r_params.size();i++) {
+            out << "COMMA ," << std::endl;
+            std::visit([&out](auto& s) {
+                Node& node_ref = static_cast<Node&>(s);
+                node_ref.print(out);
+            }, (*(func_r_params[i])));
+        }
+    }
+    out << "<FuncRParams>" << std::endl;
     out << "RPARENT )" << std::endl;
     out << "<CallExp>" << std::endl;
 }
@@ -175,23 +188,6 @@ void UnaryExp::print(std::ostream &out) {
     if (hasParent)
         out << "RPARENT )" << std::endl;
     out << "<UnaryExp>" << std::endl;
-}
-
-void FuncRParams::print(std::ostream &out) {
-    if (exps.size() > 0) {
-        std::visit([&out](auto& s) {
-            Node& node_ref = static_cast<Node&>(s);
-            node_ref.print(out);
-        }, (*(exps[0])));
-        for (int i = 1;i < exps.size();i++) {
-            out << "COMMA ," << std::endl;
-            std::visit([&out](auto& s) {
-                Node& node_ref = static_cast<Node&>(s);
-                node_ref.print(out);
-            }, (*(exps[i])));
-        }
-    }
-    out << "<FuncRParams>" << std::endl;
 }
 
 void Cond::print(std::ostream &out) {

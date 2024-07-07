@@ -427,15 +427,27 @@ ValuePtr Visitor::_visit_call_exp(const CallExp &node) {
 
     auto func_symbol = std::static_pointer_cast<FunctionSymbol>(symbol);
 
-    if (func_symbol->params_count != node.func_r_params->exps.size()) {
+    if (func_symbol->params_count != node.func_r_params.size()) {
         ErrorReporter::error(
             node.ident->lineno,
             "params number not matched in function call " + node.ident->value +
                 ", expect " + std::to_string(func_symbol->params_count) +
-                " but got " + std::to_string(node.func_r_params->exps.size()));
+                " but got " + std::to_string(node.func_r_params.size()));
         return nullptr;
     }
-    auto values = _visit_func_r_params(*node.func_r_params);
+
+    std::vector<ValuePtr> values;
+    for (auto &exp : node.func_r_params) {
+        if (exp == nullptr) { // invalid ast
+            continue;
+        }
+        auto exp_val = _visit_exp(*exp);
+        if (exp_val == nullptr) {
+            continue;
+        }
+        values.push_back(exp_val);
+    }
+
     if (values.size() != func_symbol->params_count) { // invalid ast
         return nullptr;
     }
@@ -554,21 +566,4 @@ ValuePtr Visitor::_visit_cond(const Cond &node) {
     _cur_block->InsertInstruction(cmp);
 
     return cmp;
-}
-
-std::vector<ValuePtr> Visitor::_visit_func_r_params(const FuncRParams &node) {
-    std::vector<ValuePtr> rt;
-
-    for (auto &exp : node.exps) {
-        if (exp == nullptr) { // invalid ast
-            continue;
-        }
-        auto exp_val = _visit_exp(*exp);
-        if (exp_val == nullptr) {
-            continue;
-        }
-        rt.push_back(exp_val);
-    }
-
-    return rt;
 }

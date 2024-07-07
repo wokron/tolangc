@@ -122,11 +122,9 @@ struct BinaryExp : public Node {
     void print(std::ostream &out) override;
 };
 
-struct FuncRParams;
-
 struct CallExp : public Node {
     std::shared_ptr<Ident> ident;
-    std::shared_ptr<FuncRParams> func_r_params;
+    std::vector<std::shared_ptr<Exp>> func_r_params;
 
     void print(std::ostream &out) override;
 };
@@ -142,12 +140,6 @@ struct UnaryExp : public Node {
 
 struct IdentExp : public Node {
     std::shared_ptr<Ident> ident;
-
-    void print(std::ostream &out) override;
-};
-
-struct FuncRParams : public Node {
-    std::vector<std::shared_ptr<Exp>> exps;
 
     void print(std::ostream &out) override;
 };

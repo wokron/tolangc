@@ -22,7 +22,7 @@ private:
     std::shared_ptr<Exp> _parse_mul_exp();
     std::shared_ptr<Exp> _parse_unary_exp();
     std::shared_ptr<Exp> _parse_primary_exp();
-    std::shared_ptr<FuncRParams> _parse_func_r_params();
+    void _parse_func_r_params(std::vector<std::shared_ptr<Exp>> &func_r_params);
     std::shared_ptr<Cond> _parse_cond();
     std::shared_ptr<Ident> _parse_ident();
     std::shared_ptr<Exp> _parse_number();

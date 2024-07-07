@@ -31,8 +31,6 @@ private:
     ValuePtr _visit_number(const Number &node);
     ValuePtr _visit_cond(const Cond &node);
 
-    std::vector<ValuePtr> _visit_func_r_params(const FuncRParams &node);
-
     std::shared_ptr<SymbolTable> _cur_scope;
     ModulePtr _ir_module;
     FunctionPtr _cur_func = nullptr;
