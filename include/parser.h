@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ast.h"
-#include "front/lexer/lexer.h"
+#include "lexer.h"
 #include <vector>
 
 class Parser {

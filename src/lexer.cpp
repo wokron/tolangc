@@ -1,6 +1,6 @@
-#include "front/lexer/lexer.h"
+#include "lexer.h"
 #include "error.h"
-#include "front/lexer/token.h"
+#include "token.h"
 #include <ctype.h>
 #include <fstream>
 #include <regex>

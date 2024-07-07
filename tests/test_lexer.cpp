@@ -1,7 +1,7 @@
 #include "doctest.h"
 
-#include "front/lexer/lexer.h"
-#include "front/lexer/token.h"
+#include "lexer.h"
+#include "token.h"
 #include <vector>
 #include <sstream>
 

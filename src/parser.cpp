@@ -1,6 +1,6 @@
 #include <error.h>
-#include <front/lexer/token.h>
-#include <front/parser/parser.h>
+#include <token.h>
+#include <parser.h>
 #include <memory>
 #include <string>
 

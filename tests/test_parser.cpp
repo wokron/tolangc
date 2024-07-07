@@ -1,6 +1,6 @@
 #include "doctest.h"
-#include "front/lexer/lexer.h"
-#include "front/parser/parser.h"
+#include "lexer.h"
+#include "parser.h"
 #include <sstream>
 
 constexpr char INPUT[] = R"(
