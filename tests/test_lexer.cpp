@@ -20,13 +20,15 @@ TEST_CASE("testing lexer") {
     Token token = Token(Token::TK_ERR, "", -1);
 
     int i = 0;
-    while (lexer.next(token)) {
+    lexer.next(token);
+    while (token.type != Token::TK_EOF) {
         CHECK(i <= tokens.size());
         Token result = tokens.at(i);
         CHECK_EQ(token.type, result.type);
         CHECK_EQ(token.content, result.content);
         CHECK_EQ(token.lineno, result.lineno);
         i++;
+        lexer.next(token);
     }
     CHECK_EQ(i, tokens.size());
 }

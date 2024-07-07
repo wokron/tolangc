@@ -13,7 +13,7 @@ const std::unordered_map<std::string, Token::TokenType> Lexer::_keywords_table =
         {"if", Token::TK_IF},   {"to", Token::TK_TO},
 };
 
-bool Lexer::next(Token &token) {
+void Lexer::next(Token &token) {
     std::string content;
     char ch = _input.get();
     content.append(1, ch);
@@ -118,10 +118,8 @@ bool Lexer::next(Token &token) {
         return next(token);
     } else if (ch == EOF) {
         token = Token(Token::TK_EOF, content, _lineno);
-        return false;
     } else {
         token = Token(Token::TK_ERR, content, _lineno);
         ErrorReporter::error(_lineno, "invalid character '" + content + "'");
     }
-    return true;
 }

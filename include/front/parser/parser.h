@@ -6,7 +6,7 @@
 
 class Parser {
 public:
-    Parser(AbstractLexer &lexer) : _lexer(lexer){};
+    Parser(Lexer &lexer) : _lexer(lexer){};
 
     std::shared_ptr<CompUnit> parse();
 
@@ -40,5 +40,5 @@ private:
     }
 
     Token _token, _pre_read;
-    AbstractLexer &_lexer;
+    Lexer &_lexer;
 };

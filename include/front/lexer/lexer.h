@@ -4,14 +4,9 @@
 #include <istream>
 #include <unordered_map>
 
-class AbstractLexer {
+class Lexer {
 public:
-    virtual bool next(Token &) = 0;
-};
-
-class Lexer : public AbstractLexer {
-public:
-    bool next(Token &token) override;
+    void next(Token &token);
     Lexer(std::istream &in) : _input(in) {}
 
 private:

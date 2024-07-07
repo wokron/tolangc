@@ -3,24 +3,6 @@
 #include "front/parser/parser.h"
 #include <sstream>
 
-class MockLexer : public AbstractLexer {
-public:
-    MockLexer(std::vector<Token> &tokens) : _tokens(tokens), _pos(0) {}
-
-    bool next(Token &token) override {
-        if (_pos >= _tokens.size()) {
-            token = Token(Token::TK_EOF, "", 0);
-            return false;
-        }
-        token = _tokens[_pos++];
-        return true;
-    }
-
-private:
-    std::vector<Token> &_tokens;
-    int _pos;
-};
-
 constexpr char INPUT[] = R"(
 fn add(a, b) => a + b;
 
