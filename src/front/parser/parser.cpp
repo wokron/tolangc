@@ -25,10 +25,7 @@ std::shared_ptr<CompUnit> Parser::_parse_comp_unit() {
             comp_unit->funcDefs.push_back(_parse_func_def());
         } else {
             ErrorReporter::error(_token.lineno, "expect function definition");
-            do {
-                _next_token();
-            } while (_token.type != Token::TK_SEMINCN && _token.type != Token::TK_EOF);
-            _next_token();
+            _recover();
         }
     }
 
@@ -39,10 +36,7 @@ std::shared_ptr<CompUnit> Parser::_parse_comp_unit() {
             comp_unit->varDecls.push_back(_parse_var_decl());
         } else {
             ErrorReporter::error(_token.lineno, "expect variable declaration");
-            do {
-                _next_token();
-            } while (_token.type != Token::TK_SEMINCN && _token.type != Token::TK_EOF);
-            _next_token();
+            _recover();
         }
     }
 
@@ -53,10 +47,7 @@ std::shared_ptr<CompUnit> Parser::_parse_comp_unit() {
             comp_unit->stmts.push_back(_parse_stmt());
         } else {
             ErrorReporter::error(_token.lineno, "expect statement");
-            do {
-                _next_token();
-            } while (_token.type != Token::TK_SEMINCN && _token.type != Token::TK_EOF);
-            _next_token();
+            _recover();
         }
     }
 
@@ -246,10 +237,7 @@ std::shared_ptr<Stmt> Parser::_parse_stmt() {
     } break;
     default:
         ErrorReporter::error(_token.lineno, "expect statement");
-        do {
-            _next_token();
-        } while (_token.type != Token::TK_SEMINCN && _token.type != Token::TK_EOF);
-        _next_token();
+        _recover();
         return nullptr;
     }
 }
@@ -343,10 +331,7 @@ std::shared_ptr<Exp> Parser::_parse_unary_exp() {
         return std::make_shared<Exp>(unary_exp);
     } else {
         ErrorReporter::error(_token.lineno, "expect unary expression");
-        do {
-            _next_token();
-        } while (_token.type != Token::TK_SEMINCN && _token.type != Token::TK_EOF);
-        _next_token();
+        _recover();
         return nullptr;
     }
 }
@@ -369,10 +354,7 @@ std::shared_ptr<Exp> Parser::_parse_primary_exp() {
         return _parse_number();
     } else {
         ErrorReporter::error(_token.lineno, "expect primary expression");
-        do {
-            _next_token();
-        } while (_token.type != Token::TK_SEMINCN && _token.type != Token::TK_EOF);
-        _next_token();
+        _recover();
         return  nullptr;
     }
 }
@@ -428,10 +410,7 @@ std::shared_ptr<Ident> Parser::_parse_ident() {
         return ident;
     } else {
         ErrorReporter::error(_token.lineno, "expect identifier");
-        do {
-            _next_token();
-        } while (_token.type != Token::TK_SEMINCN && _token.type != Token::TK_EOF);
-        _next_token();
+        _recover();
         return nullptr;
     }
 }
@@ -446,10 +425,7 @@ std::shared_ptr<Exp> Parser::_parse_number() {
         return std::make_shared<Exp>(number);
     } else {
         ErrorReporter::error(_token.lineno, "expect number");
-        do {
-            _next_token();
-        } while (_token.type != Token::TK_SEMINCN && _token.type != Token::TK_EOF);
-        _next_token();
+        _recover();
         return nullptr;
     }
 }

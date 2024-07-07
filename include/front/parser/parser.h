@@ -31,6 +31,14 @@ private:
         _lexer.next(_pre_read);
     }
 
+    void _recover() {
+        do {
+            _next_token();
+        } while (_token.type != Token::TK_SEMINCN &&
+                 _token.type != Token::TK_EOF);
+        _next_token();
+    }
+
     Token _token, _pre_read;
     AbstractLexer &_lexer;
 };
