@@ -42,8 +42,8 @@ struct Ident : public Node {
 };
 
 struct CompUnit : public Node {
-    std::vector<std::shared_ptr<FuncDef>> funcDefs;
-    std::vector<std::shared_ptr<VarDecl>> varDecls;
+    std::vector<std::shared_ptr<FuncDef>> func_defs;
+    std::vector<std::shared_ptr<VarDecl>> var_decls;
     std::vector<std::shared_ptr<Stmt>> stmts;
 
     void print(std::ostream &out) override;
@@ -53,7 +53,7 @@ struct FuncFParams;
 
 struct FuncDef : public Node {
     std::shared_ptr<Ident> ident;
-    std::shared_ptr<FuncFParams> funcFParams;
+    std::shared_ptr<FuncFParams> func_f_params;
     std::shared_ptr<Exp> exp;
 
     void print(std::ostream &out) override;
@@ -134,7 +134,7 @@ struct FuncRParams;
 
 struct CallExp : public Node {
     std::shared_ptr<Ident> ident;
-    std::shared_ptr<FuncRParams> funcRParams;
+    std::shared_ptr<FuncRParams> func_r_params;
 
     void print(std::ostream &out) override;
 };

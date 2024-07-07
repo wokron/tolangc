@@ -5,7 +5,7 @@
 #include "llvm/ir/value/ConstantData.h"
 
 void Visitor::visit(const CompUnit &node) {
-    for (auto &elm : node.funcDefs) {
+    for (auto &elm : node.func_defs) {
         _visit_func_def(*elm);
     }
 
@@ -16,7 +16,7 @@ void Visitor::visit(const CompUnit &node) {
     _cur_block = _cur_func->NewBasicBlock();
 
     _cur_scope = _cur_scope->push_scope();
-    for (auto &elm : node.varDecls) {
+    for (auto &elm : node.var_decls) {
         _visit_var_decl(*elm);
     }
     for (auto &elm : node.stmts) {
@@ -39,7 +39,7 @@ void Visitor::_visit_func_def(const FuncDef &node) {
         return;
     }
 
-    auto param_symbols = _visit_func_f_params(*node.funcFParams);
+    auto param_symbols = _visit_func_f_params(*node.func_f_params);
 
     // create ir function
     auto context = _ir_module->Context();
@@ -433,15 +433,15 @@ ValuePtr Visitor::_visit_call_exp(const CallExp &node) {
 
     auto func_symbol = std::static_pointer_cast<FunctionSymbol>(symbol);
 
-    if (func_symbol->params_count != node.funcRParams->exps.size()) {
+    if (func_symbol->params_count != node.func_r_params->exps.size()) {
         ErrorReporter::error(
             node.ident->lineno,
             "params number not matched in function call " + node.ident->value +
                 ", expect " + std::to_string(func_symbol->params_count) +
-                " but got " + std::to_string(node.funcRParams->exps.size()));
+                " but got " + std::to_string(node.func_r_params->exps.size()));
         return nullptr;
     }
-    auto values = _visit_func_r_params(*node.funcRParams);
+    auto values = _visit_func_r_params(*node.func_r_params);
     if (values.size() != func_symbol->params_count) { // invalid ast
         return nullptr;
     }

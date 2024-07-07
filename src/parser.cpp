@@ -1,10 +1,8 @@
 #include <error.h>
-#include <token.h>
-#include <parser.h>
 #include <memory>
+#include <parser.h>
 #include <string>
-
-// TODO: error handling
+#include <token.h>
 
 std::shared_ptr<CompUnit> Parser::parse() {
     _lexer.next(_token);
@@ -22,7 +20,7 @@ std::shared_ptr<CompUnit> Parser::_parse_comp_unit() {
 
     while (_token.type != Token::TK_VAR) {
         if (_token.type == Token::TK_FN) {
-            comp_unit->funcDefs.push_back(_parse_func_def());
+            comp_unit->func_defs.push_back(_parse_func_def());
         } else {
             ErrorReporter::error(_token.lineno, "expect function definition");
             _recover();
@@ -33,7 +31,7 @@ std::shared_ptr<CompUnit> Parser::_parse_comp_unit() {
            _token.type != Token::TK_TAG && _token.type != Token::TK_LET &&
            _token.type != Token::TK_IF && _token.type != Token::TK_TO) {
         if (_token.type == Token::TK_VAR) {
-            comp_unit->varDecls.push_back(_parse_var_decl());
+            comp_unit->var_decls.push_back(_parse_var_decl());
         } else {
             ErrorReporter::error(_token.lineno, "expect variable declaration");
             _recover();
@@ -71,10 +69,10 @@ std::shared_ptr<FuncDef> Parser::_parse_func_def() {
     _next_token();
 
     if (_token.type != Token::TK_RPARENT) {
-        func_def->funcFParams = _parse_func_f_params();
+        func_def->func_f_params = _parse_func_f_params();
     } else {
-        func_def->funcFParams = std::make_shared<FuncFParams>();
-        func_def->funcFParams->lineno = _token.lineno;
+        func_def->func_f_params = std::make_shared<FuncFParams>();
+        func_def->func_f_params->lineno = _token.lineno;
     }
 
     if (_token.type != Token::TK_RPARENT) {
@@ -304,10 +302,10 @@ std::shared_ptr<Exp> Parser::_parse_unary_exp() {
         _next_token();
 
         if (_token.type != Token::TK_RPARENT) {
-            call_exp.funcRParams = _parse_func_r_params();
+            call_exp.func_r_params = _parse_func_r_params();
         } else {
-            call_exp.funcRParams = std::make_shared<FuncRParams>();
-            call_exp.funcRParams->lineno = _token.lineno;
+            call_exp.func_r_params = std::make_shared<FuncRParams>();
+            call_exp.func_r_params->lineno = _token.lineno;
         }
 
         if (_token.type != Token::TK_RPARENT) {
@@ -355,7 +353,7 @@ std::shared_ptr<Exp> Parser::_parse_primary_exp() {
     } else {
         ErrorReporter::error(_token.lineno, "expect primary expression");
         _recover();
-        return  nullptr;
+        return nullptr;
     }
 }
 

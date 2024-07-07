@@ -9,10 +9,10 @@ void Ident::print(std::ostream &out) {
 }
 
 void CompUnit::print(std::ostream &out) {
-    for (const auto& funcDef : funcDefs) {
+    for (const auto& funcDef : func_defs) {
         (*funcDef).print(out);
     }
-    for (const auto & varDecl : varDecls) {
+    for (const auto & varDecl : var_decls) {
         (*varDecl).print(out);
     }
     for (const auto & stmt : stmts) {
@@ -28,7 +28,7 @@ void FuncDef::print(std::ostream &out) {
     out << "FN fn" << std::endl;
     ident->print(out);
     out << "LPARENT (" << std::endl;
-    (*funcFParams).print(out);
+    (*func_f_params).print(out);
     out << "RPARENT )" << std::endl;
     out << "RARROW =>" << std::endl;
     std::visit([&out](auto& s) {
@@ -160,7 +160,7 @@ void BinaryExp::print(std::ostream &out) {
 void CallExp::print(std::ostream &out) {
     ident->print(out);
     out << "LPARENT (" << std::endl;
-    (*funcRParams).print(out);
+    (*func_r_params).print(out);
     out << "RPARENT )" << std::endl;
     out << "<CallExp>" << std::endl;
 }
