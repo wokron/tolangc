@@ -28,7 +28,14 @@ void FuncDef::print(std::ostream &out) {
     out << "FN fn" << std::endl;
     ident->print(out);
     out << "LPARENT (" << std::endl;
-    (*func_f_params).print(out);
+    if (func_f_params.size() > 0) {
+        func_f_params[0]->print(out);
+        for (int i = 1;i < func_f_params.size();i++) {
+            out << "COMMA ," << std::endl;
+            func_f_params[i]->print(out);
+        }
+    }
+    out << "<FuncFParams>" << std::endl;
     out << "RPARENT )" << std::endl;
     out << "RARROW =>" << std::endl;
     std::visit([&out](auto& s) {
@@ -37,17 +44,6 @@ void FuncDef::print(std::ostream &out) {
     }, (*exp));
     out << "SEMICN ;" << std::endl;
     out << "<FuncDef>" << std::endl;
-}
-
-void FuncFParams::print(std::ostream &out) {
-    if (idents.size() > 0) {
-        idents[0]->print(out);
-        for (int i = 1;i < idents.size();i++) {
-            out << "COMMA ," << std::endl;
-            idents[i]->print(out);
-        }
-    }
-    out << "<FuncFParams>" << std::endl;
 }
 
 void VarDecl::print(std::ostream &out) {

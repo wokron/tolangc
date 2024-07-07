@@ -13,8 +13,6 @@ public:
 
 private:
     void _visit_func_def(const FuncDef &node);
-    std::vector<std::shared_ptr<VariableSymbol>>
-    _visit_func_f_params(const FuncFParams &node);
     void _visit_var_decl(const VarDecl &node);
 
     void _visit_stmt(const Stmt &node);

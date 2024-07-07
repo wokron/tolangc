@@ -69,10 +69,7 @@ std::shared_ptr<FuncDef> Parser::_parse_func_def() {
     _next_token();
 
     if (_token.type != Token::TK_RPARENT) {
-        func_def->func_f_params = _parse_func_f_params();
-    } else {
-        func_def->func_f_params = std::make_shared<FuncFParams>();
-        func_def->func_f_params->lineno = _token.lineno;
+        _parse_func_f_params(func_def->func_f_params);
     }
 
     if (_token.type != Token::TK_RPARENT) {
@@ -95,17 +92,13 @@ std::shared_ptr<FuncDef> Parser::_parse_func_def() {
     return func_def;
 }
 
-std::shared_ptr<FuncFParams> Parser::_parse_func_f_params() {
-    auto func_f_params = std::make_shared<FuncFParams>();
-    func_f_params->lineno = _token.lineno;
-
-    func_f_params->idents.push_back(_parse_ident());
+void Parser::_parse_func_f_params(
+    std::vector<std::shared_ptr<Ident>> &func_f_params) {
+    func_f_params.push_back(_parse_ident());
     while (_token.type == Token::TK_COMMA) {
         _next_token();
-        func_f_params->idents.push_back(_parse_ident());
+        func_f_params.push_back(_parse_ident());
     }
-
-    return func_f_params;
 }
 
 std::shared_ptr<VarDecl> Parser::_parse_var_decl() {

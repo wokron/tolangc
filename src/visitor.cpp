@@ -39,7 +39,15 @@ void Visitor::_visit_func_def(const FuncDef &node) {
         return;
     }
 
-    auto param_symbols = _visit_func_f_params(*node.func_f_params);
+    std::vector<std::shared_ptr<VariableSymbol>> param_symbols;
+    for (auto &ident : node.func_f_params) {
+        if (ident == nullptr) { // invalid ast
+            continue;
+        }
+        // here we don't create ir argument, just create symbol
+        param_symbols.push_back(std::make_shared<VariableSymbol>(
+            ident->value, nullptr, ident->lineno));
+    }
 
     // create ir function
     auto context = _ir_module->Context();
@@ -105,20 +113,6 @@ void Visitor::_visit_func_def(const FuncDef &node) {
 
     _cur_block = nullptr;
     _cur_func = nullptr;
-}
-
-std::vector<std::shared_ptr<VariableSymbol>>
-Visitor::_visit_func_f_params(const FuncFParams &node) {
-    std::vector<std::shared_ptr<VariableSymbol>> rt;
-    for (auto &ident : node.idents) {
-        if (ident == nullptr) { // invalid ast
-            continue;
-        }
-        // here we don't create ir argument, just create symbol
-        rt.push_back(std::make_shared<VariableSymbol>(ident->value, nullptr,
-                                                      ident->lineno));
-    }
-    return rt;
 }
 
 void Visitor::_visit_var_decl(const VarDecl &node) {

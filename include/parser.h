@@ -13,7 +13,8 @@ public:
 private:
     std::shared_ptr<CompUnit> _parse_comp_unit();
     std::shared_ptr<FuncDef> _parse_func_def();
-    std::shared_ptr<FuncFParams> _parse_func_f_params();
+    void
+    _parse_func_f_params(std::vector<std::shared_ptr<Ident>> &func_f_params);
     std::shared_ptr<VarDecl> _parse_var_decl();
     std::shared_ptr<Stmt> _parse_stmt();
     std::shared_ptr<Exp> _parse_exp();

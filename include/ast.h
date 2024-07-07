@@ -49,18 +49,10 @@ struct CompUnit : public Node {
     void print(std::ostream &out) override;
 };
 
-struct FuncFParams;
-
 struct FuncDef : public Node {
     std::shared_ptr<Ident> ident;
-    std::shared_ptr<FuncFParams> func_f_params;
+    std::vector<std::shared_ptr<Ident>> func_f_params;
     std::shared_ptr<Exp> exp;
-
-    void print(std::ostream &out) override;
-};
-
-struct FuncFParams : public Node {
-    std::vector<std::shared_ptr<Ident>> idents;
 
     void print(std::ostream &out) override;
 };
