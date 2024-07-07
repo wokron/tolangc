@@ -65,8 +65,6 @@ public:
 
     SymbolTable(std::shared_ptr<SymbolTable> father) : _father(father) {}
 
-    std::shared_ptr<SymbolTable> get_father_symbol_table() { return _father; }
-
     std::string print_symbol_table() {
         std::string output;
         for (const auto &kv : _symbols) {

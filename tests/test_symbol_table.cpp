@@ -6,80 +6,43 @@
 #include <vector>
 
 TEST_CASE("testing low symbol table") {
-    std::shared_ptr<SymbolTable> cur_symbol_table =
-        std::make_shared<SymbolTable>();
+    std::shared_ptr<SymbolTable> cur_table = std::make_shared<SymbolTable>();
     std::shared_ptr<Symbol> cur_symbol;
 
-    if (!cur_symbol_table->add_symbol(
-            std::make_shared<VariableSymbol>("a", nullptr, 10))) {
-        CHECK(1 != 1);
-    }
+    CHECK(cur_table->add_symbol(
+        std::make_shared<VariableSymbol>("a", nullptr, 10)));
 
-    if (!cur_symbol_table->add_symbol(
-            std::make_shared<TagSymbol>("b", nullptr, 20))) {
-        CHECK(1 != 1);
-    }
+    CHECK(cur_table->add_symbol(
+        std::make_shared<VariableSymbol>("b", nullptr, 20)));
 
-    if (!cur_symbol_table->add_symbol(
-            std::make_shared<FunctionSymbol>("a", nullptr, 30, 0))) {
-        // 重复声明，错误处理
-    } else {
-        CHECK(1 != 1);
-    }
+    CHECK_FALSE(cur_table->add_symbol(
+        std::make_shared<VariableSymbol>("b", nullptr, 30)));
 
-    if ((cur_symbol = cur_symbol_table->get_symbol("a")) != nullptr) {
-        CHECK(cur_symbol->name == "a");
-        CHECK(cur_symbol->lineno == 10);
-    } else {
-        // 未声明变量，错误处理
-        CHECK(1 != 1);
-    }
+    CHECK((cur_symbol = cur_table->get_symbol("a")) != nullptr);
+    CHECK(cur_symbol->name == "a");
+    CHECK(cur_symbol->lineno == 10);
 
-    if ((cur_symbol = cur_symbol_table->get_symbol("d")) != nullptr) {
-        CHECK(1 != 1);
-    } else {
-        // 未声明变量，错误处理
-    }
+    CHECK((cur_symbol = cur_table->get_symbol("d")) == nullptr);
 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    // 创建新符号表
-    cur_symbol_table = cur_symbol_table->push_scope();
+    // new scope
+    cur_table = cur_table->push_scope();
 
-    if ((cur_symbol = cur_symbol_table->get_symbol("a")) != nullptr) {
-        CHECK(cur_symbol->lineno == 10);
-    } else {
-        CHECK(1 != 1);
-    }
+    CHECK((cur_symbol = cur_table->get_symbol("a")) != nullptr);
+    CHECK(cur_symbol->name == "a");
 
-    if (!cur_symbol_table->add_symbol(
-            std::make_shared<VariableSymbol>("a", nullptr, 40))) {
-        CHECK(1 != 1);
-    }
+    CHECK(cur_table->add_symbol(
+            std::make_shared<VariableSymbol>("a", nullptr, 40)));
 
-    if ((cur_symbol = cur_symbol_table->get_symbol("a")) != nullptr) {
-        CHECK(cur_symbol->lineno == 40);
-    } else {
-        CHECK(1 != 1);
-    }
+    CHECK((cur_symbol = cur_table->get_symbol("a")) != nullptr);
+    CHECK(cur_symbol->lineno == 40);
 
-    if (!cur_symbol_table->add_symbol(
-            std::make_shared<TagSymbol>("b", nullptr, 50))) {
-        CHECK(1 != 1);
-    }
+    CHECK(cur_table->add_symbol(std::make_shared<TagSymbol>("b", nullptr, 50)));
 
-    if (!cur_symbol_table->add_symbol(
-            std::make_shared<TagSymbol>("b", nullptr, 60))) {
-        // 重复声明，错误处理
-    } else {
-        CHECK(1 != 1);
-    }
+    CHECK_FALSE(cur_table->add_symbol(std::make_shared<TagSymbol>("b", nullptr, 60)));
 
-    // 还原父符号表
-    cur_symbol_table = cur_symbol_table->get_father_symbol_table();
+    // pop scope
+    cur_table = cur_table->pop_scope();
 
-    if ((cur_symbol = cur_symbol_table->get_symbol("a")) != nullptr) {
-        CHECK(cur_symbol->lineno == 10);
-    } else {
-        CHECK(1 != 1);
-    }
+    CHECK((cur_symbol = cur_table->get_symbol("a")) != nullptr);
+    CHECK(cur_symbol->lineno == 10);
 }
