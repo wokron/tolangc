@@ -42,48 +42,48 @@ struct Ident : public Node {
 };
 
 struct CompUnit : public Node {
-    std::vector<std::shared_ptr<FuncDef>> func_defs;
-    std::vector<std::shared_ptr<VarDecl>> var_decls;
-    std::vector<std::shared_ptr<Stmt>> stmts;
+    std::vector<std::unique_ptr<FuncDef>> func_defs;
+    std::vector<std::unique_ptr<VarDecl>> var_decls;
+    std::vector<std::unique_ptr<Stmt>> stmts;
 
     void print(std::ostream &out) override;
 };
 
 struct FuncDef : public Node {
-    std::shared_ptr<Ident> ident;
-    std::vector<std::shared_ptr<Ident>> func_f_params;
-    std::shared_ptr<Exp> exp;
+    std::unique_ptr<Ident> ident;
+    std::vector<std::unique_ptr<Ident>> func_f_params;
+    std::unique_ptr<Exp> exp;
 
     void print(std::ostream &out) override;
 };
 
 struct VarDecl : public Node {
-    std::shared_ptr<Ident> ident;
+    std::unique_ptr<Ident> ident;
 
     void print(std::ostream &out) override;
 };
 
 struct GetStmt : public Node {
-    std::shared_ptr<Ident> ident;
+    std::unique_ptr<Ident> ident;
 
     void print(std::ostream &out) override;
 };
 
 struct PutStmt : public Node {
-    std::shared_ptr<Exp> exp;
+    std::unique_ptr<Exp> exp;
 
     void print(std::ostream &out) override;
 };
 
 struct TagStmt : public Node {
-    std::shared_ptr<Ident> ident;
+    std::unique_ptr<Ident> ident;
 
     void print(std::ostream &out) override;
 };
 
 struct LetStmt : public Node {
-    std::shared_ptr<Ident> ident;
-    std::shared_ptr<Exp> exp;
+    std::unique_ptr<Ident> ident;
+    std::unique_ptr<Exp> exp;
 
     void print(std::ostream &out) override;
 };
@@ -91,20 +91,20 @@ struct LetStmt : public Node {
 struct Cond;
 
 struct IfStmt : public Node {
-    std::shared_ptr<Cond> cond;
-    std::shared_ptr<Ident> ident;
+    std::unique_ptr<Cond> cond;
+    std::unique_ptr<Ident> ident;
 
     void print(std::ostream &out) override;
 };
 
 struct ToStmt : public Node {
-    std::shared_ptr<Ident> ident;
+    std::unique_ptr<Ident> ident;
 
     void print(std::ostream &out) override;
 };
 
 struct BinaryExp : public Node {
-    std::shared_ptr<Exp> lhs;
+    std::unique_ptr<Exp> lhs;
     enum BinaryOp {
         PLUS,
         MINU,
@@ -112,19 +112,19 @@ struct BinaryExp : public Node {
         DIV,
         MOD,
     } op;
-    std::shared_ptr<Exp> rhs;
+    std::unique_ptr<Exp> rhs;
 
     BinaryExp() = default;
 
-    BinaryExp(BinaryOp op, std::shared_ptr<Exp> lhs, std::shared_ptr<Exp> rhs)
-        : lhs(lhs), op(op), rhs(rhs) {}
+    BinaryExp(BinaryOp op, std::unique_ptr<Exp> lhs, std::unique_ptr<Exp> rhs)
+        : lhs(std::move(lhs)), op(op), rhs(std::move(rhs)) {}
 
     void print(std::ostream &out) override;
 };
 
 struct CallExp : public Node {
-    std::shared_ptr<Ident> ident;
-    std::vector<std::shared_ptr<Exp>> func_r_params;
+    std::unique_ptr<Ident> ident;
+    std::vector<std::unique_ptr<Exp>> func_r_params;
 
     void print(std::ostream &out) override;
 };
@@ -134,18 +134,18 @@ struct UnaryExp : public Node {
         PLUS,
         MINU,
     } op;
-    std::shared_ptr<Exp> exp;
+    std::unique_ptr<Exp> exp;
     void print(std::ostream &out) override;
 };
 
 struct IdentExp : public Node {
-    std::shared_ptr<Ident> ident;
+    std::unique_ptr<Ident> ident;
 
     void print(std::ostream &out) override;
 };
 
 struct Cond : public Node {
-    std::shared_ptr<Exp> lhs;
+    std::unique_ptr<Exp> lhs;
     enum {
         LT,
         GT,
@@ -154,7 +154,7 @@ struct Cond : public Node {
         EQ,
         NE,
     } op;
-    std::shared_ptr<Exp> rhs;
+    std::unique_ptr<Exp> rhs;
 
     void print(std::ostream &out) override;
 };

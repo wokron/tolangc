@@ -4,7 +4,7 @@
 #include <string>
 #include <token.h>
 
-std::shared_ptr<CompUnit> Parser::parse() {
+std::unique_ptr<CompUnit> Parser::parse() {
     _lexer.next(_token);
     _lexer.next(_pre_read);
     auto comp_unit = _parse_comp_unit();
@@ -14,8 +14,8 @@ std::shared_ptr<CompUnit> Parser::parse() {
     return comp_unit;
 }
 
-std::shared_ptr<CompUnit> Parser::_parse_comp_unit() {
-    auto comp_unit = std::make_shared<CompUnit>();
+std::unique_ptr<CompUnit> Parser::_parse_comp_unit() {
+    auto comp_unit = std::make_unique<CompUnit>();
     comp_unit->lineno = _token.lineno;
 
     while (_token.type != Token::TK_VAR) {
@@ -52,8 +52,8 @@ std::shared_ptr<CompUnit> Parser::_parse_comp_unit() {
     return comp_unit;
 }
 
-std::shared_ptr<FuncDef> Parser::_parse_func_def() {
-    auto func_def = std::make_shared<FuncDef>();
+std::unique_ptr<FuncDef> Parser::_parse_func_def() {
+    auto func_def = std::make_unique<FuncDef>();
     func_def->lineno = _token.lineno;
 
     if (_token.type != Token::TK_FN) {
@@ -93,7 +93,7 @@ std::shared_ptr<FuncDef> Parser::_parse_func_def() {
 }
 
 void Parser::_parse_func_f_params(
-    std::vector<std::shared_ptr<Ident>> &func_f_params) {
+    std::vector<std::unique_ptr<Ident>> &func_f_params) {
     func_f_params.push_back(_parse_ident());
     while (_token.type == Token::TK_COMMA) {
         _next_token();
@@ -101,8 +101,8 @@ void Parser::_parse_func_f_params(
     }
 }
 
-std::shared_ptr<VarDecl> Parser::_parse_var_decl() {
-    auto var_decl = std::make_shared<VarDecl>();
+std::unique_ptr<VarDecl> Parser::_parse_var_decl() {
+    auto var_decl = std::make_unique<VarDecl>();
     var_decl->lineno = _token.lineno;
 
     if (_token.type != Token::TK_VAR) {
@@ -120,7 +120,7 @@ std::shared_ptr<VarDecl> Parser::_parse_var_decl() {
     return var_decl;
 }
 
-std::shared_ptr<Stmt> Parser::_parse_stmt() {
+std::unique_ptr<Stmt> Parser::_parse_stmt() {
     switch (_token.type) {
     case Token::TK_GET: {
         GetStmt get_stmt;
@@ -135,7 +135,7 @@ std::shared_ptr<Stmt> Parser::_parse_stmt() {
         }
         _next_token();
 
-        return std::make_shared<Stmt>(get_stmt);
+        return std::make_unique<Stmt>(std::move(get_stmt));
     } break;
     case Token::TK_PUT: {
         PutStmt put_stmt;
@@ -150,7 +150,7 @@ std::shared_ptr<Stmt> Parser::_parse_stmt() {
         }
         _next_token();
 
-        return std::make_shared<Stmt>(put_stmt);
+        return std::make_unique<Stmt>(std::move(put_stmt));
     } break;
     case Token::TK_TAG: {
         TagStmt tag_stmt;
@@ -165,7 +165,7 @@ std::shared_ptr<Stmt> Parser::_parse_stmt() {
         }
         _next_token();
 
-        return std::make_shared<Stmt>(tag_stmt);
+        return std::make_unique<Stmt>(std::move(tag_stmt));
     } break;
     case Token::TK_LET: {
         LetStmt let_stmt;
@@ -187,7 +187,7 @@ std::shared_ptr<Stmt> Parser::_parse_stmt() {
         }
         _next_token();
 
-        return std::make_shared<Stmt>(let_stmt);
+        return std::make_unique<Stmt>(std::move(let_stmt));
     } break;
     case Token::TK_IF: {
         IfStmt if_stmt;
@@ -209,7 +209,7 @@ std::shared_ptr<Stmt> Parser::_parse_stmt() {
         }
         _next_token();
 
-        return std::make_shared<Stmt>(if_stmt);
+        return std::make_unique<Stmt>(std::move(if_stmt));
     } break;
     case Token::TK_TO: {
         ToStmt to_stmt;
@@ -224,7 +224,7 @@ std::shared_ptr<Stmt> Parser::_parse_stmt() {
         }
         _next_token();
 
-        return std::make_shared<Stmt>(to_stmt);
+        return std::make_unique<Stmt>(std::move(to_stmt));
     } break;
     default:
         ErrorReporter::error(_token.lineno, "expect statement");
@@ -233,28 +233,28 @@ std::shared_ptr<Stmt> Parser::_parse_stmt() {
     }
 }
 
-std::shared_ptr<Exp> Parser::_parse_exp() { return _parse_add_exp(); }
+std::unique_ptr<Exp> Parser::_parse_exp() { return _parse_add_exp(); }
 
-std::shared_ptr<Exp> Parser::_parse_add_exp() {
+std::unique_ptr<Exp> Parser::_parse_add_exp() {
     auto lineno = _token.lineno;
 
     auto exp = _parse_mul_exp();
     while (_token.type == Token::TK_PLUS || _token.type == Token::TK_MINU) {
         BinaryExp binary_exp;
         binary_exp.lineno = lineno;
-        binary_exp.lhs = exp;
+        binary_exp.lhs = std::move(exp);
         binary_exp.op =
             _token.type == Token::TK_PLUS ? BinaryExp::PLUS : BinaryExp::MINU;
 
         _next_token();
         auto rhs = _parse_mul_exp();
-        binary_exp.rhs = rhs;
-        exp = std::make_shared<Exp>(binary_exp);
+        binary_exp.rhs = std::move(rhs);
+        exp = std::make_unique<Exp>(std::move(binary_exp));
     }
     return exp;
 }
 
-std::shared_ptr<Exp> Parser::_parse_mul_exp() {
+std::unique_ptr<Exp> Parser::_parse_mul_exp() {
     auto lineno = _token.lineno;
 
     auto exp = _parse_unary_exp();
@@ -262,7 +262,7 @@ std::shared_ptr<Exp> Parser::_parse_mul_exp() {
            _token.type == Token::TK_MOD) {
         BinaryExp binary_exp;
         binary_exp.lineno = lineno;
-        binary_exp.lhs = exp;
+        binary_exp.lhs = std::move(exp);
         switch (_token.type) {
         case Token::TK_MULT:
             binary_exp.op = BinaryExp::MULT;
@@ -277,12 +277,12 @@ std::shared_ptr<Exp> Parser::_parse_mul_exp() {
 
         _next_token();
         binary_exp.rhs = _parse_unary_exp();
-        exp = std::make_shared<Exp>(binary_exp);
+        exp = std::make_unique<Exp>(std::move(binary_exp));
     }
     return exp;
 }
 
-std::shared_ptr<Exp> Parser::_parse_unary_exp() {
+std::unique_ptr<Exp> Parser::_parse_unary_exp() {
     if (_token.type == Token::TK_IDENT && _pre_read.type == Token::TK_LPARENT) {
         CallExp call_exp;
         call_exp.lineno = _token.lineno;
@@ -303,7 +303,7 @@ std::shared_ptr<Exp> Parser::_parse_unary_exp() {
         }
         _next_token();
 
-        return std::make_shared<Exp>(call_exp);
+        return std::make_unique<Exp>(std::move(call_exp));
     } else if (_token.type == Token::TK_IDENT ||
                _token.type == Token::TK_NUMBER ||
                _token.type == Token::TK_LPARENT) {
@@ -316,7 +316,7 @@ std::shared_ptr<Exp> Parser::_parse_unary_exp() {
 
         _next_token();
         unary_exp.exp = _parse_unary_exp();
-        return std::make_shared<Exp>(unary_exp);
+        return std::make_unique<Exp>(std::move(unary_exp));
     } else {
         ErrorReporter::error(_token.lineno, "expect unary expression");
         _recover();
@@ -324,7 +324,7 @@ std::shared_ptr<Exp> Parser::_parse_unary_exp() {
     }
 }
 
-std::shared_ptr<Exp> Parser::_parse_primary_exp() {
+std::unique_ptr<Exp> Parser::_parse_primary_exp() {
     if (_token.type == Token::TK_LPARENT) {
         _next_token();
         auto exp = _parse_exp();
@@ -337,7 +337,7 @@ std::shared_ptr<Exp> Parser::_parse_primary_exp() {
         IdentExp lval_exp;
         lval_exp.lineno = _token.lineno;
         lval_exp.ident = _parse_ident();
-        return std::make_shared<Exp>(lval_exp);
+        return std::make_unique<Exp>(std::move(lval_exp));
     } else if (_token.type == Token::TK_NUMBER) {
         return _parse_number();
     } else {
@@ -348,7 +348,7 @@ std::shared_ptr<Exp> Parser::_parse_primary_exp() {
 }
 
 void Parser::_parse_func_r_params(
-    std::vector<std::shared_ptr<Exp>> &func_r_params) {
+    std::vector<std::unique_ptr<Exp>> &func_r_params) {
     func_r_params.push_back(_parse_exp());
     while (_token.type == Token::TK_COMMA) {
         _next_token();
@@ -356,8 +356,8 @@ void Parser::_parse_func_r_params(
     }
 }
 
-std::shared_ptr<Cond> Parser::_parse_cond() {
-    auto cond = std::make_shared<Cond>();
+std::unique_ptr<Cond> Parser::_parse_cond() {
+    auto cond = std::make_unique<Cond>();
     cond->lineno = _token.lineno;
 
     cond->lhs = _parse_exp();
@@ -386,9 +386,9 @@ std::shared_ptr<Cond> Parser::_parse_cond() {
     return cond;
 }
 
-std::shared_ptr<Ident> Parser::_parse_ident() {
+std::unique_ptr<Ident> Parser::_parse_ident() {
     if (_token.type == Token::TK_IDENT) {
-        auto ident = std::make_shared<Ident>();
+        auto ident = std::make_unique<Ident>();
         ident->lineno = _token.lineno;
         ident->value = _token.content;
         _next_token();
@@ -400,14 +400,14 @@ std::shared_ptr<Ident> Parser::_parse_ident() {
     }
 }
 
-std::shared_ptr<Exp> Parser::_parse_number() {
+std::unique_ptr<Exp> Parser::_parse_number() {
     if (_token.type == Token::TK_NUMBER) {
         Number number;
         number.lineno = _token.lineno;
         // number is float, so use std::stof
         number.value = std::stof(_token.content);
         _next_token();
-        return std::make_shared<Exp>(number);
+        return std::make_unique<Exp>(number);
     } else {
         ErrorReporter::error(_token.lineno, "expect number");
         _recover();

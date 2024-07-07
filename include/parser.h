@@ -8,24 +8,24 @@ class Parser {
 public:
     Parser(Lexer &lexer) : _lexer(lexer){};
 
-    std::shared_ptr<CompUnit> parse();
+    std::unique_ptr<CompUnit> parse();
 
 private:
-    std::shared_ptr<CompUnit> _parse_comp_unit();
-    std::shared_ptr<FuncDef> _parse_func_def();
+    std::unique_ptr<CompUnit> _parse_comp_unit();
+    std::unique_ptr<FuncDef> _parse_func_def();
     void
-    _parse_func_f_params(std::vector<std::shared_ptr<Ident>> &func_f_params);
-    std::shared_ptr<VarDecl> _parse_var_decl();
-    std::shared_ptr<Stmt> _parse_stmt();
-    std::shared_ptr<Exp> _parse_exp();
-    std::shared_ptr<Exp> _parse_add_exp();
-    std::shared_ptr<Exp> _parse_mul_exp();
-    std::shared_ptr<Exp> _parse_unary_exp();
-    std::shared_ptr<Exp> _parse_primary_exp();
-    void _parse_func_r_params(std::vector<std::shared_ptr<Exp>> &func_r_params);
-    std::shared_ptr<Cond> _parse_cond();
-    std::shared_ptr<Ident> _parse_ident();
-    std::shared_ptr<Exp> _parse_number();
+    _parse_func_f_params(std::vector<std::unique_ptr<Ident>> &func_f_params);
+    std::unique_ptr<VarDecl> _parse_var_decl();
+    std::unique_ptr<Stmt> _parse_stmt();
+    std::unique_ptr<Exp> _parse_exp();
+    std::unique_ptr<Exp> _parse_add_exp();
+    std::unique_ptr<Exp> _parse_mul_exp();
+    std::unique_ptr<Exp> _parse_unary_exp();
+    std::unique_ptr<Exp> _parse_primary_exp();
+    void _parse_func_r_params(std::vector<std::unique_ptr<Exp>> &func_r_params);
+    std::unique_ptr<Cond> _parse_cond();
+    std::unique_ptr<Ident> _parse_ident();
+    std::unique_ptr<Exp> _parse_number();
 
     void _next_token() {
         _token = _pre_read;

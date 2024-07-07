@@ -559,7 +559,7 @@ ValuePtr Visitor::_visit_cond(const Cond &node) {
         ir_op = CompareOpType::GreaterThanOrEqual;
         break;
     default:
-        break; // unreachable
+        throw std::runtime_error("invalid compare op");
     }
 
     auto cmp = CompareInstruction::New(ir_op, left_val, right_val);
