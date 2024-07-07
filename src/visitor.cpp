@@ -6,7 +6,7 @@
 
 void Visitor::visit(const CompUnit &node) {
     for (auto &elm : node.funcDefs) {
-        visitFuncDef(*elm);
+        _visit_func_def(*elm);
     }
 
     // create main function
@@ -17,13 +17,13 @@ void Visitor::visit(const CompUnit &node) {
 
     _cur_scope = _cur_scope->pushScope();
     for (auto &elm : node.varDecls) {
-        visitVarDecl(*elm);
+        _visit_var_decl(*elm);
     }
     for (auto &elm : node.stmts) {
         if (elm == nullptr) { // invalid ast
             continue;
         }
-        visitStmt(*elm);
+        _visit_stmt(*elm);
     }
     _cur_scope = _cur_scope->popScope();
 
@@ -34,12 +34,12 @@ void Visitor::visit(const CompUnit &node) {
     _cur_func = nullptr;
 }
 
-void Visitor::visitFuncDef(const FuncDef &node) {
+void Visitor::_visit_func_def(const FuncDef &node) {
     if (node.ident == nullptr) { // invalid ast
         return;
     }
 
-    auto param_symbols = visitFuncFParams(*node.funcFParams);
+    auto param_symbols = _visit_func_f_params(*node.funcFParams);
 
     // create ir function
     auto context = _ir_module->Context();
@@ -88,7 +88,7 @@ void Visitor::visitFuncDef(const FuncDef &node) {
     if (node.exp == nullptr) { // invalid ast
         return;
     }
-    auto val = visitExp(*node.exp);
+    auto val = _visit_exp(*node.exp);
     if (val == nullptr) {
         return;
     }
@@ -101,7 +101,7 @@ void Visitor::visitFuncDef(const FuncDef &node) {
 }
 
 std::vector<std::shared_ptr<VariableSymbol>>
-Visitor::visitFuncFParams(const FuncFParams &node) {
+Visitor::_visit_func_f_params(const FuncFParams &node) {
     std::vector<std::shared_ptr<VariableSymbol>> rt;
     for (auto &ident : node.idents) {
         if (ident == nullptr) { // invalid ast
@@ -114,7 +114,7 @@ Visitor::visitFuncFParams(const FuncFParams &node) {
     return rt;
 }
 
-void Visitor::visitVarDecl(const VarDecl &node) {
+void Visitor::_visit_var_decl(const VarDecl &node) {
     if (node.ident == nullptr) { // invalid ast
         return;
     }
@@ -133,19 +133,19 @@ void Visitor::visitVarDecl(const VarDecl &node) {
     (*_cur_func->BasicBlockBegin())->InsertInstruction(alloca);
 }
 
-void Visitor::visitStmt(const Stmt &node) {
+void Visitor::_visit_stmt(const Stmt &node) {
     std::visit(overloaded{
-                   [this](const GetStmt &node) { visitGetStmt(node); },
-                   [this](const PutStmt &node) { visitPutStmt(node); },
-                   [this](const TagStmt &node) { visitTagStmt(node); },
-                   [this](const LetStmt &node) { visitLetStmt(node); },
-                   [this](const IfStmt &node) { visitIfStmt(node); },
-                   [this](const ToStmt &node) { visitToStmt(node); },
+                   [this](const GetStmt &node) { _visit_get_stmt(node); },
+                   [this](const PutStmt &node) { _visit_put_stmt(node); },
+                   [this](const TagStmt &node) { _visit_tag_stmt(node); },
+                   [this](const LetStmt &node) { _visit_let_stmt(node); },
+                   [this](const IfStmt &node) { _visit_if_stmt(node); },
+                   [this](const ToStmt &node) { _visit_to_stmt(node); },
                },
                node);
 }
 
-void Visitor::visitGetStmt(const GetStmt &node) {
+void Visitor::_visit_get_stmt(const GetStmt &node) {
     if (node.ident == nullptr) { // invalid ast
         return;
     }
@@ -161,18 +161,18 @@ void Visitor::visitGetStmt(const GetStmt &node) {
     _cur_block->InsertInstruction(store);
 }
 
-void Visitor::visitPutStmt(const PutStmt &node) {
+void Visitor::_visit_put_stmt(const PutStmt &node) {
     if (node.exp == nullptr) { // invalid ast
         return;
     }
-    auto val = visitExp(*node.exp);
+    auto val = _visit_exp(*node.exp);
     if (val == nullptr) {
         return;
     }
     _cur_block->InsertInstruction(OutputInst::New(val));
 }
 
-void Visitor::visitTagStmt(const TagStmt &node) {
+void Visitor::_visit_tag_stmt(const TagStmt &node) {
     if (node.ident == nullptr) { // invalid ast
         return;
     }
@@ -217,7 +217,7 @@ void Visitor::visitTagStmt(const TagStmt &node) {
     }
 }
 
-void Visitor::visitLetStmt(const LetStmt &node) {
+void Visitor::_visit_let_stmt(const LetStmt &node) {
     if (node.ident == nullptr) { // invalid ast
         return;
     }
@@ -237,7 +237,7 @@ void Visitor::visitLetStmt(const LetStmt &node) {
     if (node.exp == nullptr) { // invalid ast
         return;
     }
-    auto exp_val = visitExp(*node.exp);
+    auto exp_val = _visit_exp(*node.exp);
     if (exp_val == nullptr) {
         return;
     }
@@ -249,12 +249,12 @@ void Visitor::visitLetStmt(const LetStmt &node) {
     _cur_block->InsertInstruction(StoreInst::New(exp_val, addr));
 }
 
-void Visitor::visitIfStmt(const IfStmt &node) {
+void Visitor::_visit_if_stmt(const IfStmt &node) {
     if (node.cond == nullptr) { // invalid ast
         return;
     }
 
-    auto val = visitCond(*node.cond);
+    auto val = _visit_cond(*node.cond);
     if (val == nullptr) {
         return;
     }
@@ -294,7 +294,7 @@ void Visitor::visitIfStmt(const IfStmt &node) {
     }
 }
 
-void Visitor::visitToStmt(const ToStmt &node) {
+void Visitor::_visit_to_stmt(const ToStmt &node) {
     if (node.ident == nullptr) { // invalid ast
         return;
     }
@@ -332,24 +332,24 @@ void Visitor::visitToStmt(const ToStmt &node) {
     }
 }
 
-ValuePtr Visitor::visitExp(const Exp &node) {
+ValuePtr Visitor::_visit_exp(const Exp &node) {
     return std::visit(
         overloaded{
-            [this](const BinaryExp &node) { return visitBinaryExp(node); },
-            [this](const CallExp &node) { return visitCallExp(node); },
-            [this](const UnaryExp &node) { return visitUnaryExp(node); },
-            [this](const IdentExp &node) { return visitIdentExp(node); },
-            [this](const Number &node) { return visitNumber(node); },
+            [this](const BinaryExp &node) { return _visit_binary_exp(node); },
+            [this](const CallExp &node) { return _visit_call_exp(node); },
+            [this](const UnaryExp &node) { return _visit_unary_exp(node); },
+            [this](const IdentExp &node) { return _visit_ident_exp(node); },
+            [this](const Number &node) { return _visit_number(node); },
         },
         node);
 }
 
-ValuePtr Visitor::visitBinaryExp(const BinaryExp &node) {
+ValuePtr Visitor::_visit_binary_exp(const BinaryExp &node) {
     if (node.lhs == nullptr || node.rhs == nullptr) { // invalid ast
         return nullptr;
     }
-    auto left_val = visitExp(*node.lhs);
-    auto right_val = visitExp(*node.rhs);
+    auto left_val = _visit_exp(*node.lhs);
+    auto right_val = _visit_exp(*node.rhs);
     if (!left_val || !right_val) {
         return nullptr;
     }
@@ -382,7 +382,7 @@ ValuePtr Visitor::visitBinaryExp(const BinaryExp &node) {
     return val;
 }
 
-ValuePtr Visitor::visitCallExp(const CallExp &node) {
+ValuePtr Visitor::_visit_call_exp(const CallExp &node) {
     if (node.ident == nullptr) { // invalid ast
         return nullptr;
     }
@@ -405,7 +405,7 @@ ValuePtr Visitor::visitCallExp(const CallExp &node) {
                   node.ident->value);
         return nullptr;
     }
-    auto values = visitFuncRParams(*node.funcRParams);
+    auto values = _visit_func_r_params(*node.funcRParams);
     if (values.size() != func_symbol->params_count) { // invalid ast
         return nullptr;
     }
@@ -422,11 +422,11 @@ ValuePtr Visitor::visitCallExp(const CallExp &node) {
     return call;
 }
 
-ValuePtr Visitor::visitUnaryExp(const UnaryExp &node) {
+ValuePtr Visitor::_visit_unary_exp(const UnaryExp &node) {
     if (node.exp == nullptr) { // invalid ast
         return nullptr;
     }
-    auto exp_val = visitExp(*node.exp);
+    auto exp_val = _visit_exp(*node.exp);
     if (exp_val == nullptr) {
         return nullptr;
     }
@@ -450,7 +450,7 @@ ValuePtr Visitor::visitUnaryExp(const UnaryExp &node) {
     return val;
 }
 
-ValuePtr Visitor::visitIdentExp(const IdentExp &node) {
+ValuePtr Visitor::_visit_ident_exp(const IdentExp &node) {
     if (node.ident == nullptr) { // invalid ast
         return nullptr;
     }
@@ -474,19 +474,19 @@ ValuePtr Visitor::visitIdentExp(const IdentExp &node) {
     return val;
 }
 
-ValuePtr Visitor::visitNumber(const Number &node) {
+ValuePtr Visitor::_visit_number(const Number &node) {
     // return const value
     auto val =
         ConstantData::New(_ir_module->Context()->GetFloatTy(), node.value);
     return val;
 }
 
-ValuePtr Visitor::visitCond(const Cond &node) {
+ValuePtr Visitor::_visit_cond(const Cond &node) {
     if (node.lhs == nullptr || node.rhs == nullptr) { // invalid ast
         return nullptr;
     }
-    auto left_val = visitExp(*node.lhs);
-    auto right_val = visitExp(*node.rhs);
+    auto left_val = _visit_exp(*node.lhs);
+    auto right_val = _visit_exp(*node.rhs);
     if (left_val == nullptr || right_val == nullptr) {
         return nullptr;
     }
@@ -521,14 +521,14 @@ ValuePtr Visitor::visitCond(const Cond &node) {
     return cmp;
 }
 
-std::vector<ValuePtr> Visitor::visitFuncRParams(const FuncRParams &node) {
+std::vector<ValuePtr> Visitor::_visit_func_r_params(const FuncRParams &node) {
     std::vector<ValuePtr> rt;
 
     for (auto &exp : node.exps) {
         if (exp == nullptr) { // invalid ast
             continue;
         }
-        auto exp_val = visitExp(*exp);
+        auto exp_val = _visit_exp(*exp);
         if (exp_val == nullptr) {
             continue;
         }

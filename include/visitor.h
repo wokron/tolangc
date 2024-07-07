@@ -8,34 +8,33 @@ class Visitor {
 public:
     Visitor(ModulePtr module)
         : _ir_module(module), _cur_scope(std::make_shared<SymbolTable>()) {}
-    Visitor(ModulePtr module, std::shared_ptr<SymbolTable> cur_scope)
-        : _ir_module(module), _cur_scope(cur_scope) {}
 
     void visit(const CompUnit &node);
-    void visitFuncDef(const FuncDef &node);
-    std::vector<std::shared_ptr<VariableSymbol>>
-    visitFuncFParams(const FuncFParams &node);
-    void visitVarDecl(const VarDecl &node);
-
-    void visitStmt(const Stmt &node);
-    void visitGetStmt(const GetStmt &node);
-    void visitPutStmt(const PutStmt &node);
-    void visitTagStmt(const TagStmt &node);
-    void visitLetStmt(const LetStmt &node);
-    void visitIfStmt(const IfStmt &node);
-    void visitToStmt(const ToStmt &node);
-
-    ValuePtr visitExp(const Exp &node);
-    ValuePtr visitBinaryExp(const BinaryExp &node);
-    ValuePtr visitCallExp(const CallExp &node);
-    ValuePtr visitUnaryExp(const UnaryExp &node);
-    ValuePtr visitIdentExp(const IdentExp &node);
-    ValuePtr visitNumber(const Number &node);
-    ValuePtr visitCond(const Cond &node);
-
-    std::vector<ValuePtr> visitFuncRParams(const FuncRParams &node);
 
 private:
+    void _visit_func_def(const FuncDef &node);
+    std::vector<std::shared_ptr<VariableSymbol>>
+    _visit_func_f_params(const FuncFParams &node);
+    void _visit_var_decl(const VarDecl &node);
+
+    void _visit_stmt(const Stmt &node);
+    void _visit_get_stmt(const GetStmt &node);
+    void _visit_put_stmt(const PutStmt &node);
+    void _visit_tag_stmt(const TagStmt &node);
+    void _visit_let_stmt(const LetStmt &node);
+    void _visit_if_stmt(const IfStmt &node);
+    void _visit_to_stmt(const ToStmt &node);
+
+    ValuePtr _visit_exp(const Exp &node);
+    ValuePtr _visit_binary_exp(const BinaryExp &node);
+    ValuePtr _visit_call_exp(const CallExp &node);
+    ValuePtr _visit_unary_exp(const UnaryExp &node);
+    ValuePtr _visit_ident_exp(const IdentExp &node);
+    ValuePtr _visit_number(const Number &node);
+    ValuePtr _visit_cond(const Cond &node);
+
+    std::vector<ValuePtr> _visit_func_r_params(const FuncRParams &node);
+
     std::shared_ptr<SymbolTable> _cur_scope;
     ModulePtr _ir_module;
     FunctionPtr _cur_func = nullptr;
