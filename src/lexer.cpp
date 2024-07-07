@@ -3,7 +3,6 @@
 #include "token.h"
 #include <ctype.h>
 #include <fstream>
-#include <regex>
 #include <string>
 
 const std::unordered_map<std::string, Token::TokenType> Lexer::_keywords_table =

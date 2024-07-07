@@ -4,11 +4,25 @@
 #include "symtable.h"
 #include "llvm/ir/Module.h"
 
+/**
+ * @brief `Visitor` is a class that visits the abstract syntax tree and
+ * generates the intermediate representation.
+ */
 class Visitor {
 public:
+    /**
+     * @brief Construct a new Visitor object.
+     * @param module The intermediate representation module.
+     */
     Visitor(ModulePtr module)
         : _ir_module(module), _cur_scope(std::make_shared<SymbolTable>()) {}
 
+    /**
+     * @brief Visit the given abstract syntax tree.
+     * @param node The root of the abstract syntax tree.
+     * @note This function will generate the intermediate representation, and
+     * store it in the `module`, which has been passed to the constructor.
+     */
     void visit(const CompUnit &node);
 
 private:
