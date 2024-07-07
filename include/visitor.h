@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ast.h"
-#include "symbol_table.h"
+#include "symtable.h"
 #include "llvm/ir/Module.h"
 
 class Visitor {
