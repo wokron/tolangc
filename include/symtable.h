@@ -8,6 +8,19 @@
 
 enum SymbolType { VAR, TAG, FUNC };
 
+inline std::string symbol_type_to_string(SymbolType type) {
+    switch (type) {
+    case SymbolType::VAR:
+        return "variable";
+    case SymbolType::TAG:
+        return "tag";
+    case SymbolType::FUNC:
+        return "function";
+    default:
+        throw std::runtime_error("unknown symbol type");
+    }
+}
+
 struct Symbol {
     SymbolType type;
     std::string name;
