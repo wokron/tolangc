@@ -50,6 +50,16 @@ private:
     }
 
     /**
+     * @brief Match the current token with the expected token type, and get the
+     * next token if they match.
+     * @param token The current token.
+     * @param expected The expected token type.
+     * @note If the current token type does not match the expected token type,
+     * an error will be reported.
+     */
+    void _match(const Token &token, Token::TokenType expected);
+
+    /**
      * @brief Recover from a syntax error.
      * @note Skip tokens until a semicolon or EOF is encountered.
      */

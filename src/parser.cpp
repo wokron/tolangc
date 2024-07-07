@@ -56,38 +56,23 @@ std::unique_ptr<FuncDef> Parser::_parse_func_def() {
     auto func_def = std::make_unique<FuncDef>();
     func_def->lineno = _token.lineno;
 
-    if (_token.type != Token::TK_FN) {
-        ErrorReporter::error(_token.lineno, "expect function definition");
-    }
-    _next_token();
+    _match(_token, Token::TK_FN);
 
     func_def->ident = _parse_ident();
 
-    if (_token.type != Token::TK_LPARENT) {
-        ErrorReporter::error(_token.lineno, "expect '('");
-    }
-    _next_token();
+    _match(_token, Token::TK_LPARENT);
 
     if (_token.type != Token::TK_RPARENT) {
         _parse_func_f_params(func_def->func_f_params);
     }
 
-    if (_token.type != Token::TK_RPARENT) {
-        ErrorReporter::error(_token.lineno, "expect ')'");
-    }
-    _next_token();
+    _match(_token, Token::TK_RPARENT);
 
-    if (_token.type != Token::TK_RARROW) {
-        ErrorReporter::error(_token.lineno, "expect '->'");
-    }
-    _next_token();
+    _match(_token, Token::TK_RARROW);
 
     func_def->exp = _parse_exp();
 
-    if (_token.type != Token::TK_SEMINCN) {
-        ErrorReporter::error(_token.lineno, "expect ';'");
-    }
-    _next_token();
+    _match(_token, Token::TK_SEMINCN);
 
     return func_def;
 }
@@ -105,17 +90,11 @@ std::unique_ptr<VarDecl> Parser::_parse_var_decl() {
     auto var_decl = std::make_unique<VarDecl>();
     var_decl->lineno = _token.lineno;
 
-    if (_token.type != Token::TK_VAR) {
-        ErrorReporter::error(_token.lineno, "expect variable declaration");
-    }
-    _next_token();
+    _match(_token, Token::TK_VAR);
 
     var_decl->ident = _parse_ident();
 
-    if (_token.type != Token::TK_SEMINCN) {
-        ErrorReporter::error(_token.lineno, "expect ';'");
-    }
-    _next_token();
+    _match(_token, Token::TK_SEMINCN);
 
     return var_decl;
 }
@@ -130,13 +109,10 @@ std::unique_ptr<Stmt> Parser::_parse_stmt() {
 
         get_stmt.ident = _parse_ident();
 
-        if (_token.type != Token::TK_SEMINCN) {
-            ErrorReporter::error(_token.lineno, "expect ';'");
-        }
-        _next_token();
+        _match(_token, Token::TK_SEMINCN);
 
         return std::make_unique<Stmt>(std::move(get_stmt));
-    } break;
+    }
     case Token::TK_PUT: {
         PutStmt put_stmt;
         put_stmt.lineno = _token.lineno;
@@ -145,13 +121,10 @@ std::unique_ptr<Stmt> Parser::_parse_stmt() {
 
         put_stmt.exp = _parse_exp();
 
-        if (_token.type != Token::TK_SEMINCN) {
-            ErrorReporter::error(_token.lineno, "expect ';'");
-        }
-        _next_token();
+        _match(_token, Token::TK_SEMINCN);
 
         return std::make_unique<Stmt>(std::move(put_stmt));
-    } break;
+    }
     case Token::TK_TAG: {
         TagStmt tag_stmt;
         tag_stmt.lineno = _token.lineno;
@@ -160,13 +133,10 @@ std::unique_ptr<Stmt> Parser::_parse_stmt() {
 
         tag_stmt.ident = _parse_ident();
 
-        if (_token.type != Token::TK_SEMINCN) {
-            ErrorReporter::error(_token.lineno, "expect ';'");
-        }
-        _next_token();
+        _match(_token, Token::TK_SEMINCN);
 
         return std::make_unique<Stmt>(std::move(tag_stmt));
-    } break;
+    }
     case Token::TK_LET: {
         LetStmt let_stmt;
         let_stmt.lineno = _token.lineno;
@@ -175,20 +145,14 @@ std::unique_ptr<Stmt> Parser::_parse_stmt() {
 
         let_stmt.ident = _parse_ident();
 
-        if (_token.type != Token::TK_ASSIGN) {
-            ErrorReporter::error(_token.lineno, "expect '='");
-        }
-        _next_token();
+        _match(_token, Token::TK_ASSIGN);
 
         let_stmt.exp = _parse_exp();
 
-        if (_token.type != Token::TK_SEMINCN) {
-            ErrorReporter::error(_token.lineno, "expect ';'");
-        }
-        _next_token();
+        _match(_token, Token::TK_SEMINCN);
 
         return std::make_unique<Stmt>(std::move(let_stmt));
-    } break;
+    }
     case Token::TK_IF: {
         IfStmt if_stmt;
         if_stmt.lineno = _token.lineno;
@@ -197,20 +161,14 @@ std::unique_ptr<Stmt> Parser::_parse_stmt() {
 
         if_stmt.cond = _parse_cond();
 
-        if (_token.type != Token::TK_TO) {
-            ErrorReporter::error(_token.lineno, "expect 'to'");
-        }
-        _next_token();
+        _match(_token, Token::TK_TO);
 
         if_stmt.ident = _parse_ident();
 
-        if (_token.type != Token::TK_SEMINCN) {
-            ErrorReporter::error(_token.lineno, "expect ';'");
-        }
-        _next_token();
+        _match(_token, Token::TK_SEMINCN);
 
         return std::make_unique<Stmt>(std::move(if_stmt));
-    } break;
+    }
     case Token::TK_TO: {
         ToStmt to_stmt;
         to_stmt.lineno = _token.lineno;
@@ -219,13 +177,10 @@ std::unique_ptr<Stmt> Parser::_parse_stmt() {
 
         to_stmt.ident = _parse_ident();
 
-        if (_token.type != Token::TK_SEMINCN) {
-            ErrorReporter::error(_token.lineno, "expect ';'");
-        }
-        _next_token();
+        _match(_token, Token::TK_SEMINCN);
 
         return std::make_unique<Stmt>(std::move(to_stmt));
-    } break;
+    }
     default:
         ErrorReporter::error(_token.lineno, "expect statement");
         _recover();
@@ -273,6 +228,8 @@ std::unique_ptr<Exp> Parser::_parse_mul_exp() {
         case Token::TK_MOD:
             binary_exp.op = BinaryExp::MOD;
             break;
+        default:
+            throw std::runtime_error("unreachable code");
         }
 
         _next_token();
@@ -289,19 +246,13 @@ std::unique_ptr<Exp> Parser::_parse_unary_exp() {
 
         call_exp.ident = _parse_ident();
 
-        if (_token.type != Token::TK_LPARENT) {
-            ErrorReporter::error(_token.lineno, "expect '('");
-        }
-        _next_token();
+        _match(_token, Token::TK_LPARENT);
 
         if (_token.type != Token::TK_RPARENT) {
             _parse_func_r_params(call_exp.func_r_params);
         }
 
-        if (_token.type != Token::TK_RPARENT) {
-            ErrorReporter::error(_token.lineno, "expect ')'");
-        }
-        _next_token();
+        _match(_token, Token::TK_RPARENT);
 
         return std::make_unique<Exp>(std::move(call_exp));
     } else if (_token.type == Token::TK_IDENT ||
@@ -325,22 +276,25 @@ std::unique_ptr<Exp> Parser::_parse_unary_exp() {
 }
 
 std::unique_ptr<Exp> Parser::_parse_primary_exp() {
-    if (_token.type == Token::TK_LPARENT) {
+    switch (_token.type) {
+    case Token::TK_LPARENT: {
         _next_token();
         auto exp = _parse_exp();
-        if (_token.type != Token::TK_RPARENT) {
-            ErrorReporter::error(_token.lineno, "expect ')'");
-        }
-        _next_token();
+
+        _match(_token, Token::TK_RPARENT);
+
         return exp;
-    } else if (_token.type == Token::TK_IDENT) {
+    }
+    case Token::TK_IDENT: {
         IdentExp lval_exp;
         lval_exp.lineno = _token.lineno;
         lval_exp.ident = _parse_ident();
         return std::make_unique<Exp>(std::move(lval_exp));
-    } else if (_token.type == Token::TK_NUMBER) {
+    }
+    case Token::TK_NUMBER: {
         return _parse_number();
-    } else {
+    }
+    default:
         ErrorReporter::error(_token.lineno, "expect primary expression");
         _recover();
         return nullptr;
@@ -364,24 +318,32 @@ std::unique_ptr<Cond> Parser::_parse_cond() {
     switch (_token.type) {
     case Token::TK_LT:
         cond->op = Cond::LT;
+        _next_token();
         break;
     case Token::TK_GT:
         cond->op = Cond::GT;
+        _next_token();
         break;
     case Token::TK_LE:
         cond->op = Cond::LE;
+        _next_token();
         break;
     case Token::TK_GE:
         cond->op = Cond::GE;
+        _next_token();
         break;
     case Token::TK_EQ:
         cond->op = Cond::EQ;
+        _next_token();
         break;
     case Token::TK_NE:
         cond->op = Cond::NE;
+        _next_token();
+        break;
+    default:
+        ErrorReporter::error(_token.lineno, "expect comparison operator");
         break;
     }
-    _next_token();
     cond->rhs = _parse_exp();
     return cond;
 }
@@ -395,7 +357,6 @@ std::unique_ptr<Ident> Parser::_parse_ident() {
         return ident;
     } else {
         ErrorReporter::error(_token.lineno, "expect identifier");
-        _recover();
         return nullptr;
     }
 }
@@ -410,7 +371,15 @@ std::unique_ptr<Exp> Parser::_parse_number() {
         return std::make_unique<Exp>(number);
     } else {
         ErrorReporter::error(_token.lineno, "expect number");
-        _recover();
         return nullptr;
+    }
+}
+
+void Parser::_match(const Token &token, Token::TokenType expected) {
+    if (token.type != expected) {
+        ErrorReporter::error(_token.lineno,
+                             "expect '" + token_type_to_string(expected) + "'");
+    } else {
+        _next_token();
     }
 }
