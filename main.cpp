@@ -58,7 +58,8 @@ void compile(const char *name, const Options &options,
     auto visitor = Visitor(module);
     visitor.visit(*root);
 
-    if (has_error()) {
+    if (ErrorReporter::get().has_error()) {
+        ErrorReporter::get().dump(std::cerr);
         cmd_error(name, "compilation failed");
     }
 

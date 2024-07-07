@@ -57,7 +57,7 @@ void Visitor::visitFuncDef(const FuncDef &node) {
 
     // try to add function symbol to current scope
     if (!_cur_scope->addSymbol(symbol)) {
-        error(node.lineno, "redefine function " + node.ident->value);
+        ErrorReporter::error(node.lineno, "redefine function " + node.ident->value);
         return;
     }
 
@@ -72,7 +72,7 @@ void Visitor::visitFuncDef(const FuncDef &node) {
 
     for (auto &param_symbol : param_symbols) {
         if (!_cur_scope->addSymbol(param_symbol)) {
-            error(param_symbol->line_number,
+            ErrorReporter::error(param_symbol->line_number,
                   "redefine parameter " + param_symbol->name);
         }
 
@@ -125,7 +125,7 @@ void Visitor::visitVarDecl(const VarDecl &node) {
                                                    node.ident->lineno);
 
     if (!_cur_scope->addSymbol(symbol)) {
-        error(node.ident->lineno, "redefine variable " + node.ident->value);
+        ErrorReporter::error(node.ident->lineno, "redefine variable " + node.ident->value);
         return;
     }
 
@@ -152,7 +152,7 @@ void Visitor::visitGetStmt(const GetStmt &node) {
 
     auto symbol = _cur_scope->getSymbol(node.ident->value);
     if (symbol == nullptr) {
-        error(node.ident->lineno, "undefined symbol " + node.ident->value);
+        ErrorReporter::error(node.ident->lineno, "undefined symbol " + node.ident->value);
         return;
     }
     auto input = InputInst::New(_ir_module->Context());
@@ -180,7 +180,7 @@ void Visitor::visitTagStmt(const TagStmt &node) {
     if (_cur_scope->existInScope(node.ident->value)) {
         auto symbol = _cur_scope->getSymbol(node.ident->value);
         if (symbol->type != SymbolType::Tag) {
-            error(node.ident->lineno, node.ident->value + " is not a tag");
+            ErrorReporter::error(node.ident->lineno, node.ident->value + " is not a tag");
             return;
         }
 
@@ -224,11 +224,11 @@ void Visitor::visitLetStmt(const LetStmt &node) {
 
     auto symbol = _cur_scope->getSymbol(node.ident->value);
     if (symbol == nullptr) {
-        error(node.ident->lineno, "undefined symbol " + node.ident->value);
+        ErrorReporter::error(node.ident->lineno, "undefined symbol " + node.ident->value);
         return;
     }
     if (symbol->type != SymbolType::Variable) {
-        error(node.ident->lineno, node.ident->value + " is not a variable");
+        ErrorReporter::error(node.ident->lineno, node.ident->value + " is not a variable");
         return;
     }
 
@@ -262,7 +262,7 @@ void Visitor::visitIfStmt(const IfStmt &node) {
     if (_cur_scope->existInScope(node.ident->value)) {
         auto symbol = _cur_scope->getSymbol(node.ident->value);
         if (symbol->type != SymbolType::Tag) {
-            error(node.ident->lineno, node.ident->value + " is not a tag");
+            ErrorReporter::error(node.ident->lineno, node.ident->value + " is not a tag");
             return;
         }
 
@@ -302,7 +302,7 @@ void Visitor::visitToStmt(const ToStmt &node) {
     if (_cur_scope->existInScope(node.ident->value)) {
         auto symbol = _cur_scope->getSymbol(node.ident->value);
         if (symbol->type != SymbolType::Tag) {
-            error(node.ident->lineno, node.ident->value + " is not a tag");
+            ErrorReporter::error(node.ident->lineno, node.ident->value + " is not a tag");
             return;
         }
 
@@ -389,18 +389,18 @@ ValuePtr Visitor::visitCallExp(const CallExp &node) {
 
     auto symbol = _cur_scope->getSymbol(node.ident->value);
     if (symbol == nullptr) {
-        error(node.ident->lineno, "undefined symbol " + node.ident->value);
+        ErrorReporter::error(node.ident->lineno, "undefined symbol " + node.ident->value);
         return nullptr;
     }
     if (symbol->type != SymbolType::Function) {
-        error(node.ident->lineno, node.ident->value + " is not a variable");
+        ErrorReporter::error(node.ident->lineno, node.ident->value + " is not a variable");
         return nullptr;
     }
 
     auto func_symbol = std::static_pointer_cast<FunctionSymbol>(symbol);
 
     if (func_symbol->params_count != node.funcRParams->exps.size()) {
-        error(node.ident->lineno,
+        ErrorReporter::error(node.ident->lineno,
               "params number not matched in function call " +
                   node.ident->value);
         return nullptr;
@@ -457,11 +457,11 @@ ValuePtr Visitor::visitIdentExp(const IdentExp &node) {
 
     auto symbol = _cur_scope->getSymbol(node.ident->value);
     if (symbol == nullptr) {
-        error(node.ident->lineno, "undefined symbol " + node.ident->value);
+        ErrorReporter::error(node.ident->lineno, "undefined symbol " + node.ident->value);
         return nullptr;
     }
     if (symbol->type != SymbolType::Variable) {
-        error(node.ident->lineno, node.ident->value + " is not a variable");
+        ErrorReporter::error(node.ident->lineno, node.ident->value + " is not a variable");
         return nullptr;
     }
 

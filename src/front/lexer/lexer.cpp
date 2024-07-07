@@ -95,7 +95,7 @@ bool Lexer::next(Token &token) {
         } else {
             _input.unget();
             token = Token(Token::TK_ERR, content, _lineno);
-            error(_lineno, "invalid character '!'");
+            ErrorReporter::error(_lineno, "invalid character '!'");
         }
     } else if (ch == ';') {
         token = Token(Token::TK_SEMINCN, content, _lineno);
@@ -121,7 +121,7 @@ bool Lexer::next(Token &token) {
         return false;
     } else {
         token = Token(Token::TK_ERR, content, _lineno);
-        error(_lineno, "invalid character '" + content + "'");
+        ErrorReporter::error(_lineno, "invalid character '" + content + "'");
     }
     return true;
 }
