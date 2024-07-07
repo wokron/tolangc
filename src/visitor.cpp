@@ -15,7 +15,7 @@ void Visitor::visit(const CompUnit &node) {
     _ir_module->AddMainFunction(_cur_func);
     _cur_block = _cur_func->NewBasicBlock();
 
-    _cur_scope = _cur_scope->pushScope();
+    _cur_scope = _cur_scope->push_scope();
     for (auto &elm : node.varDecls) {
         _visit_var_decl(*elm);
     }
@@ -25,7 +25,7 @@ void Visitor::visit(const CompUnit &node) {
         }
         _visit_stmt(*elm);
     }
-    _cur_scope = _cur_scope->popScope();
+    _cur_scope = _cur_scope->pop_scope();
 
     _cur_block->InsertInstruction(
         ReturnInst::New(ConstantData::New(context->GetInt32Ty(), 0)));
@@ -56,7 +56,7 @@ void Visitor::_visit_func_def(const FuncDef &node) {
         node.ident->value, _cur_func, node.lineno, param_symbols.size());
 
     // try to add function symbol to current scope
-    if (!_cur_scope->addSymbol(symbol)) {
+    if (!_cur_scope->add_symbol(symbol)) {
         ErrorReporter::error(node.lineno, "redefine function " + node.ident->value);
         return;
     }
@@ -68,11 +68,11 @@ void Visitor::_visit_func_def(const FuncDef &node) {
     _cur_block = _cur_func->NewBasicBlock();
 
     // new scope for function
-    _cur_scope = _cur_scope->pushScope();
+    _cur_scope = _cur_scope->push_scope();
 
     for (auto &param_symbol : param_symbols) {
-        if (!_cur_scope->addSymbol(param_symbol)) {
-            ErrorReporter::error(param_symbol->line_number,
+        if (!_cur_scope->add_symbol(param_symbol)) {
+            ErrorReporter::error(param_symbol->lineno,
                   "redefine parameter " + param_symbol->name);
         }
 
@@ -94,7 +94,7 @@ void Visitor::_visit_func_def(const FuncDef &node) {
     }
     _cur_block->InsertInstruction(ReturnInst::New(val));
 
-    _cur_scope = _cur_scope->popScope();
+    _cur_scope = _cur_scope->pop_scope();
 
     _cur_block = nullptr;
     _cur_func = nullptr;
@@ -124,7 +124,7 @@ void Visitor::_visit_var_decl(const VarDecl &node) {
     auto symbol = std::make_shared<VariableSymbol>(node.ident->value, alloca,
                                                    node.ident->lineno);
 
-    if (!_cur_scope->addSymbol(symbol)) {
+    if (!_cur_scope->add_symbol(symbol)) {
         ErrorReporter::error(node.ident->lineno, "redefine variable " + node.ident->value);
         return;
     }
@@ -150,7 +150,7 @@ void Visitor::_visit_get_stmt(const GetStmt &node) {
         return;
     }
 
-    auto symbol = _cur_scope->getSymbol(node.ident->value);
+    auto symbol = _cur_scope->get_symbol(node.ident->value);
     if (symbol == nullptr) {
         ErrorReporter::error(node.ident->lineno, "undefined symbol " + node.ident->value);
         return;
@@ -177,9 +177,9 @@ void Visitor::_visit_tag_stmt(const TagStmt &node) {
         return;
     }
 
-    if (_cur_scope->existInScope(node.ident->value)) {
-        auto symbol = _cur_scope->getSymbol(node.ident->value);
-        if (symbol->type != SymbolType::Tag) {
+    if (_cur_scope->exist_in_scope(node.ident->value)) {
+        auto symbol = _cur_scope->get_symbol(node.ident->value);
+        if (symbol->type != SymbolType::TAG) {
             ErrorReporter::error(node.ident->lineno, node.ident->value + " is not a tag");
             return;
         }
@@ -213,7 +213,7 @@ void Visitor::_visit_tag_stmt(const TagStmt &node) {
         auto symbol = std::make_shared<TagSymbol>(node.ident->value, nullptr,
                                                   node.ident->lineno);
         symbol->target = label;
-        _cur_scope->addSymbol(symbol);
+        _cur_scope->add_symbol(symbol);
     }
 }
 
@@ -222,12 +222,12 @@ void Visitor::_visit_let_stmt(const LetStmt &node) {
         return;
     }
 
-    auto symbol = _cur_scope->getSymbol(node.ident->value);
+    auto symbol = _cur_scope->get_symbol(node.ident->value);
     if (symbol == nullptr) {
         ErrorReporter::error(node.ident->lineno, "undefined symbol " + node.ident->value);
         return;
     }
-    if (symbol->type != SymbolType::Variable) {
+    if (symbol->type != SymbolType::VAR) {
         ErrorReporter::error(node.ident->lineno, node.ident->value + " is not a variable");
         return;
     }
@@ -259,9 +259,9 @@ void Visitor::_visit_if_stmt(const IfStmt &node) {
         return;
     }
 
-    if (_cur_scope->existInScope(node.ident->value)) {
-        auto symbol = _cur_scope->getSymbol(node.ident->value);
-        if (symbol->type != SymbolType::Tag) {
+    if (_cur_scope->exist_in_scope(node.ident->value)) {
+        auto symbol = _cur_scope->get_symbol(node.ident->value);
+        if (symbol->type != SymbolType::TAG) {
             ErrorReporter::error(node.ident->lineno, node.ident->value + " is not a tag");
             return;
         }
@@ -288,7 +288,7 @@ void Visitor::_visit_if_stmt(const IfStmt &node) {
 
         auto symbol =
             std::make_shared<TagSymbol>(node.ident->value, nullptr, -1);
-        _cur_scope->addSymbol(symbol);
+        _cur_scope->add_symbol(symbol);
         // add jump inst to symbol
         symbol->jump_insts.push_back(jump);
     }
@@ -299,9 +299,9 @@ void Visitor::_visit_to_stmt(const ToStmt &node) {
         return;
     }
 
-    if (_cur_scope->existInScope(node.ident->value)) {
-        auto symbol = _cur_scope->getSymbol(node.ident->value);
-        if (symbol->type != SymbolType::Tag) {
+    if (_cur_scope->exist_in_scope(node.ident->value)) {
+        auto symbol = _cur_scope->get_symbol(node.ident->value);
+        if (symbol->type != SymbolType::TAG) {
             ErrorReporter::error(node.ident->lineno, node.ident->value + " is not a tag");
             return;
         }
@@ -325,7 +325,7 @@ void Visitor::_visit_to_stmt(const ToStmt &node) {
 
         auto symbol =
             std::make_shared<TagSymbol>(node.ident->value, nullptr, -1);
-        _cur_scope->addSymbol(symbol);
+        _cur_scope->add_symbol(symbol);
 
         // add jump inst to symbol
         symbol->jump_insts.push_back(jump);
@@ -387,12 +387,12 @@ ValuePtr Visitor::_visit_call_exp(const CallExp &node) {
         return nullptr;
     }
 
-    auto symbol = _cur_scope->getSymbol(node.ident->value);
+    auto symbol = _cur_scope->get_symbol(node.ident->value);
     if (symbol == nullptr) {
         ErrorReporter::error(node.ident->lineno, "undefined symbol " + node.ident->value);
         return nullptr;
     }
-    if (symbol->type != SymbolType::Function) {
+    if (symbol->type != SymbolType::FUNC) {
         ErrorReporter::error(node.ident->lineno, node.ident->value + " is not a variable");
         return nullptr;
     }
@@ -455,12 +455,12 @@ ValuePtr Visitor::_visit_ident_exp(const IdentExp &node) {
         return nullptr;
     }
 
-    auto symbol = _cur_scope->getSymbol(node.ident->value);
+    auto symbol = _cur_scope->get_symbol(node.ident->value);
     if (symbol == nullptr) {
         ErrorReporter::error(node.ident->lineno, "undefined symbol " + node.ident->value);
         return nullptr;
     }
-    if (symbol->type != SymbolType::Variable) {
+    if (symbol->type != SymbolType::VAR) {
         ErrorReporter::error(node.ident->lineno, node.ident->value + " is not a variable");
         return nullptr;
     }
