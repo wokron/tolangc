@@ -1,6 +1,6 @@
 //
 #pragma once
-#include "asm/AsmPrinter.h"
+#include "llvm/asm/AsmPrinter.h"
 #include "mips/mips_forward.h"
 #include "mips/mips_inst.h"
 #include "mips/mips_reg.h"
