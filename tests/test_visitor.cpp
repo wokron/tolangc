@@ -2,7 +2,7 @@
 #include "lexer.h"
 #include "parser.h"
 #include "visitor.h"
-#include "llvm/asm/AsmPrinter.h"
+#include "asm/AsmPrinter.h"
 #include <doctest.h>
 #include <sstream>
 

@@ -15,7 +15,7 @@ using FloatRegPtr = FloatReg *;
 class RetAddrReg;
 class StkPtrReg;
 class FrmPtrReg;
-class Offset;
+class OffsetReg;
 
 class MipsData;
 using MipsDataPtr = MipsData *;

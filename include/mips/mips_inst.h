@@ -75,6 +75,8 @@ private:
 };
 
 enum MipsCodeType {
+    //error
+    Error,
     // ICode
     BC1F,
     BC1T,
@@ -147,8 +149,8 @@ public:
     };
 
     // CEqS, CLeS, CLtS, CvtSW, CvtWS, TruncWS,
-    RCode(MipsCodeType op, MipsRegPtr rd, MipsRegPtr rt)
-        : MipsCode(op, rd, nullptr, rt, 0) {
+    RCode(MipsCodeType op, MipsRegPtr rs, MipsRegPtr rt)
+        : MipsCode(op, nullptr, rs, rt, 0) {
         if (op > TruncWS || op < CEqS) {
             TOLANG_DIE("MipsCode not supported.");
         }
@@ -227,5 +229,7 @@ public:
         : MipsCode(MipsCodeType::Label, nullptr, nullptr, nullptr, 0) {
         this->label = std::move(label);
     };
+
+    std::string GetName(){return label;}
     void PrintCode(AsmWriterPtr out) override;
 };

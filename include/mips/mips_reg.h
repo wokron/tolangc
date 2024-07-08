@@ -9,7 +9,7 @@ enum MipsRegType {
     ArgRegTy,     //$a0-$a3
     ValueRegTy,   //$v0-$v1
     TmpRegTy,     //$t0-$t7
-    FloatRegTy,   //$f0-$f9
+    FloatRegTy,   //$f0-$f31
     RetAddrRegTy, //$ra
     StkPtrRegTy,  //$sp
     FrmPtrRegTy,  //$fp
@@ -68,7 +68,7 @@ class TmpReg : public MipsReg {
 class FloatReg : public MipsReg {
     friend MipsManager;
     FloatReg(int index) : MipsReg(index, FloatRegTy) {
-        if (index > 9 || index < 0)
+        if (index > 31 || index < 0)
             TOLANG_DIE("MipsReg not supported.");
     };
 };
@@ -88,7 +88,7 @@ class FrmPtrReg : public MipsReg {
     FrmPtrReg() : MipsReg(-1, FrmPtrRegTy){};
 };
 
-class Offset : public MipsReg {
+class OffsetReg : public MipsReg {
     friend MipsManager;
-    Offset(int offset) : MipsReg(offset, MipsRegType::OffsetTy){};
+    OffsetReg(int offset) : MipsReg(offset, MipsRegType::OffsetTy){};
 };

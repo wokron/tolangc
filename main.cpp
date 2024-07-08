@@ -3,7 +3,7 @@
 #include "lexer.h"
 #include "parser.h"
 #include "visitor.h"
-#include "llvm/asm/AsmPrinter.h"
+#include "asm/AsmPrinter.h"
 #include "llvm/ir/Module.h"
 #include <fstream>
 #include <getopt.h>

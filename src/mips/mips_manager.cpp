@@ -11,12 +11,18 @@ MipsManager::MipsManager(std::ostream &_out) : _out(_out) {
     for (int i=0; i<TMPCOUNT; i++) {
         tmpRegPool.insert(std::pair<int, TmpRegPtr>(i, new TmpReg(i)));
     }
-    for (int i=0; i<FLOATCOUNT; i++) {
+    // f0 保留
+    for (int i=1; i<FLOATCOUNT; i++) {
+        if (i == 12)
+            continue;
         floatRegPool.insert(std::pair<int, FloatRegPtr>(i, new FloatReg(i)));
     }
     zero = new ZeroReg();
-    fp = new FrmPtrReg();
     sp = new StkPtrReg();
+    ra = new RetAddrReg();
+    v0 = new ValueReg(0);
+    f0 = new FloatReg(0);
+    f12 = new FloatReg(12);
 }
 
 void MipsManager::addAsciiz(std::string value) {
@@ -30,7 +36,19 @@ std::string MipsManager::addFloat(float f) {
         floatMap.insert(std::pair<float, FloatDataPtr>(f, ptr));
     }
     return floatMap.find(f)->second->GetName();
+}
 
+std::string MipsManager::newLabelName() {
+   return functionName + "_" +std::to_string(labelCount++);
+}
+
+std::string MipsManager::getLabelName(BasicBlockPtr basicBlockPtr) {
+    if (blockNames.count(basicBlockPtr) != 0) {
+        return *blockNames.find(basicBlockPtr)->second;
+    }
+    std::string name = newLabelName();
+    blockNames.insert(std::pair<BasicBlockPtr, std::string*>(basicBlockPtr, &name));
+    return name;
 }
 
 TmpRegPtr MipsManager::getFreeTmp(){
@@ -89,8 +107,10 @@ MipsRegPtr MipsManager::getFree(Type::TypeID type) {
     }
 }
 
-void MipsManager::resetFrame() {
-    addCode(new ICode(Addiu, static_cast<MipsRegPtr>(sp), static_cast<MipsRegPtr>(fp), 0));
+void MipsManager::resetFrame(std::string name) {
+    this->functionName = name;
+    addCode(new MipsLabel(name));
+//    addCode(new ICode(Addiu, static_cast<MipsRegPtr>(sp), static_cast<MipsRegPtr>(fp), 0));
     labelCount = 0;
     currentOffset = 0;
     occupation.clear();
@@ -106,6 +126,12 @@ void MipsManager::resetFrame() {
     floatCount = 0;
 }
 
+void MipsManager::allocMem(AllocaInstPtr allocaInstPtr, int size) {
+    currentOffset -= 4*size;
+    occupy(new OffsetReg(currentOffset + 4), allocaInstPtr);
+
+}
+
 MipsRegPtr MipsManager::allocReg(ValuePtr valuePtr) {
     MipsRegPtr mipsRegPtr = getFree(valuePtr->GetType()->TypeId());
     occupy(mipsRegPtr, valuePtr);
@@ -113,11 +139,40 @@ MipsRegPtr MipsManager::allocReg(ValuePtr valuePtr) {
 }
 
 MipsRegPtr MipsManager::getReg(ValuePtr valuePtr) {
-    if (occupation.count(valuePtr) == 0) return nullptr;
+    if (occupation.count(valuePtr) == 0){
+        if (valuePtr->Is<GlobalValue>()) {
+            auto addr = allocReg(valuePtr);
+            addCode(new ICode(LA, addr, valuePtr->GetName()));
+        } else {
+            return nullptr;
+        }
+    }
     if (occupation.find(valuePtr)->second->GetType() == OffsetTy) {
-        load(valuePtr);
+        // 存offset有两种情况：
+        // 1. 临时寄存器池中变量推到栈中，occupation中存相对sp的偏移量；
+        // 2. 指针变量所指的相对sp的位置
+        if (!valuePtr->GetType()->IsPointerTy()){
+            load(valuePtr);
+        }
     }
     return occupation.find(valuePtr)->second;
+}
+
+MipsRegPtr MipsManager::loadConst(ValuePtr valuePtr, MipsRegType type) {
+    if (!valuePtr->Is<ConstantData>()){
+        return getReg(valuePtr);
+    }
+    MipsRegPtr newRegPtr = getFree(valuePtr->GetType()->TypeId());
+    if (type == TmpRegTy){
+        addCode(new ICode(Addiu, newRegPtr, zero, valuePtr->As<ConstantData>()->GetIntValue()));
+    } else if (type == FloatRegTy) {
+        std::string name = addFloat(valuePtr->As<ConstantData>()->GetFloatValue());
+        addCode(new ICode(LS, newRegPtr, name));
+    } else {
+        TOLANG_DIE("wrong binary operator type");
+    }
+    occupy(newRegPtr, valuePtr);
+    return newRegPtr;
 }
 
 void MipsManager::tryRelease(UserPtr userPtr) {
@@ -157,11 +212,19 @@ void MipsManager::push(ValuePtr valuePtr) {
     } else {
         TOLANG_DIE("invalid value-mipsreg type");
     }
-    addCode(new ICode(codeType, sp, sp, currentOffset));
+    addCode(new ICode(codeType, getReg(valuePtr), sp, currentOffset));
 
     release(valuePtr);
-    occupation.insert(std::pair<ValuePtr, MipsRegPtr>(valuePtr, new Offset(currentOffset)));
+    occupation.insert(std::pair<ValuePtr, MipsRegPtr>(valuePtr, new OffsetReg(currentOffset)));
     currentOffset -= 4;
+}
+
+void MipsManager::pushAll() {
+    for (auto occ: occupation) {
+        if (occ.second->GetType() != OffsetTy) {
+            push(occ.first);
+        }
+    }
 }
 
 void MipsManager::load(ValuePtr valuePtr) {
