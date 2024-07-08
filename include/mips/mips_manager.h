@@ -26,7 +26,6 @@ private:
     std::unordered_map<float, FloatDataPtr> floatMap;
 
     std::vector<MipsCodePtr> codes;
-    AsmPrinter *printer;
     std::ostream &_out;
 
     std::unordered_map<int, TmpRegPtr> tmpRegPool;

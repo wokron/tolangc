@@ -12,10 +12,9 @@ class MipsCode;
 
 class MipsData {
 protected:
-    virtual void PrintData(AsmWriterPtr out);
     MipsData(std::string &name) : name(name){};
-    virtual void printName(AsmWriterPtr out);
-    virtual void printValue(AsmWriterPtr out);
+    virtual void printName(std::ostream& out);
+    virtual void printValue(std::ostream& out);
 
 protected:
     std::string name;
@@ -25,6 +24,7 @@ protected:
 public:
     std::string GetName() { return name; };
     int GetValue{};
+    virtual void PrintData(std::ostream& out);
 };
 
 // .word
@@ -36,12 +36,12 @@ public:
         str = nullptr;
         ;
     }
-    void PrintData(AsmWriterPtr out) override;
+    void PrintData(std::ostream& out) override;
 
 private:
     int *array;
-    void printName(AsmWriterPtr out) override;
-    void printValue(AsmWriterPtr out) override;
+    void printName(std::ostream& out) override;
+    void printValue(std::ostream& out) override;
 };
 
 // .float
@@ -52,11 +52,11 @@ public:
         f_value = value;
         str = nullptr;
     }
-    void PrintData(AsmWriterPtr out) override;
+    void PrintData(std::ostream& out) override;
 
 private:
-    void printName(AsmWriterPtr out) override;
-    void printValue(AsmWriterPtr out) override;
+    void printName(std::ostream& out) override;
+    void printValue(std::ostream& out) override;
 };
 
 // .asciiz
@@ -67,11 +67,11 @@ public:
         f_value = 0;
         str = value;
     }
-    void PrintData(AsmWriterPtr out) override;
+    void PrintData(std::ostream& out) override;
 
 private:
-    void printName(AsmWriterPtr out) override;
-    void printValue(AsmWriterPtr out) override;
+    void printName(std::ostream& out) override;
+    void printValue(std::ostream& out) override;
 };
 
 enum MipsCodeType {
@@ -133,7 +133,7 @@ protected:
         : op(op), rs(rs), rt(rt), rd(rd), intermediate(inter){};
 
 public:
-    virtual void PrintCode(AsmWriterPtr out);
+    virtual void PrintCode(std::ostream& out);
 };
 
 class RCode : public MipsCode {
@@ -179,7 +179,7 @@ public:
         }
     };
 
-    void PrintCode(AsmWriterPtr out) override;
+    void PrintCode(std::ostream& out) override;
 };
 
 class ICode : public MipsCode {
@@ -211,7 +211,7 @@ public:
         }
     };
 
-    void PrintCode(AsmWriterPtr out) override;
+    void PrintCode(std::ostream& out) override;
 };
 
 class JCode : public MipsCode {
@@ -220,7 +220,7 @@ public:
         : MipsCode(op, nullptr, nullptr, nullptr, 0) {
         this->label = std::move(label);
     };
-    void PrintCode(AsmWriterPtr out) override;
+    void PrintCode(std::ostream& out) override;
 };
 
 class MipsLabel : public MipsCode {
@@ -231,5 +231,5 @@ public:
     };
 
     std::string GetName(){return label;}
-    void PrintCode(AsmWriterPtr out) override;
+    void PrintCode(std::ostream& out) override;
 };

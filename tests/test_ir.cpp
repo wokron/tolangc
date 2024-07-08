@@ -2,7 +2,7 @@
 
 #include "doctest.h"
 
-#include "asm/AsmPrinter.h"
+#include "llvm/asm/AsmPrinter.h"
 #include "llvm/ir/Llvm.h"
 
 /*

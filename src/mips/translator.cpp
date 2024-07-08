@@ -1,6 +1,5 @@
 //
 #include "mips/translator.h"
-#include "mips/mips_manager.h"
 #include "llvm/ir/value/Use.h"
 #include "utils.h"
 #include <cassert>
@@ -35,7 +34,7 @@ void Translator::translate(BasicBlockPtr basicBlockPtr) {
         translate(*instr);
         instr++;
     }
-    manager.pushAll();
+    manager->pushAll();
 }
 
 void Translator::translate(InstructionPtr instructionPtr) {
@@ -280,7 +279,7 @@ void Translator::translate(CallInstPtr callInstPtr) {
         auto resultReg = manager->allocReg(callInstPtr);
         if (callInstPtr->GetType()->IsIntegerTy()){
             // 整数返回值已经存在v0中
-            manager->addCode(new RCode(Addu, resultReg, manager->v0, new ZeroReg()));
+            manager->addCode(new RCode(Addu, resultReg, manager->v0, manager->zero));
         } else if (callInstPtr->GetType()->IsFloatTy()) {
             // 浮点数返回值已经存在f0中
             auto reg0 = manager->getFreeFloat();
@@ -299,8 +298,8 @@ void Translator::translate(JumpInstPtr jumpInstPtr) {
 
 void Translator::translate(LoadInstPtr loadInstPtr) {
     // Operand -> pointerty
-    OffsetReg* offsetptr =
-        dynamic_cast<OffsetReg *>(manager->getReg(loadInstPtr->Operand()));
+    auto offsetptr =
+        manager->getReg(loadInstPtr->Operand());
 
     auto resultReg = manager->allocReg(loadInstPtr);
     MipsCodeType op = loadInstPtr->GetType()->IsFloatTy() ? LS : LW;
@@ -314,8 +313,8 @@ void Translator::translate(StoreInstPtr storeInstPtr) {
     auto operand = manager->loadConst(storeInstPtr->LeftOperand(), storeInstPtr->LeftOperand()->GetType()->IsFloatTy() ? FloatRegTy : TmpRegTy);
     MipsCodeType op = storeInstPtr->LeftOperand()->GetType()->IsFloatTy() ? SS : SW;
 
-    OffsetReg* offsetptr =
-        dynamic_cast<OffsetReg *>(manager->getReg(storeInstPtr->RightOperand()));
+    auto offsetptr =
+        manager->getReg(storeInstPtr->RightOperand());
     if (storeInstPtr->RightOperand()->Is<GlobalValue>()) {
         manager->addCode(new ICode(op, operand, offsetptr, 0));
     } else {
