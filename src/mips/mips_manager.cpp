@@ -24,18 +24,6 @@ MipsManager::MipsManager() {
     f12 = new FloatReg(12);
 }
 
-void MipsManager::PrintMips() {
-    AsmWriterPtr writer = AsmWriter::New(_out);
-    for (auto data: datas) {
-        data->PrintData(writer);
-    }
-
-    for (auto code: codes) {
-        code->PrintCode(writer);
-    }
-
-}
-
 void MipsManager::addAsciiz(std::string value) {
     addData(new AsciizData("str" + std::to_string(asciizCount++), value));
 }
