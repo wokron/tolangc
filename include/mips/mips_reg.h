@@ -19,9 +19,9 @@ class MipsReg {
     friend MipsManager;
 
 public:
-    int GetIndex() { return index; };
+    int GetIndex() const { return index; };
     MipsRegType GetType() { return type; };
-    virtual void PrintReg(std::ostream& out);
+    virtual void PrintReg(std::ostream& out){};
 
 protected:
     MipsReg(int index, MipsRegType type) : index(index), type(type){};
@@ -41,7 +41,7 @@ class ArgumentReg : public MipsReg {
     friend MipsManager;
 
 public:
-    ArgumentReg(int index) : MipsReg(index, ArgRegTy) {
+    explicit ArgumentReg(int index) : MipsReg(index, ArgRegTy) {
         if (index > 3 || index < 0)
             TOLANG_DIE("Operation not supported.");
     };
@@ -50,7 +50,7 @@ public:
 
 class ValueReg : public MipsReg {
     friend MipsManager;
-    ValueReg(int index) : MipsReg(index, ValueRegTy) {
+    explicit ValueReg(int index) : MipsReg(index, ValueRegTy) {
         if (index > 1 || index < 0)
             TOLANG_DIE("MipsReg not supported.");
     };
@@ -59,7 +59,7 @@ class ValueReg : public MipsReg {
 
 class TmpReg : public MipsReg {
     friend MipsManager;
-    TmpReg(int index) : MipsReg(index, TmpRegTy) {
+    explicit TmpReg(int index) : MipsReg(index, TmpRegTy) {
         if (index > 7 || index < 0)
             TOLANG_DIE("MipsReg not supported.");
     };
@@ -68,7 +68,7 @@ class TmpReg : public MipsReg {
 
 class FloatReg : public MipsReg {
     friend MipsManager;
-    FloatReg(int index) : MipsReg(index, FloatRegTy) {
+    explicit FloatReg(int index) : MipsReg(index, FloatRegTy) {
         if (index > 31 || index < 0)
             TOLANG_DIE("MipsReg not supported.");
     };
@@ -90,10 +90,11 @@ class StkPtrReg : public MipsReg {
 class FrmPtrReg : public MipsReg {
     friend MipsManager;
     FrmPtrReg() : MipsReg(-1, FrmPtrRegTy){};
+    void PrintReg(std::ostream& out) override;
 };
 
 class OffsetReg : public MipsReg {
     friend MipsManager;
-    OffsetReg(int offset) : MipsReg(offset, MipsRegType::OffsetTy){};
+    explicit OffsetReg(int offset) : MipsReg(offset, MipsRegType::OffsetTy){};
     void PrintReg(std::ostream& out) override;
 };

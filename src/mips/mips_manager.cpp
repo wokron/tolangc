@@ -7,7 +7,6 @@
 #include <cassert>
 
 MipsManager::MipsManager(std::ostream &_out) : _out(_out) {
-    printer = new AsmPrinter();
     for (int i=0; i<TMPCOUNT; i++) {
         tmpRegPool.insert(std::pair<int, TmpRegPtr>(i, new TmpReg(i)));
     }
@@ -23,18 +22,6 @@ MipsManager::MipsManager(std::ostream &_out) : _out(_out) {
     v0 = new ValueReg(0);
     f0 = new FloatReg(0);
     f12 = new FloatReg(12);
-}
-
-void MipsManager::PrintMips() {
-    AsmWriterPtr writer = AsmWriter::New(_out);
-    for (auto data: datas) {
-        data->PrintData(writer);
-    }
-
-    for (auto code: codes) {
-        code->PrintCode(writer);
-    }
-
 }
 
 void MipsManager::addAsciiz(std::string value) {

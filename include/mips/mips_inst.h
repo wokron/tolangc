@@ -12,19 +12,19 @@ class MipsCode;
 
 class MipsData {
 protected:
-    MipsData(std::string &name) : name(name){};
-    virtual void printName(std::ostream& out);
-    virtual void printValue(std::ostream& out);
+    explicit MipsData(std::string &name) : name(name){};
+    void printName(std::ostream& out){out << name;};
+    virtual void printValue(std::ostream& out){};
 
 protected:
     std::string name;
-    int w_value;
-    float f_value;
+    int w_value{};
+    float f_value{};
     std::string str;
 public:
     std::string GetName() { return name; };
     int GetValue{};
-    virtual void PrintData(std::ostream& out);
+    virtual void PrintData(std::ostream& out){};
 };
 
 // .word
@@ -34,13 +34,11 @@ public:
         w_value = value;
         f_value = 0;
         str = nullptr;
-        ;
     }
     void PrintData(std::ostream& out) override;
 
 private:
-    int *array;
-    void printName(std::ostream& out) override;
+    int *array{};
     void printValue(std::ostream& out) override;
 };
 
@@ -55,7 +53,6 @@ public:
     void PrintData(std::ostream& out) override;
 
 private:
-    void printName(std::ostream& out) override;
     void printValue(std::ostream& out) override;
 };
 
@@ -70,7 +67,6 @@ public:
     void PrintData(std::ostream& out) override;
 
 private:
-    void printName(std::ostream& out) override;
     void printValue(std::ostream& out) override;
 };
 
@@ -133,7 +129,7 @@ protected:
         : op(op), rs(rs), rt(rt), rd(rd), intermediate(inter){};
 
 public:
-    virtual void PrintCode(std::ostream& out);
+    virtual void PrintCode(std::ostream& out){};
 };
 
 class RCode : public MipsCode {
@@ -141,6 +137,7 @@ public:
     //  Div, Mul, Rem,
     //  Addu, Subu,
     //  AddS, SubS, MulS, DivS,
+    //  Slt, Sle, Sgt, Sge, Seq, Sne,
     RCode(MipsCodeType op, MipsRegPtr rd, MipsRegPtr rs, MipsRegPtr rt)
         : MipsCode(op, rd, rs, rt, 0) {
         if (op < Div || op > Sne) {
@@ -173,8 +170,8 @@ public:
     }
 
     // syscall, nop
-    RCode(MipsCodeType op) : MipsCode(op, nullptr, nullptr, nullptr, 0) {
-        if (op != Syscall || op != Nop) {
+    explicit RCode(MipsCodeType op) : MipsCode(op, nullptr, nullptr, nullptr, 0) {
+        if (op != Syscall && op != Nop) {
             TOLANG_DIE("MipsCode not supported.");
         }
     };
@@ -216,6 +213,7 @@ public:
 
 class JCode : public MipsCode {
 public:
+    // J, Jal
     JCode(MipsCodeType op, std::string label)
         : MipsCode(op, nullptr, nullptr, nullptr, 0) {
         this->label = std::move(label);
