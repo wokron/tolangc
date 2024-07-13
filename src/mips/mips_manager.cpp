@@ -6,7 +6,7 @@
 #include "llvm/ir/value/Use.h"
 #include <cassert>
 
-MipsManager::MipsManager(std::ostream &_out) : _out(_out) {
+MipsManager::MipsManager() {
     for (int i=0; i<TMPCOUNT; i++) {
         tmpRegPool.insert(std::pair<int, TmpRegPtr>(i, new TmpReg(i)));
     }
@@ -37,16 +37,19 @@ std::string MipsManager::addFloat(float f) {
     return floatMap.find(f)->second->GetName();
 }
 
-std::string MipsManager::newLabelName() {
-   return functionName + "_" +std::to_string(labelCount++);
+std::string* MipsManager::newLabelName() {
+    return new std::string(functionName + "_" + std::to_string(labelCount++));
 }
 
-std::string MipsManager::getLabelName(BasicBlockPtr basicBlockPtr) {
-    if (blockNames.count(basicBlockPtr) != 0) {
-        return *blockNames.find(basicBlockPtr)->second;
+std::string* MipsManager::getLabelName(BasicBlockPtr basicBlockPtr) {
+    if (blockNames.count(basicBlockPtr) == 0) {
+        std::string* name = newLabelName();
+        blockNames.insert(std::pair<BasicBlockPtr, std::string*>(basicBlockPtr, name));
     }
-    std::string name = newLabelName();
-    blockNames.insert(std::pair<BasicBlockPtr, std::string*>(basicBlockPtr, &name));
+    if (blockNames.find(basicBlockPtr) == blockNames.end()){
+        TOLANG_DIE("block index error");
+    }
+    std::string* name = blockNames.find(basicBlockPtr)->second;
     return name;
 }
 
@@ -103,13 +106,14 @@ MipsRegPtr MipsManager::getFree(Type::TypeID type) {
         return getFreeTmp();
     } else {
         TOLANG_DIE("invalid MipsRegType");
+        return nullptr;
     }
 }
 
 void MipsManager::resetFrame(std::string name) {
     this->functionName = name;
     addCode(new MipsLabel(name));
-//    addCode(new ICode(Addiu, static_cast<MipsRegPtr>(sp), static_cast<MipsRegPtr>(fp), 0));
+    blockNames.clear();
     labelCount = 0;
     currentOffset = 0;
     occupation.clear();
@@ -118,7 +122,10 @@ void MipsManager::resetFrame(std::string name) {
     for (int i=0; i<TMPCOUNT; i++) {
         tmpRegPool.insert(std::pair<int, TmpRegPtr>(i, new TmpReg(i)));
     }
-    for (int i=0; i<FLOATCOUNT; i++) {
+    // f0，f12 保留
+    for (int i=1; i<FLOATCOUNT; i++) {
+        if (i == 12)
+            continue;
         floatRegPool.insert(std::pair<int, FloatRegPtr>(i, new FloatReg(i)));
     }
     tmpCount = 0;
@@ -149,7 +156,7 @@ MipsRegPtr MipsManager::getReg(ValuePtr valuePtr) {
     if (occupation.find(valuePtr)->second->GetType() == OffsetTy) {
         // 存offset有两种情况：
         // 1. 临时寄存器池中变量推到栈中，occupation中存相对sp的偏移量；
-        // 2. 指针变量所指的相对sp的位置
+        // 2. 指针变量，存所指的相对sp的位置
         if (!valuePtr->GetType()->IsPointerTy()){
             load(valuePtr);
         }
@@ -177,7 +184,9 @@ MipsRegPtr MipsManager::loadConst(ValuePtr valuePtr, MipsRegType type) {
 void MipsManager::tryRelease(UserPtr userPtr) {
     for(UsePtr use: *(userPtr->GetUseList())){
         //TODO:完善寄存器的释放逻辑判断（基本块流图和活跃变量分析）
-        release(use->GetValue());
+        if (!use->GetValue()->GetType()->IsPointerTy()) {
+            release(use->GetValue());
+        }
     }
 }
 
@@ -219,10 +228,14 @@ void MipsManager::push(ValuePtr valuePtr) {
 }
 
 void MipsManager::pushAll() {
+    std::set<ValuePtr> pushSet;
     for (auto occ: occupation) {
         if (occ.second->GetType() != OffsetTy) {
-            push(occ.first);
+            pushSet.insert(occ.first);
         }
+    }
+    for (auto p: pushSet) {
+        push(p);
     }
 }
 

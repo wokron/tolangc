@@ -24,10 +24,10 @@ private:
     void translate(OutputInstPtr outputInstPtr);
 
 public:
-    explicit Translator(std::ostream &_out) {
-        manager = new MipsManager(_out);
+    Translator() {
+        manager = new MipsManager();
     };
 
     void translate(const ModulePtr &modulePtr);
-    void print();
+    void print(std::ostream& _out);
 };

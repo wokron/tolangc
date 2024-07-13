@@ -2,6 +2,7 @@
 #pragma once
 
 class MipsManager;
+class Translator;
 
 class MipsReg;
 using MipsRegPtr = MipsReg *;

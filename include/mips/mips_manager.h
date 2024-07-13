@@ -4,7 +4,6 @@
 #include "mips/mips_forward.h"
 #include "mips/mips_inst.h"
 #include "mips/mips_reg.h"
-#include "mips/translator.h"
 #include "llvm/ir/IrForward.h"
 #include "llvm/ir/Llvm.h"
 #include <map>
@@ -26,7 +25,6 @@ private:
     std::unordered_map<float, FloatDataPtr> floatMap;
 
     std::vector<MipsCodePtr> codes;
-    std::ostream &_out;
 
     std::unordered_map<int, TmpRegPtr> tmpRegPool;
     std::unordered_map<int, FloatRegPtr> floatRegPool;
@@ -48,8 +46,8 @@ private:
     void addData(MipsDataPtr dataPtr) { datas.emplace_back(dataPtr); };
     void addAsciiz(std::string);
     std::string addFloat(float f);
-    std::string newLabelName();
-    std::string getLabelName(BasicBlockPtr basicBlockPtr);
+    std::string* newLabelName();
+    std::string* getLabelName(BasicBlockPtr basicBlockPtr);
     void resetFrame(std::string name);
     void allocMem(AllocaInstPtr allocaInstPtr, int size);
     MipsRegPtr allocReg(ValuePtr valuePtr);
@@ -67,6 +65,6 @@ private:
     void load(ValuePtr valuePtr);
 
 public:
-    explicit MipsManager(std::ostream &_out);
-    void PrintMips();
+    MipsManager();
+    void PrintMips(std::ostream& _out);
 };

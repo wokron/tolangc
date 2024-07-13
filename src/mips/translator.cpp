@@ -1,11 +1,12 @@
 //
 #include "mips/translator.h"
 #include "llvm/ir/value/Use.h"
+#include "llvm/asm/AsmWriter.h"
 #include "utils.h"
 #include <cassert>
 
-void Translator::print() {
-    manager->PrintMips();
+void Translator::print(std::ostream& _out) {
+    manager->PrintMips(_out);
 }
 
 void Translator::translate(const ModulePtr& modulePtr) {
@@ -28,7 +29,8 @@ void Translator::translate(FunctionPtr functionPtr) {
 }
 
 void Translator::translate(BasicBlockPtr basicBlockPtr) {
-    manager->addCode(new MipsLabel(manager->getLabelName(basicBlockPtr)));
+    auto name = *manager->getLabelName(basicBlockPtr);
+    manager->addCode(new MipsLabel(name));
     auto instr = basicBlockPtr->InstructionBegin();
     while (instr != basicBlockPtr->InstructionEnd()) {
         translate(*instr);
@@ -141,10 +143,13 @@ void Translator::translate(UnaryOperatorPtr unaryOperatorPtr) {
         auto result = manager->allocReg(unaryOperatorPtr);
         if (unaryOperatorPtr->GetType()->IsFloatTy()){
             manager->addCode(new RCode(CEqS, operandRegPtr, manager->zero));
-            std::string label1 = manager->newLabelName(), label2 = manager->newLabelName();
+            std::string label1 = *manager->newLabelName(), label2 = *manager->newLabelName();
             manager->addCode(new ICode(BC1T, label1));
+            manager->addCode(new RCode(Nop));
+
             manager->addCode(new ICode(Addiu,result, manager->zero, 0));
             manager->addCode(new JCode(J, label2));
+            manager->addCode(new RCode(Nop));
 
             manager->addCode(new MipsLabel(label1));
             manager->addCode(new ICode(Addiu, result, manager->zero, 1));
@@ -217,12 +222,15 @@ void Translator::translate(CompareInstructionPtr compareInstructionPtr) {
             TOLANG_DIE("Invalid Compare operator");
         }
         MipsCodeType btype = doOpposite ? BC1F : BC1T;
-        std::string label1 = manager->newLabelName(), label2 = manager->newLabelName();
+        std::string label1 = *manager->newLabelName(), label2 = *manager->newLabelName();
 
         manager->addCode(new RCode(op, leftRegPtr, rightRegPtr));
         manager->addCode(new ICode(btype, label1));
+        manager->addCode(new RCode(Nop));
+
         manager->addCode(new ICode(Addiu, resultRegPtr, manager->zero, 0));
         manager->addCode(new JCode(J, label2));
+        manager->addCode(new RCode(Nop));
 
         manager->addCode(new MipsLabel(label1));
         manager->addCode(new ICode(Addiu, resultRegPtr, manager->zero, 1));
@@ -235,8 +243,8 @@ void Translator::translate(AllocaInstPtr allocaInstPtr){
 
 void Translator::translate(BranchInstPtr branchInstPtr) {
     MipsRegPtr cond = manager->loadConst(branchInstPtr->Condition(), TmpRegTy);
-    std::string trueLabel = manager->getLabelName(branchInstPtr->TrueBlock());
-    std::string falseLabel = manager->getLabelName(branchInstPtr->FalseBlock());
+    std::string trueLabel = *manager->getLabelName(branchInstPtr->TrueBlock());
+    std::string falseLabel = *manager->getLabelName(branchInstPtr->FalseBlock());
 
     manager->addCode(new ICode(Bnez, cond, falseLabel));
     manager->addCode(new RCode(Nop));
@@ -291,7 +299,7 @@ void Translator::translate(CallInstPtr callInstPtr) {
 }
 
 void Translator::translate(JumpInstPtr jumpInstPtr) {
-    std::string label = manager->getLabelName(jumpInstPtr->Target());
+    std::string label = *manager->getLabelName(jumpInstPtr->Target());
     manager->addCode(new JCode(J, label));
     manager->addCode(new RCode(Nop));
 }
@@ -309,8 +317,9 @@ void Translator::translate(LoadInstPtr loadInstPtr) {
 void Translator::translate(StoreInstPtr storeInstPtr) {
     // LeftOperand -> IntegerTy / FloatTy
     // RightOperand -> PointerTy
-    if (manager->getReg(storeInstPtr->RightOperand()) == nullptr) return;
     auto operand = manager->loadConst(storeInstPtr->LeftOperand(), storeInstPtr->LeftOperand()->GetType()->IsFloatTy() ? FloatRegTy : TmpRegTy);
+    if (operand == nullptr)
+        return;
     MipsCodeType op = storeInstPtr->LeftOperand()->GetType()->IsFloatTy() ? SS : SW;
 
     auto offsetptr =

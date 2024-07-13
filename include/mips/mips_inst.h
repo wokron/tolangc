@@ -33,7 +33,6 @@ public:
     WordData(std::string name, int value) : MipsData(name) {
         w_value = value;
         f_value = 0;
-        str = nullptr;
     }
     void PrintData(std::ostream& out) override;
 
@@ -48,7 +47,6 @@ public:
     FloatData(std::string name, float value) : MipsData(name) {
         w_value = 0;
         f_value = value;
-        str = nullptr;
     }
     void PrintData(std::ostream& out) override;
 

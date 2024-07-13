@@ -3,13 +3,13 @@
 #include "mips/mips_manager.h"
 #include <iostream>
 
-void MipsManager::PrintMips() {
+void MipsManager::PrintMips(std::ostream& _out) {
     _out << ".data" << std::endl;
     for (auto data: datas) {
         data->PrintData(_out);
     }
 
-    _out << ".text" << std::endl << "j main" << std::endl;
+    _out << ".text" << std::endl << "j main" << std::endl << "nop" << std::endl ;
     for (auto code: codes) {
         code->PrintCode(_out);
     }
@@ -183,7 +183,7 @@ void ICode::PrintCode(std::ostream &out) {
     } else if (op <= BC1T && op >= BC1F) {
         Ope = op == BC1F ? "bc1f" :
               op == BC1T ? "bc1f" : "";
-        out << op << " "  << label << std::endl;
+        out << Ope << " "  << label << std::endl;
     } else {
         TOLANG_DIE("ICode not supported.");
     }
@@ -192,10 +192,10 @@ void ICode::PrintCode(std::ostream &out) {
 void JCode::PrintCode(std::ostream &out) {
     std::string Ope = op == J ? "j" :
                       op == Jal ? "jal" : "";
-    out << Ope << label << std::endl;
+    out << Ope << " " << label << std::endl;
 }
 
 void MipsLabel::PrintCode(std::ostream &out) {
-    out << label << ":" << std::endl;
+    out << std::endl << label << ":" << std::endl;
 }
 
