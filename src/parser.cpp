@@ -9,7 +9,7 @@ std::unique_ptr<CompUnit> Parser::parse() {
     _lexer.next(_pre_read);
     auto comp_unit = _parse_comp_unit();
     if (_token.type != Token::TK_EOF) {
-        ErrorReporter::error(_token.lineno, "unexpected token");
+        ErrorReporter::error(_token.lineno, "expect end of file");
     }
     return comp_unit;
 }
@@ -18,7 +18,7 @@ std::unique_ptr<CompUnit> Parser::_parse_comp_unit() {
     auto comp_unit = std::make_unique<CompUnit>();
     comp_unit->lineno = _token.lineno;
 
-    while (_token.type != Token::TK_VAR) {
+    while (_token.type != Token::TK_VAR && _token.type != Token::TK_EOF) {
         if (_token.type == Token::TK_FN) {
             comp_unit->func_defs.push_back(_parse_func_def());
         } else {
@@ -29,7 +29,8 @@ std::unique_ptr<CompUnit> Parser::_parse_comp_unit() {
 
     while (_token.type != Token::TK_GET && _token.type != Token::TK_PUT &&
            _token.type != Token::TK_TAG && _token.type != Token::TK_LET &&
-           _token.type != Token::TK_IF && _token.type != Token::TK_TO) {
+           _token.type != Token::TK_IF && _token.type != Token::TK_TO &&
+           _token.type != Token::TK_EOF) {
         if (_token.type == Token::TK_VAR) {
             comp_unit->var_decls.push_back(_parse_var_decl());
         } else {
