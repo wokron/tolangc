@@ -164,14 +164,14 @@ TEST_CASE("testing mips") {
     std::cout << "build module success" << std::endl;
 
     // translate
-    auto translator = new Translator();
-    translator->translate(modulePtr);
+    Translator translator;
+    translator.translate(modulePtr);
     std::cout << "translate success" << std::endl;
     std::ostringstream ss;
-    translator->print(ss);
+    translator.print(ss);
 
     auto ir = ss.str();
-//    std::cout << ir;
+    // std::cout << ir;
     CHECK_EQ(ir, EXPECTED);
 }
 

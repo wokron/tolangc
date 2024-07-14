@@ -1,5 +1,5 @@
-//
 #pragma once
+
 #include "llvm/asm/AsmWriter.h"
 #include "mips/mips_forward.h"
 #include "utils.h"

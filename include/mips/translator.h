@@ -1,4 +1,5 @@
-//
+#pragma once
+
 #include "mips_manager.h"
 #include "llvm/ir/Llvm.h"
 

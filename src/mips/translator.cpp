@@ -5,8 +5,8 @@
 #include "utils.h"
 #include <cassert>
 
-void Translator::print(std::ostream& _out) {
-    manager->PrintMips(_out);
+void Translator::print(std::ostream& out) {
+    manager->PrintMips(out);
 }
 
 void Translator::translate(const ModulePtr& modulePtr) {
@@ -60,7 +60,6 @@ void Translator::translate(InstructionPtr instructionPtr) {
         translate(instructionPtr->As<OutputInst>());
     } else if (instructionPtr->Is<CompareInstruction>()){
         translate(instructionPtr->As<CompareInstruction>());
-
     } else if (instructionPtr->Is<UnaryOperator>()) {
         translate(instructionPtr->As<UnaryOperator>());
     } else if (instructionPtr->Is<BinaryOperator>()){
