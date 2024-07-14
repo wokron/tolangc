@@ -115,9 +115,13 @@ void Visitor::_visit_func_def(const FuncDef &node) {
     _cur_func = nullptr;
 }
 
-void Visitor::_visit_var_decl(const VarDecl &node) {
-    if (node.ident == nullptr) { // invalid ast
-        return;
+std::vector<std::shared_ptr<VariableSymbol>>
+Visitor::visitFuncFParams(const FuncFParams &node) {
+    std::vector<std::shared_ptr<VariableSymbol>> rt;
+    for (auto &elm : node.idents) {
+        // here we don't create ir argument, just create symbol
+        rt.push_back(
+            std::make_shared<VariableSymbol>(elm.value, nullptr, node.line));
     }
 
     auto context = _ir_module->Context();
@@ -306,8 +310,8 @@ void Visitor::_visit_if_stmt(const IfStmt &node) {
         jump->SetFalseBlock(_cur_block);
 
         auto symbol =
-            std::make_shared<TagSymbol>(node.ident->value, nullptr, -1);
-        _cur_scope->add_symbol(symbol);
+            std::make_shared<TagSymbol>(node.ident.value, nullptr, -1);
+        _cur_scope->addSymbol(symbol);
         // add jump inst to symbol
         symbol->jump_insts.push_back(jump);
     }
@@ -347,8 +351,8 @@ void Visitor::_visit_to_stmt(const ToStmt &node) {
         _cur_block = _cur_func->NewBasicBlock();
 
         auto symbol =
-            std::make_shared<TagSymbol>(node.ident->value, nullptr, -1);
-        _cur_scope->add_symbol(symbol);
+            std::make_shared<TagSymbol>(node.ident.value, nullptr, -1);
+        _cur_scope->addSymbol(symbol);
 
         // add jump inst to symbol
         symbol->jump_insts.push_back(jump);

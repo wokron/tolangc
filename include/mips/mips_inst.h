@@ -1,8 +1,8 @@
 #pragma once
 
-#include "llvm/asm/AsmWriter.h"
 #include "mips/mips_forward.h"
 #include "utils.h"
+#include "llvm/asm/AsmWriter.h"
 #include <optional>
 #include <string>
 #include <utility>
@@ -13,18 +13,19 @@ class MipsCode;
 class MipsData {
 protected:
     explicit MipsData(std::string &name) : name(name){};
-    void printName(std::ostream& out){out << name;};
-    virtual void printValue(std::ostream& out){};
+    void printName(std::ostream &out) { out << name; };
+    virtual void printValue(std::ostream &out){};
 
 protected:
     std::string name;
     int w_value{};
     float f_value{};
     std::string str;
+
 public:
     std::string GetName() { return name; };
     int GetValue{};
-    virtual void PrintData(std::ostream& out){};
+    virtual void PrintData(std::ostream &out){};
 };
 
 // .word
@@ -34,11 +35,11 @@ public:
         w_value = value;
         f_value = 0;
     }
-    void PrintData(std::ostream& out) override;
+    void PrintData(std::ostream &out) override;
 
 private:
     int *array{};
-    void printValue(std::ostream& out) override;
+    void printValue(std::ostream &out) override;
 };
 
 // .float
@@ -48,10 +49,10 @@ public:
         w_value = 0;
         f_value = value;
     }
-    void PrintData(std::ostream& out) override;
+    void PrintData(std::ostream &out) override;
 
 private:
-    void printValue(std::ostream& out) override;
+    void printValue(std::ostream &out) override;
 };
 
 // .asciiz
@@ -62,14 +63,14 @@ public:
         f_value = 0;
         str = value;
     }
-    void PrintData(std::ostream& out) override;
+    void PrintData(std::ostream &out) override;
 
 private:
-    void printValue(std::ostream& out) override;
+    void printValue(std::ostream &out) override;
 };
 
 enum MipsCodeType {
-    //error
+    // error
     Error,
     // ICode
     BC1F,
@@ -127,7 +128,7 @@ protected:
         : op(op), rs(rs), rt(rt), rd(rd), intermediate(inter){};
 
 public:
-    virtual void PrintCode(std::ostream& out){};
+    virtual void PrintCode(std::ostream &out){};
 };
 
 class RCode : public MipsCode {
@@ -168,13 +169,14 @@ public:
     }
 
     // syscall, nop
-    explicit RCode(MipsCodeType op) : MipsCode(op, nullptr, nullptr, nullptr, 0) {
+    explicit RCode(MipsCodeType op)
+        : MipsCode(op, nullptr, nullptr, nullptr, 0) {
         if (op != Syscall && op != Nop) {
             TOLANG_DIE("MipsCode not supported.");
         }
     };
 
-    void PrintCode(std::ostream& out) override;
+    void PrintCode(std::ostream &out) override;
 };
 
 class ICode : public MipsCode {
@@ -206,7 +208,7 @@ public:
         }
     };
 
-    void PrintCode(std::ostream& out) override;
+    void PrintCode(std::ostream &out) override;
 };
 
 class JCode : public MipsCode {
@@ -216,7 +218,7 @@ public:
         : MipsCode(op, nullptr, nullptr, nullptr, 0) {
         this->label = std::move(label);
     };
-    void PrintCode(std::ostream& out) override;
+    void PrintCode(std::ostream &out) override;
 };
 
 class MipsLabel : public MipsCode {
@@ -226,6 +228,6 @@ public:
         this->label = std::move(label);
     };
 
-    std::string GetName(){return label;}
-    void PrintCode(std::ostream& out) override;
+    std::string GetName() { return label; }
+    void PrintCode(std::ostream &out) override;
 };

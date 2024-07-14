@@ -7,11 +7,11 @@
 #include <cassert>
 
 MipsManager::MipsManager() {
-    for (int i=0; i<TMPCOUNT; i++) {
+    for (int i = 0; i < TMPCOUNT; i++) {
         tmpRegPool.insert(std::pair<int, TmpRegPtr>(i, new TmpReg(i)));
     }
     // f0 保留
-    for (int i=1; i<FLOATCOUNT; i++) {
+    for (int i = 1; i < FLOATCOUNT; i++) {
         if (i == 12)
             continue;
         floatRegPool.insert(std::pair<int, FloatRegPtr>(i, new FloatReg(i)));
@@ -25,37 +25,38 @@ MipsManager::MipsManager() {
 }
 
 void MipsManager::addAsciiz(std::string value) {
-    addData(new AsciizData("str"+std::to_string(asciizCount++), value));
+    addData(new AsciizData("str" + std::to_string(asciizCount++), value));
 }
 
 std::string MipsManager::addFloat(float f) {
-    if (floatMap.count(f) == 0){
-        auto ptr = new FloatData("flt"+std::to_string(floatDataCount++), f);
+    if (floatMap.count(f) == 0) {
+        auto ptr = new FloatData("flt" + std::to_string(floatDataCount++), f);
         addData(ptr);
         floatMap.insert(std::pair<float, FloatDataPtr>(f, ptr));
     }
     return floatMap.find(f)->second->GetName();
 }
 
-std::string* MipsManager::newLabelName() {
+std::string *MipsManager::newLabelName() {
     return new std::string(functionName + "_" + std::to_string(labelCount++));
 }
 
-std::string* MipsManager::getLabelName(BasicBlockPtr basicBlockPtr) {
+std::string *MipsManager::getLabelName(BasicBlockPtr basicBlockPtr) {
     if (blockNames.count(basicBlockPtr) == 0) {
-        std::string* name = newLabelName();
-        blockNames.insert(std::pair<BasicBlockPtr, std::string*>(basicBlockPtr, name));
+        std::string *name = newLabelName();
+        blockNames.insert(
+            std::pair<BasicBlockPtr, std::string *>(basicBlockPtr, name));
     }
-    if (blockNames.find(basicBlockPtr) == blockNames.end()){
+    if (blockNames.find(basicBlockPtr) == blockNames.end()) {
         TOLANG_DIE("block index error");
     }
-    std::string* name = blockNames.find(basicBlockPtr)->second;
+    std::string *name = blockNames.find(basicBlockPtr)->second;
     return name;
 }
 
-TmpRegPtr MipsManager::getFreeTmp(){
-    for (int i=0; i<TMPCOUNT; i++){
-        int index = (tmpCount+i) % TMPCOUNT;
+TmpRegPtr MipsManager::getFreeTmp() {
+    for (int i = 0; i < TMPCOUNT; i++) {
+        int index = (tmpCount + i) % TMPCOUNT;
         if (tmpRegPool.count(index) != 0) {
             auto tmpPtr = tmpRegPool.find(index);
             tmpCount = (index + 1) % TMPCOUNT;
@@ -63,21 +64,21 @@ TmpRegPtr MipsManager::getFreeTmp(){
         }
     }
     int index = tmpCount;
-    tmpCount = (tmpCount+1) % TMPCOUNT;
+    tmpCount = (tmpCount + 1) % TMPCOUNT;
     ValuePtr valuePtr;
-    for (const auto& pair : occupation){
-        if (pair.second->GetIndex() == index){
+    for (const auto &pair : occupation) {
+        if (pair.second->GetIndex() == index) {
             valuePtr = pair.first;
             break;
         }
     }
     push(valuePtr);
     assert(tmpRegPool.count(index) == 1);
-     return tmpRegPool.find(index)->second;
+    return tmpRegPool.find(index)->second;
 }
 
-FloatRegPtr MipsManager::getFreeFloat(){
-    for (int i=0; i<FLOATCOUNT; i++){
+FloatRegPtr MipsManager::getFreeFloat() {
+    for (int i = 0; i < FLOATCOUNT; i++) {
         int index = (floatCount + i) % FLOATCOUNT;
         if (floatRegPool.count(index) != 0) {
             auto floatPtr = floatRegPool.find(index);
@@ -88,8 +89,8 @@ FloatRegPtr MipsManager::getFreeFloat(){
     int index = floatCount;
     floatCount = (floatCount + 1) % FLOATCOUNT;
     ValuePtr valuePtr;
-    for (const auto& pair : occupation){
-        if (pair.second->GetIndex() == index){
+    for (const auto &pair : occupation) {
+        if (pair.second->GetIndex() == index) {
             valuePtr = pair.first;
             break;
         }
@@ -119,11 +120,11 @@ void MipsManager::resetFrame(std::string name) {
     occupation.clear();
     tmpRegPool.clear();
     floatRegPool.clear();
-    for (int i=0; i<TMPCOUNT; i++) {
+    for (int i = 0; i < TMPCOUNT; i++) {
         tmpRegPool.insert(std::pair<int, TmpRegPtr>(i, new TmpReg(i)));
     }
     // f0，f12 保留
-    for (int i=1; i<FLOATCOUNT; i++) {
+    for (int i = 1; i < FLOATCOUNT; i++) {
         if (i == 12)
             continue;
         floatRegPool.insert(std::pair<int, FloatRegPtr>(i, new FloatReg(i)));
@@ -133,9 +134,8 @@ void MipsManager::resetFrame(std::string name) {
 }
 
 void MipsManager::allocMem(AllocaInstPtr allocaInstPtr, int size) {
-    currentOffset -= 4*size;
+    currentOffset -= 4 * size;
     occupy(new OffsetReg(currentOffset + 4), allocaInstPtr);
-
 }
 
 MipsRegPtr MipsManager::allocReg(ValuePtr valuePtr) {
@@ -145,7 +145,7 @@ MipsRegPtr MipsManager::allocReg(ValuePtr valuePtr) {
 }
 
 MipsRegPtr MipsManager::getReg(ValuePtr valuePtr) {
-    if (occupation.count(valuePtr) == 0){
+    if (occupation.count(valuePtr) == 0) {
         if (valuePtr->Is<GlobalValue>()) {
             auto addr = allocReg(valuePtr);
             addCode(new ICode(LA, addr, valuePtr->GetName()));
@@ -157,7 +157,7 @@ MipsRegPtr MipsManager::getReg(ValuePtr valuePtr) {
         // 存offset有两种情况：
         // 1. 临时寄存器池中变量推到栈中，occupation中存相对sp的偏移量；
         // 2. 指针变量，存所指的相对sp的位置
-        if (!valuePtr->GetType()->IsPointerTy()){
+        if (!valuePtr->GetType()->IsPointerTy()) {
             load(valuePtr);
         }
     }
@@ -165,14 +165,16 @@ MipsRegPtr MipsManager::getReg(ValuePtr valuePtr) {
 }
 
 MipsRegPtr MipsManager::loadConst(ValuePtr valuePtr, MipsRegType type) {
-    if (!valuePtr->Is<ConstantData>()){
+    if (!valuePtr->Is<ConstantData>()) {
         return getReg(valuePtr);
     }
     MipsRegPtr newRegPtr = getFree(valuePtr->GetType()->TypeId());
-    if (type == TmpRegTy){
-        addCode(new ICode(Addiu, newRegPtr, zero, valuePtr->As<ConstantData>()->GetIntValue()));
+    if (type == TmpRegTy) {
+        addCode(new ICode(Addiu, newRegPtr, zero,
+                          valuePtr->As<ConstantData>()->GetIntValue()));
     } else if (type == FloatRegTy) {
-        std::string name = addFloat(valuePtr->As<ConstantData>()->GetFloatValue());
+        std::string name =
+            addFloat(valuePtr->As<ConstantData>()->GetFloatValue());
         addCode(new ICode(LS, newRegPtr, name));
     } else {
         TOLANG_DIE("wrong binary operator type");
@@ -182,8 +184,8 @@ MipsRegPtr MipsManager::loadConst(ValuePtr valuePtr, MipsRegType type) {
 }
 
 void MipsManager::tryRelease(UserPtr userPtr) {
-    for(UsePtr use: *(userPtr->GetUseList())){
-        //TODO:完善寄存器的释放逻辑判断（基本块流图和活跃变量分析）
+    for (UsePtr use : *(userPtr->GetUseList())) {
+        // TODO:完善寄存器的释放逻辑判断（基本块流图和活跃变量分析）
         if (!use->GetValue()->GetType()->IsPointerTy()) {
             release(use->GetValue());
         }
@@ -191,19 +193,21 @@ void MipsManager::tryRelease(UserPtr userPtr) {
 }
 
 void MipsManager::release(ValuePtr valuePtr) {
-    if (occupation.count(valuePtr)!=0){
+    if (occupation.count(valuePtr) != 0) {
         auto regPtr = occupation.find(valuePtr)->second;
-        if (regPtr->GetType() == FloatRegTy){
-            floatRegPool.insert(std::pair<int, FloatRegPtr>(regPtr->GetIndex(), (FloatRegPtr)regPtr));
-        } else if (regPtr->GetType() == TmpRegTy){
-            tmpRegPool.insert(std::pair<int, TmpRegPtr>(regPtr->GetIndex(), (TmpRegPtr)regPtr));
+        if (regPtr->GetType() == FloatRegTy) {
+            floatRegPool.insert(std::pair<int, FloatRegPtr>(
+                regPtr->GetIndex(), (FloatRegPtr)regPtr));
+        } else if (regPtr->GetType() == TmpRegTy) {
+            tmpRegPool.insert(std::pair<int, TmpRegPtr>(regPtr->GetIndex(),
+                                                        (TmpRegPtr)regPtr));
         }
         occupation.erase(valuePtr);
     }
 }
 
 void MipsManager::occupy(MipsRegPtr mipsRegPtr, ValuePtr valuePtr) {
-    if (mipsRegPtr->GetType() == FloatRegTy){
+    if (mipsRegPtr->GetType() == FloatRegTy) {
         floatRegPool.erase(mipsRegPtr->GetIndex());
     } else if (mipsRegPtr->GetType() == TmpRegTy) {
         tmpRegPool.erase(mipsRegPtr->GetIndex());
@@ -213,7 +217,7 @@ void MipsManager::occupy(MipsRegPtr mipsRegPtr, ValuePtr valuePtr) {
 
 void MipsManager::push(ValuePtr valuePtr) {
     MipsCodeType codeType;
-    if (valuePtr->GetType()->IsFloatTy()){
+    if (valuePtr->GetType()->IsFloatTy()) {
         codeType = SS;
     } else if (valuePtr->GetType()->IsIntegerTy()) {
         codeType = SW;
@@ -223,25 +227,26 @@ void MipsManager::push(ValuePtr valuePtr) {
     addCode(new ICode(codeType, getReg(valuePtr), sp, currentOffset));
 
     release(valuePtr);
-    occupation.insert(std::pair<ValuePtr, MipsRegPtr>(valuePtr, new OffsetReg(currentOffset)));
+    occupation.insert(std::pair<ValuePtr, MipsRegPtr>(
+        valuePtr, new OffsetReg(currentOffset)));
     currentOffset -= 4;
 }
 
 void MipsManager::pushAll() {
     std::set<ValuePtr> pushSet;
-    for (auto occ: occupation) {
+    for (auto occ : occupation) {
         if (occ.second->GetType() != OffsetTy) {
             pushSet.insert(occ.first);
         }
     }
-    for (auto p: pushSet) {
+    for (auto p : pushSet) {
         push(p);
     }
 }
 
 void MipsManager::load(ValuePtr valuePtr) {
     MipsCodeType codeType;
-    if (valuePtr->GetType()->IsFloatTy()){
+    if (valuePtr->GetType()->IsFloatTy()) {
         codeType = LS;
     } else if (valuePtr->GetType()->IsIntegerTy()) {
         codeType = LW;

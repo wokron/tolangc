@@ -20,7 +20,7 @@ class MipsReg {
 public:
     int GetIndex() const { return index; };
     MipsRegType GetType() { return type; };
-    virtual void PrintReg(std::ostream& out){};
+    virtual void PrintReg(std::ostream &out){};
 
 protected:
     MipsReg(int index, MipsRegType type) : index(index), type(type){};
@@ -33,7 +33,7 @@ private:
 class ZeroReg : public MipsReg {
     friend MipsManager;
     ZeroReg() : MipsReg(-1, ZeroRegTy){};
-    void PrintReg(std::ostream& out) override;
+    void PrintReg(std::ostream &out) override;
 };
 
 class ArgumentReg : public MipsReg {
@@ -44,7 +44,7 @@ public:
         if (index > 3 || index < 0)
             TOLANG_DIE("Operation not supported.");
     };
-    void PrintReg(std::ostream& out) override;
+    void PrintReg(std::ostream &out) override;
 };
 
 class ValueReg : public MipsReg {
@@ -53,7 +53,7 @@ class ValueReg : public MipsReg {
         if (index > 1 || index < 0)
             TOLANG_DIE("MipsReg not supported.");
     };
-    void PrintReg(std::ostream& out) override;
+    void PrintReg(std::ostream &out) override;
 };
 
 class TmpReg : public MipsReg {
@@ -62,7 +62,7 @@ class TmpReg : public MipsReg {
         if (index > 7 || index < 0)
             TOLANG_DIE("MipsReg not supported.");
     };
-    void PrintReg(std::ostream& out) override;
+    void PrintReg(std::ostream &out) override;
 };
 
 class FloatReg : public MipsReg {
@@ -71,29 +71,29 @@ class FloatReg : public MipsReg {
         if (index > 31 || index < 0)
             TOLANG_DIE("MipsReg not supported.");
     };
-    void PrintReg(std::ostream& out) override;
+    void PrintReg(std::ostream &out) override;
 };
 
 class RetAddrReg : public MipsReg {
     friend MipsManager;
     RetAddrReg() : MipsReg(-1, RetAddrRegTy){};
-    void PrintReg(std::ostream& out) override;
+    void PrintReg(std::ostream &out) override;
 };
 
 class StkPtrReg : public MipsReg {
     friend MipsManager;
     StkPtrReg() : MipsReg(-1, StkPtrRegTy){};
-    void PrintReg(std::ostream& out) override;
+    void PrintReg(std::ostream &out) override;
 };
 
 class FrmPtrReg : public MipsReg {
     friend MipsManager;
     FrmPtrReg() : MipsReg(-1, FrmPtrRegTy){};
-    void PrintReg(std::ostream& out) override;
+    void PrintReg(std::ostream &out) override;
 };
 
 class OffsetReg : public MipsReg {
     friend MipsManager;
     explicit OffsetReg(int offset) : MipsReg(offset, MipsRegType::OffsetTy){};
-    void PrintReg(std::ostream& out) override;
+    void PrintReg(std::ostream &out) override;
 };

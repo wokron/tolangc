@@ -1,9 +1,9 @@
 #pragma once
 
+#include "llvm/asm/AsmWriter.h"
 #include "llvm/ir/IrForward.h"
 #include "llvm/ir/Type.h"
 #include <string>
-#include "llvm/asm/AsmWriter.h"
 
 // All types used in LLVM for tolang.
 enum class ValueType {

@@ -25,10 +25,8 @@ private:
     void translate(OutputInstPtr outputInstPtr);
 
 public:
-    Translator() {
-        manager = new MipsManager();
-    };
+    Translator() { manager = new MipsManager(); };
 
     void translate(const ModulePtr &modulePtr);
-    void print(std::ostream& _out);
+    void print(std::ostream &_out);
 };

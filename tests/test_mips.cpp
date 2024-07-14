@@ -211,8 +211,7 @@ static FunctionPtr BuildAverage(ModulePtr module) {
     auto t2 = BinaryOperator::New(BinaryOpType::Div, t1, two);
     // lhs * rhs / lhs
 
-    block->InsertInstruction(t1)
-        ->InsertInstruction(t2);
+    block->InsertInstruction(t1)->InsertInstruction(t2);
     block->InsertInstruction(ReturnInst::New(t2));
     return avrFunc;
 }
@@ -263,7 +262,7 @@ static FunctionPtr BuildMain(ModulePtr module, FunctionPtr average) {
         ->InsertInstruction(comp)
         ->InsertInstruction(branch);
 
-    //i1 = i2 % 4;
+    // i1 = i2 % 4;
     load_i2 = LoadInst::New(i2);
     auto four = ConstantData::New(context->GetFloatTy(), 4.0f);
     auto sub = BinaryOperator::New(BinaryOpType::Sub, load_i2, four);
