@@ -8,7 +8,7 @@
 
 在编译过程中，遇到变量声明定义的语句时，我们就可以把对应的信息填入符号表。对于一张符号表来说，通常具有如图的结构：一个指向外层作用域符号表的指针pre，表主体（符号名与对应信息），若干指向内层作用域符号表的指针next。此外，在编译的过程中，有一个指向当前作用域符号表的指针cur。
 
-<img src="../../figure/symbol_table.png" alt="parser_3" style="zoom:40%;" />
+<img src="imgs\chapter04\symbol_table.png" alt="parser_3" style="zoom:40%;" />
 
 符号表的生成主要有以下几个操作：
 
