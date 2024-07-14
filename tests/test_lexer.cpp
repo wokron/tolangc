@@ -7,7 +7,7 @@
 
 constexpr char INPUT[] = R"(fn nonParam() => 1 - 3.3;
 fn paramOne(a) => a * 0.2;
-fn paramMore(a,b,_c,d) => a / (b + _c) % d;
+fn paramMore(a,b,_c,d) => a / (b + _c);
 get a;
 put a;# one line comment
 let n = a - 2.000003;
@@ -44,8 +44,7 @@ static std::vector<Token> EXPECTS = {
     Token(Token::TK_IDENT, "a", 3),    Token(Token::TK_DIV, "/", 3),
     Token(Token::TK_LPARENT, "(", 3),  Token(Token::TK_IDENT, "b", 3),
     Token(Token::TK_PLUS, "+", 3),     Token(Token::TK_IDENT, "_c", 3),
-    Token(Token::TK_RPARENT, ")", 3),  Token(Token::TK_MOD, "%", 3),
-    Token(Token::TK_IDENT, "d", 3),    Token(Token::TK_SEMINCN, ";", 3),
+    Token(Token::TK_RPARENT, ")", 3),  Token(Token::TK_SEMINCN, ";", 3),
 
     Token(Token::TK_GET, "get", 4),    Token(Token::TK_IDENT, "a", 4),
     Token(Token::TK_SEMINCN, ";", 4),

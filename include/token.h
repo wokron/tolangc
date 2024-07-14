@@ -25,7 +25,6 @@
     X(TK_MINU, "-")                                                            \
     X(TK_MULT, "*")                                                            \
     X(TK_DIV, "/")                                                             \
-    X(TK_MOD, "%")                                                             \
     X(TK_LT, "<")                                                              \
     X(TK_GT, ">")                                                              \
     X(TK_LE, "<=")                                                             \

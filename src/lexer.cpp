@@ -54,8 +54,6 @@ void Lexer::next(Token &token) {
         token = Token(Token::TK_MULT, content, _lineno);
     } else if (ch == '/') {
         token = Token(Token::TK_DIV, content, _lineno);
-    } else if (ch == '%') {
-        token = Token(Token::TK_MOD, content, _lineno);
     } else if (ch == '<') {
         ch = _input.get();
         if (ch == '=') {

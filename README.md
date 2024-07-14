@@ -35,7 +35,7 @@ AddExp:
 
 MulExp:
     UnaryExp
-    | MulExp ('*' | '/' | '%') UnaryExp
+    | MulExp ('*' | '/') UnaryExp
 
 UnaryExp:
     PrimaryExp

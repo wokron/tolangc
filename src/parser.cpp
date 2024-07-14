@@ -214,8 +214,7 @@ std::unique_ptr<Exp> Parser::_parse_mul_exp() {
     auto lineno = _token.lineno;
 
     auto exp = _parse_unary_exp();
-    while (_token.type == Token::TK_MULT || _token.type == Token::TK_DIV ||
-           _token.type == Token::TK_MOD) {
+    while (_token.type == Token::TK_MULT || _token.type == Token::TK_DIV) {
         BinaryExp binary_exp;
         binary_exp.lineno = lineno;
         binary_exp.lhs = std::move(exp);
@@ -225,9 +224,6 @@ std::unique_ptr<Exp> Parser::_parse_mul_exp() {
             break;
         case Token::TK_DIV:
             binary_exp.op = BinaryExp::DIV;
-            break;
-        case Token::TK_MOD:
-            binary_exp.op = BinaryExp::MOD;
             break;
         default:
             throw std::runtime_error("unreachable code");
