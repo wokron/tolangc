@@ -1,6 +1,6 @@
 #include "doctest.h"
-#include "front/lexer/lexer.h"
-#include "front/parser/parser.h"
+#include "lexer.h"
+#include "parser.h"
 #include <sstream>
 
 constexpr char INPUT[] = R"(
@@ -155,14 +155,9 @@ TEST_CASE("testing parser") {
     std::istringstream iss(INPUT);
 
     Lexer lexer(iss);
-    Token cur(Token::TokenType::ASSIGN, "s", 0);
-    std::vector<Token> tokens;
-    while (lexer.next(cur)) {
-        tokens.push_back(cur);
-    }
 
-    Parser parser(tokens);
-    auto root = parser.parseCompUnit();
+    Parser parser(lexer);
+    auto root = parser.parse();
 
     std::ostringstream oss;
     root->print(oss);
