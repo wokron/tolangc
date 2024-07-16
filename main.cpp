@@ -1,7 +1,7 @@
 #include "ast.h"
 #include "error.h"
-#include "front/lexer/lexer.h"
-#include "front/parser/parser.h"
+#include "lexer.h"
+#include "parser.h"
 #include "visitor.h"
 #include "llvm/asm/AsmPrinter.h"
 #include "llvm/ir/Module.h"
@@ -42,14 +42,8 @@ void compile(const char *name, const Options &options,
     std::ifstream infile(input, std::ios::in);
 
     Lexer lexer(infile);
-    Token cur(Token::TokenType::ASSIGN, "s", 0);
-    std::vector<Token> tokens;
-    while (lexer.next(cur)) {
-        tokens.push_back(cur);
-    }
-
-    Parser parser(tokens);
-    auto root = parser.parseCompUnit();
+    Parser parser(lexer);
+    auto root = parser.parse();
 
     if (options.emit_ast) {
         if (output.length() == 0) {
@@ -64,7 +58,8 @@ void compile(const char *name, const Options &options,
     auto visitor = Visitor(module);
     visitor.visit(*root);
 
-    if (has_error()) {
+    if (ErrorReporter::get().has_error()) {
+        ErrorReporter::get().dump(std::cerr);
         cmd_error(name, "compilation failed");
     }
 
