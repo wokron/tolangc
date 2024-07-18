@@ -26,8 +26,14 @@ void usage(const char *name) {
     std::cerr << "Usage: " << name << " [options] [file]" << std::endl;
     std::cerr << "Options:" << std::endl;
     std::cerr << "  -h, --help: Show this help message" << std::endl;
+<<<<<<< HEAD:bin/main.cpp
     std::cerr << "  --emit-ast: Emit AST" << std::endl;
     std::cerr << "  --emit-ir: Emit IR" << std::endl;
+=======
+    std::cerr << "  --emit-ast: Emit AST as JSON" << std::endl;
+    std::cerr << "  --emit-ir: Emit IR as JSON" << std::endl;
+    std::cerr << "  --emit-pcode: Emit Pcode as JSON" << std::endl;
+>>>>>>> d76be9d (feat: pcode):main.cpp
     std::cerr << "  -S, --emit-asm: Emit assembly" << std::endl;
     std::cerr << "  -o, --output: Output file" << std::endl;
 }
@@ -79,6 +85,33 @@ void compile(const char *name, const Options &options,
         return;
     }
 
+<<<<<<< HEAD:bin/main.cpp
+=======
+    // TODO: ir to asm
+    // if (options.emit_asm) {
+    //     cmd_error(name, "ir to asm not implemented");
+    // }
+
+    // Added: Generate pcode
+    if (options.emit_pcode) {
+        // auto
+        PcodeModule pm;
+        PcodeVisitor pv(pm);
+        pv.visit(*root);
+        
+        if (output.length() == 0) {
+            output = "out.pcode";
+        }
+        outfile.open(output, std::ios::out);
+        pm.print(outfile);
+        PcodeRuntime pr(pm);
+        pr.run();
+
+        return;
+        // cmd_error(name, "pcode not implemented");
+    }
+
+>>>>>>> d76be9d (feat: pcode):main.cpp
     if (options.emit_asm) {
         if (output.length() == 0) {
             output = "out.s";
