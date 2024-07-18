@@ -2,9 +2,11 @@
 #include "error.h"
 #include "front/lexer/lexer.h"
 #include "front/parser/parser.h"
-#include "visitor.h"
-#include "llvm/asm/AsmPrinter.h"
-#include "llvm/ir/Module.h"
+// #include "visitor.h"
+// #include "llvm/asm/AsmPrinter.h"
+// #include "llvm/ir/Module.h"
+#include "pcode/PcodeVisitor.h"
+#include "pcode/runtime/PcodeRuntime.h"
 #include <fstream>
 #include <getopt.h>
 #include <iostream>
@@ -14,6 +16,7 @@ struct Options {
     bool emit_ast = false;
     bool emit_ir = false;
     bool emit_asm = false;
+    bool emit_pcode = false;
     std::string output;
 };
 
@@ -23,6 +26,7 @@ void usage(const char *name) {
     std::cerr << "  -h, --help: Show this help message" << std::endl;
     std::cerr << "  --emit-ast: Emit AST as JSON" << std::endl;
     std::cerr << "  --emit-ir: Emit IR as JSON" << std::endl;
+    std::cerr << "  --emit-pcode: Emit Pcode as JSON" << std::endl;
     std::cerr << "  -S, --emit-asm: Emit assembly" << std::endl;
     std::cerr << "  -o, --output: Output file" << std::endl;
 }
@@ -60,27 +64,46 @@ void compile(const char *name, const Options &options,
         return;
     }
 
-    ModulePtr module = Module::New(input);
-    auto visitor = Visitor(module);
-    visitor.visit(*root);
+    // ModulePtr module = Module::New(input);
+    // auto visitor = Visitor(module);
+    // visitor.visit(*root);
 
-    if (has_error()) {
-        cmd_error(name, "compilation failed");
-    }
+    // if (has_error()) {
+    //     cmd_error(name, "compilation failed");
+    // }
 
-    if (options.emit_ir) {
-        if (output.length() == 0) {
-            output = "out.ll";
-        }
-        outfile.open(output, std::ios::out);
+    // if (options.emit_ir) {
+    //     if (output.length() == 0) {
+    //         output = "out.ll";
+    //     }
+    //     outfile.open(output, std::ios::out);
 
-        AsmPrinter printer;
-        printer.Print(module, outfile);
-        return;
-    }
+    //     AsmPrinter printer;
+    //     printer.Print(module, outfile);
+    //     return;
+    // }
 
     // TODO: ir to asm
-    cmd_error(name, "ir to asm not implemented");
+    // if (options.emit_asm) {
+    //     cmd_error(name, "ir to asm not implemented");
+    // }
+    // Added: Generate pcode
+    if (options.emit_pcode) {
+        // auto
+        PcodeVisitor pv;
+        pv.visit(*root);
+        
+        if (output.length() == 0) {
+            output = "out.pcode";
+        }
+        outfile.open(output, std::ios::out);
+        pv.print(outfile);
+        PcodeRuntime pr(pv);
+        pr.run();
+
+        return;
+        // cmd_error(name, "pcode not implemented");
+    }
 
     if (options.emit_asm) {
         if (output.length() == 0) {
@@ -100,6 +123,7 @@ int main(int argc, char *argv[]) {
         EMIT_IR,
         EMIT_AST,
         EMIT_ASM,
+        EMIT_PCODE,
         OUTPUT,
     };
     const struct option long_options[] = {
@@ -107,6 +131,7 @@ int main(int argc, char *argv[]) {
         {"emit-ast", no_argument, 0, EMIT_AST},
         {"emit-ir", no_argument, 0, EMIT_IR},
         {"emit-asm", no_argument, 0, EMIT_ASM},
+        {"emit-pcode", no_argument, 0, EMIT_PCODE},
         {"output", required_argument, 0, OUTPUT},
         {0, 0, 0, 0}};
 
@@ -129,6 +154,9 @@ int main(int argc, char *argv[]) {
         case 'S':
         case EMIT_ASM:
             options.emit_asm = true;
+            break;
+        case EMIT_PCODE:
+            options.emit_pcode = true;
             break;
         case 'o':
         case OUTPUT:

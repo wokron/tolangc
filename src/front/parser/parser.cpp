@@ -7,6 +7,7 @@
 Token Parser::getToken() { return tokens[pos]; }
 
 bool Parser::hasNext() { return pos < tokens.size(); }
+
 std::shared_ptr<CompUnit> Parser::parseCompUnit() {
     struct CompUnit compUnit;
     while (hasNext() && getToken().token_type == Token::FN) {
