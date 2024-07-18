@@ -108,7 +108,7 @@ void PcodeRuntime::executeOpr(const PcodeInstPtr &inst) {
             case OperationInst::GEQ:
                 ar.pushTmp(first >= second); break;
             case OperationInst::EQL:
-                ar.pushTmp(first = second); break;
+                ar.pushTmp(first == second); break;
             case OperationInst::NEQ:
                 ar.pushTmp(first != second); break;
         }
