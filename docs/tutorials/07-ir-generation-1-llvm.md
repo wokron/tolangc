@@ -1,85 +1,114 @@
-# LLVM指导手册
+# LLVM 指导手册
 
-**`LLVM`** 可能大部分同学是第一次接触，看上去上手比较困难。本教程将分模块为大家讲解llvm主要特点和语法结构，实验文法、C 语言函数与 LLVM IR 之间的对应转换关系，以及如何使用llvm进行代码生成。可以结合**语法分析**和**中间代码生成**部分教程进行学习。
+对于大部分同学来说，可能是第一次接触 **LLVM**，虽然看上去上手比较困难，但了解了基本语法后还是比较容易的。本教程将分模块为大家讲解 LLVM 主要特点和语法结构，实验文法、C 语言函数与 LLVM IR 之间的对应转换关系，以及如何使用 LLVM 进行代码生成。建议学习过程中可以结合**语法分析**和**中间代码生成**。
 
-## 1. 简单介绍
+## 1. 基本概念
 
-### （1）LLVM是什么
+### （1）LLVM？
 
-**`LLVM`** 最早叫底层虚拟机 (Low Level Virtual Machine) ，最初是伊利诺伊大学的一个研究项目，目的是提供一种现代的、基于 SSA（静态单一赋值）的编译策略，能够支持任意编程语言的静态和动态编译。从那时起，LLVM 已经发展成为一个由多个子项目组成的伞式项目，其中许多子项目被各种各样的商业和开源项目用于生产，并被广泛用于学术研究。
+**LLVM** 最早叫底层虚拟机（Low Level Virtual Machine），最初是伊利诺伊大学的一个研究项目，目的是提供一种现代的、基于 SSA（静态单一赋值）的编译策略，能够支持任意编程语言的静态和动态编译。到现在，LLVM 已经发展成为一个由多个子项目组成的伞式项目，其中许多子项目被各种各样的商业和开源项目用于生产，并被广泛用于学术研究。
 
-现在，LLVM 被用作实现各种静态和运行时编译语言的通用基础设施（例如，GCC、Java、.NET、Python、Ruby、Scheme、Haskell、D以及无数鲜为人知的语言所支持的语言族）。
+现在，LLVM 被用作实现各种静态和运行时编译语言的通用基础设施（例如 C/C++、Java、.NET、Python、Ruby、Scheme、Haskell、D 以及无数鲜为人知的语言所支持的语言族）。一些参考资料：
 
-一些参考资料：
-
-- [https://aosabook.org/en/v1/llvm.html#footnote-1](https://aosabook.org/en/v1/llvm.html#footnote-1)
-- [https://llvm.org/](https://llvm.org/)
+- <https://aosabook.org/en/v1/llvm.html>
+- <https://llvm.org/>
 
 ### （2）三端设计
 
-传统静态编译器，例如大多数C语言的编译器，最主流的设计是**三端设计**，其主要组件是前端、优化器和后端。前端解析源代码，检查其错误，并构建特定语言的**抽象语法树AST**（AST, Abstract Syntax Tree）来表示输入代码。AST可以选择转换为新的目标码进行优化，优化器和后端在代码上运行。
+LLVM 流行的一个非常重要的原因就是它采用了**三端设计**，并提供了一个非常灵活而强大的中间代码表示形式。在三端设计中，主要组件是前端、优化器和后端。**前端**解析源代码，检查其错误，并构建特定语言的**抽象语法树**（Abstract Syntax Tree，AST）来表示输入的源代码。AST 可以进一步转化为新的目标码进行优化，最终由后端生成具体的二进制可执行文件。**优化器**的作用是**提高代码的运行效率**，例如消除冗余计算。**后端**负责将代码**映射到目标指令集**，其常见的功能包括指令选择、寄存器分配和指令调度。
+
+这种设计最重要的优点在于对多种源语言和目标体系结构的支持。不难发现，对于 $M$ 种源语言，$N$ 种体系结构，如果前后端不分开，将会需要 $M \times N$ 个编译器，而在三端设计中，只需要 $M$ 种前端和 $N$ 种后端，实现了复用。这一特点的官方表述是 Retargetablity，即可重定向性或可移植性。同学们熟悉的 GCC、Java 中的 JIT，都是采用这种设计。下面这张图反映了 LLVM 中三端设计的应用。
 
 <img src="imgs/chapter07-1/llvm-0-1.png" alt="llvm-0-1" />
 
-**优化器** 的作用是**增加代码的运行效率**，例如消除冗余计算。 **后端** ，也即代码生成器，负责将代码**映射到目标指令集**，其常见部分包括指令选择、寄存器分配和指令调度。
+## 2. LLVM 快速上手
 
-当编译器需要支持**多种源语言或目标体系结构**时，使用这种设计最重要的优点就是，如果编译器在其优化器中使用公共代码表示，那么可以为任何可以编译到它的语言编写前端，也可以为任何能够从它编译的目标编写后端，如图 0-1 所示。
+> 比起指导书，亲自体验的学习效率要高很多。这一节中会为大家介绍如何在本地生成并运行 LLVM IR。
 
+在平时的使用中，LLVM 一般指的是 LLVM IR，即中间代码。中间代码往往不能单独存在，因此我们需要有一个能生成 LLVM IR 的编译器，所以我们需要使用 GCC 之外的另一款编译器 Clang，也是 LLVM 的子项目之一。
 
-官网对这张设计图的描述只有一个单词 **Retargetablity**，译为**可重定向性**或**可移植性**。通俗理解，如果需要移植编译器以支持新的源语言，只需要实现一个新的前端，但现有的优化器和后端可以重用。如果不将这些部分分开，实现一种新的源语言将需要从头开始，因此，不难发现，支持 $N$ 个目标和 $M$ 种源语言需要 $N×M$ 个编译器，而采用三端设计后，中端优化器可以复用，所以只需要 $N+M$ 个编译器。例如同学们熟悉的Java中的 **JIT**，**GCC** 都是采用这种设计。
+在我们的实验中，评测机采用的 Clang 版本为 12.0，不同版本的 Clang 输出的 LLVM 可能有少许区别，但不会对正确性造成影响。
 
-**IR** (Intermediate Representation) 的翻译即为中间表示。
+### （1）开发环境准备
 
-LLVM 编译器采用三端设计。在基于 LLVM 的编译器中，前端负责解析、验证和诊断输入代码中的错误，然后将解析的代码转换为 LLVM IR，中端（此处即 LLVM 优化器）对 LLVM IR进行优化，后端则负责将 LLVM IR 转换为目标语言。
+在我们的实验中，主要会用到两个工具：`clang` 和 `lli`。`clang` 是 LLVM 项目中 C/C++ 语言的前端，其用法与 GCC 基本相同，可以为源代码生成 LLVM IR。`lli` 会解释执行 `.bc` 和 `.ll` 程序，方便大家验证生成的 LLVM IR 的正确性。
 
-### （3）工具介绍
+#### Linux
 
-> 这一节应该配合下一节一起使用，但是下一节需要用到这些工具，故先放前面写了。
+Linux 下的环境配置相对更方便，使用 Windows 的话推荐大家使用 [WSL 2](https://learn.microsoft.com/zh-cn/windows/wsl/install) + Ubuntu，其他 Linux 环境如虚拟机、云服务器也都是可以的。
 
-课程实验目标是将C语言的程序生成为 LLVM IR 的中间代码，尽管有指导书，但不可避免地，同学们还会遇到很多不会的情况。所以这里给出一个能够自己进行代码生成测试的工具介绍，帮助大家更方便地测试和完成实验。
-
-这里着重介绍 Ubuntu (20.04 或更新版本) 的下载与操作，一是方便，二是同学们或多或少有该系统的 WSL、VMware 或者云服务器等等。如果真的没有，也可以在 Windows 或 MacOS 上直接安装。MacOS 和 Windows 安装 Clang 和 LLVM 的方法请自行搜索。
-
-首先安装 **LLVM** 和 **Clang**
+首先更新包信息。
 
 ```bash
-$ sudo apt-get install llvm
-$ sudo apt-get install clang
+sudo apt update
+sudo apt upgrade
+```
+
+如果不在意版本，直接进行安装即可。
+
+```bash
+sudo apt install llvm
+sudo apt install clang
+```
+
+如果比较在意版本，可以使用 `apt search` 查找当前发行版包含的 Clang 版本。在 Ubuntu 20.04 中，有 7~12；在 Ubuntu 22.04 中，有 11~15，大家可以选择自己喜欢的版本，当然高版本会更好，也可以选择和评测机相同的 12。
+
+```bash
+$ apt search clang | grep -P ^clang-[0-9]+/
+clang-10/focal 1:10.0.0-4ubuntu1 amd64
+clang-11/focal-updates 1:11.0.0-2~ubuntu20.04.1 amd64
+clang-12/focal-updates,focal-security 1:12.0.0-3ubuntu1~20.04.5 amd64
+clang-7/focal 1:7.0.1-12 amd64
+clang-8/focal 1:8.0.1-9 amd64
+clang-9/focal 1:9.0.1-12 amd64
+$ apt search llvm | grep -P ^llvm-[0-9]+/
+llvm-10/focal 1:10.0.0-4ubuntu1 amd64
+llvm-11/focal-updates 1:11.0.0-2~ubuntu20.04.1 amd64
+llvm-12/focal-updates,focal-security 1:12.0.0-3ubuntu1~20.04.5 amd64
+llvm-7/focal 1:7.0.1-12 amd64
+llvm-8/focal 1:8.0.1-9 amd64
+llvm-9/focal 1:9.0.1-12 amd64
+```
+
+安装特定版本时，可以手动修改默认的版本，从而避免每次命令都包含版本号。
+
+```bash
+sudo apt install llvm-12
+sudo apt install clang-12
+sudo update-alternatives --install /usr/bin/lli lli /usr/bin/lli-12 100
+sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-12 100
+sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-12 100
 ```
 
 安装完成后，输入指令查看版本。如果出现版本信息则说明安装成功。
 
 ```bash
-$ clang -v 
-$ lli --version 
+clang -v 
+lli --version 
 ```
 
-> **注意：** 请务必保证llvm版本至少是 **10.0.0 及以上**，否则**会影响正确性！**
+#### Windows
 
-如果使用 `apt` 无法安装，则将下列代码加入到 `/etc/apt/sources.list` 文件中
+Windows 安装 Clang 比较麻烦，但是我们可以借助强大的 Visual Studio。还没有 Visual Studio？可以去官网下载免费的社区版：[Download Visual Studio Tools](https://visualstudio.microsoft.com/downloads/)。安装时，需要在 Individual components 里勾选对 Clang 的支持。
 
-```bash
-deb http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main
-deb-src http://apt.llvm.org/focal/ llvm-toolchain-focal-10 main
-```
+![image-20240712193229554](imgs/chapter07-1/vs-workload.png)
 
-然后在终端执行
+安装完成后，你的电脑中应该会多出 Visual Studio 的命令行工具，就可以在其中使用 `clang` 了。
 
-```bash
-wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
-apt-get install clang-10 lldb-10 lld-10
-```
+![image-20240712193426785](07-ir-generation-1-llvm/vs-cmd.png)
 
+不幸的是，Visual Studio 并没有直接对 `lli` 的支持，手动构建比较麻烦，感兴趣的同学可以自行尝试。
 
+#### MacOS
 
-**MacOS** 上 LLVM 的安装需要 XCode 或 XCode Command Line Tools, 其默认自带Clang
+MacOS 上 LLVM 的安装需要 XCode 或 XCode Command Line Tools，其默认自带 Clang 支持。
 
 ```bash
 xcode-select --install
 brew install llvm
 ```
 
-安装完成后，需要添加 LLVM 到 $PATH
+安装完成后，需要添加 LLVM 到 `$PATH`。
 
 ```bash
 echo 'export PATH="/usr/local/opt/llvm/bin:$PATH"' >> ~/.bash_profile
@@ -87,34 +116,25 @@ echo 'export PATH="/usr/local/opt/llvm/bin:$PATH"' >> ~/.bash_profile
 
 这时候可以仿照之前查看版本的方法，如果显示版本号则证明安装成功。
 
-- `clang` 是 LLVM 项目中 C/C++ 语言的前端，其用法与 GCC 基本相同。
-- `lli` 会解释 .bc 和 .ll 程序。
-
-具体如何使用上述工具链，将在下一章介绍。
-
 > 上文指导安装的是 LLVM 的 Dev 版本，只能编译运行优化 LLVM 代码，不支持代码调试。LLVM 的 Debug 版本需要的空间较大（包括相关配置工具在内共约 30G），且安装操作复杂；实际调试时还需要针对性的编写 LLVM pass。因此，课程组不推荐同学们使用 LLVM 的系统调试工具。阶段性打印信息到控制台不失为一种快捷有效的 debug 方法。
 
-### （4）LLVM IR示例
+### （2）基本命令
 
-LLVM IR 具有三种表示形式，一种是在**内存中**的数据结构格式，一种是在磁盘二进制 **位码 (bitcode)** 格式 `.bc` ，一种是文本格式 `.ll` 。生成目标代码为LLVM IR的同学要求输出的是 `.ll` 形式的 LLVM IR。
-
-下面是一些常用指令，针对编译执行的不同阶段输出相应结果：
+LLVM IR 具有三种表示形式，首先当然是代码中的数据结构，其次是作为输出的二进制位码（Bitcode）格式 `.bc` 和文本格式 `.ll`。在我们的实验中，要求大家能够输出正确的 `.ll` 文件。下面是一些常用指令，针对编译执行的不同阶段输出相应结果：
 
 ```bash
-$ clang -ccc-print-phases main.c # 查看编译的过程
-$ clang -E -Xclang -dump-tokens main.c # 生成 tokens（词法分析）
-$ clang -fsyntax-only -Xclang -ast-dump main.c # 生成抽象语法树
-$ clang -S -emit-llvm main.c -o main.ll -O0 # 生成 llvm ir (不开优化)
-$ clang -S -emit-llvm main.m -o main.ll -Os # 生成 llvm ir (中端优化)
-$ clang -S main.c -o main.s # 生成汇编
-$ clang -S main.bc -o main.s -Os # 生成汇编（后端优化）
-$ clang -c main.c -o main.o # 生成目标文件
-$ clang main.c -o main # 生成可执行文件
+clang -ccc-print-phases main.c               # 查看编译的过程
+clang -E -Xclang -dump-tokens main.c         # 生成 tokens（词法分析）
+clang -fsyntax-only -Xclang -ast-dump main.c # 生成抽象语法树
+clang -S -emit-llvm main.c -o main.ll -O0    # 生成 LLVM ir (不开优化)
+clang -S -emit-llvm main.m -o main.ll -Os    # 生成 LLVM ir (中端优化)
+clang -S main.c -o main.s                    # 生成汇编
+clang -S main.bc -o main.s -Os               # 生成汇编（后端优化）
+clang -c main.c -o main.o                    # 生成目标文件
+clang main.c -o main                         # 直接生成可执行文件
 ```
 
-作为一门全新的语言，与其讲过于理论的语法，不如直接看一个实例来得直观，也方便大家快速入门。
-
-例如，给出源程序 `main.c` 如下
+作为一门全新的语言，与其讲过于理论的语法，不如直接看一个实例来得直观，也方便大家快速入门。例如，给出源程序 `main.c` 如下。
 
 ```c
 int a = 1;
@@ -129,14 +149,13 @@ int main() {
 }
 ```
 
-输入 `clang -S -emit-llvm main.c -o main.ll` 后，会在同目录下生成一个 `main.ll` 的文件。在 LLVM 中，注释以 `;` 打头。
+使用命令 `clang -S -emit-llvm main.c -o main.ll` 后，会在同目录下生成一个 `main.ll` 的文件。在 LLVM 中，注释以 `;` 打头。
 
 ```llvm
 ; ModuleID = 'main.c'     
 source_filename = "main.c"  
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-pc-linux-gnu"
-
 
 ; 从下一行开始，是实验需要生成的部分，注释不要求生成。
 @a = dso_local global i32 1, align 4 
@@ -168,7 +187,7 @@ define dso_local i32 @main() #0 {
 ; 实验要求生成的代码到上一行即可
 
 attributes #0 = { noinline nounwind optnone uwtable ...}
-; ...是手动改的，因为后面一串太长了
+; 实际的 attributes 很多，这里进行了省略
 
 !llvm.module.flags = !{!0}
 !llvm.ident = !{!1}
@@ -179,61 +198,78 @@ attributes #0 = { noinline nounwind optnone uwtable ...}
 
 用 `lli main.ll` 解释执行生成的 `.ll` 文件。如果一切正常，输入 `echo $?` 查看上一条指令的返回值。
 
+> 注意，`$?` 只保存返回值的第八位，即实际返回值与 `0xff` 按位与的结果。
+
 在本次实验中，同学们会用到一些库函数。库函数将打包为 `libsysy.zip` 放在课程资料区，使用的时候请将 `libsysy.c` 和 `libsysy.h` 放在同一目录下，对使用到了库函数的源程序进行编译时，需要用到如下指令：
 
 ```bash
-# 1. 分别导出 libsysy 和 main.c 对应的的 .ll 文件
+# 分别导出 libsysy 和 main.c 对应的的 .ll 文件
 $ clang -emit-llvm -S libsysy.c -o lib.ll
 $ clang -emit-llvm -S main.c -o main.ll
 
-# 2. 使用 llvm-link 将两个文件链接，生成新的 IR 文件
+# 使用 llvm-link 将两个文件链接，生成新的 IR 文件
 $ llvm-link main.ll lib.ll -S -o out.ll
 
-# 3. 用 lli 解释运行
+# 用 lli 解释运行
 $ lli out.ll
 ```
+
+> 对于这些基本的指令，同学们可自行编写自动化脚本进行生成。
 
 LLVM IR 使用的是**三地址码**。下面对上述代码进行简要注释。
 
 - Module ID：指明 Module 的标识
-- source_filename：表明该Module是从什么文件编译得到的。如果是通过链接得到的，此处会显示 `llvm-link`
+- source_filename：表明该 Module 是从什么文件编译得到的。如果是通过链接得到的，此处会显示 `llvm-link`
 - target datalayout 和 target triple 是程序标签属性说明，和硬件/系统有关。
 
-- `@a = dso_local global i32 1, align 4`：全局变量，名称是a，类型是i32，初始值是1，对齐方式是4字节。dso_local 表明该变量会在同一个链接单元（llvm-link 命令的源文件范围）内解析符号。
-- `define dso_local i32 @add(i32 %0, i32 %1) #0`：函数定义。其中第一个i32是返回值类型，%add是函数名；第二个和第三个i32是形参类型，%0，%1是形参名。
+- `@a = dso_local global i32 1, align 4`：全局变量，名称是 `a`，类型是 `i32`，初始值是 1，对齐方式是 4 字节。`dso_local` 表明该变量会在同一个链接单元（`llvm-link` 命令的源文件范围）内解析符号。
 
-> llvm中的标识符分为两种类型：全局的和局部的。全局的标识符包括函数名和全局变量，会加一个 `@` 前缀，局部的标识符会加一个 `%` 前缀。
+  > 这里的 `align` 其实并不是必须的，大家在中间代码生成中也不一定需要生成。
+- `define dso_local i32 @add(i32 %0, i32 %1) #0`：函数定义。其中第一个 `i32` 是返回值类型，`@add` 是函数名；第二个和第三个 `i32` 是形参类型，`%0`，`%1` 是形参名。
+
+> LLVM 中的标识符分为两种类型：全局的和局部的。全局的标识符包括函数名和全局变量，会加一个 `@` 前缀，局部的标识符会加一个 `%` 前缀。
 >
-> -  `#0` 指出了函数的 `attribute group`。在文件的最后，也能找到对应的attributes #0。因为attribute group可能很包含很多attribute且复用到多个函数，所以IR使用attribute group ID(即#0)的形式指明函数的attribute，这样既简洁又清晰。
+> `#0` 指出了函数的 attribute group。由于每个函数的 attribute 很多，而且不同函数的 attributes 往往相同，因此将相同的 attributes 合并为一个 attribute group，从而使 IR 更加简洁清晰。
 
-- 而在大括号中间的函数体，是由一系列 **BasicBlock** 组成的。每个 BasicBlock 都有一个 **label**，label 使得该 BasicBlock 有一个符号表的入口点。BasicBlock 以 terminator instruction（ret、br等）结尾。每个 BasicBlock 由一系列 **Instruction** 组成。Instruction 是 LLVM IR 的基本指令。
-- `%7 = add i32 %5, %6`：随便拿上面一条指令来说，`%7` 是一个临时寄存器，是Instruction 的实例，它的操作数里面有两个值，一个是 `%5`，一个是 `%6`。`%5` 和 `%6` 也是临时寄存器，即前两条 Instruction 的实例。
+- 大括号中间的是函数体，是由一系列 `BasicBlock` 组成的。每个 `BasicBlock` 都有一个 label，label 使得该 `BasicBlock` 有一个符号表的入口点。`BasicBlock` 以 terminator instruction（`ret`、`br` 等）结尾。每个 `BasicBlock` 由一系列 `Instruction` 组成，`Instruction` 是 LLVM IR 的基本指令。
+- `%7 = add i32 %5, %6`：随便拿上面一条指令来说，`%7` 是一个临时寄存器，是 `Instruction` 的实例，它的操作数里面有两个值，一个是 `%5`，一个是 `%6`。`%5` 和 `%6` 也是临时寄存器，即前两条 `Instruction` 的实例。
 
-对于一些常用的 Instructions，下面给出示例。对于一些没有给出的，可以参考[LLVM IR指令集](https://llvm.org/docs/LangRef.html#instruction-reference)。
+### （3）LLVM 指令概览
 
-| llvm ir       | 使用方法                                                     | 简介                                       |
-| ------------- | ------------------------------------------------------------ | ------------------------------------------ |
-| add           | ` <result> = add <ty> <op1>, <op2>`                          | /                                          |
-| sub           | `<result> = sub <ty> <op1>, <op2>`                           | /                                          |
-| mul           | `<result> = mul <ty> <op1>, <op2> `                          | /                                          |
-| sdiv          | `<result> = sdiv <ty> <op1>, <op2>  `                        | 有符号除法                                 |
-| icmp          | `<result> = icmp <cond> <ty> <op1>, <op2>   `                | 比较指令                                   |
-| and           | `<result> = and <ty> <op1>, <op2>  `                         | 与                                         |
-| or            | `<result> = or <ty> <op1>, <op2>   `                         | 或                                         |
-| call          | `<result> =  call  [ret attrs]  <ty> <fnptrval>(<function args>)` | 函数调用                                   |
-| alloca        | `  <result> = alloca <type> `                                | 分配内存                                   |
-| load          | `<result> = load  <ty>, <ty>* <pointer>`                     | 读取内存                                   |
-| store         | `store  <ty> <value>, <ty>* <pointer>`                       | 写内存                                     |
-| getelementptr | `<result> = getelementptr <ty>, * {, [inrange] <ty> <idx>}*` <br>  `<result> = getelementptr inbounds <ty>, <ty>* <ptrval>{, [inrange] <ty> <idx>}*` | 计算目标元素的位置（这一章会单独详细说明） |
-| phi           | `<result> = phi [fast-math-flags] <ty> [ <val0>, <label0>], ...` | /                                          |
-| zext..to      | `<result> = zext <ty> <value> to <ty2>  `                    | 将 `ty`的`value`的type扩充为`ty2`          |
-| trunc..to     | `<result> = trunc <ty> <value> to <ty2>  `                   | 将 `ty`的`value`的type缩减为`ty2`          |
-| br            | `br i1 <cond>, label <iftrue>, label <iffalse>` <br> `br label <dest>  ` | 改变控制流                                 |
-| ret           | `ret <type> <value> `  ,`ret void  `                         | 退出当前函数，并返回值                     |
+对于一些常用的 Instructions，下面给出示例。对于一些没有给出的，可以参考 [LLVM IR 指令集](https://llvm.org/docs/LangRef.html#instruction-reference)。
 
-下面给出一个 Module 的主要架构。
+|     LLVM IR     |                           使用方法                           |                    简介                    |
+| :-------------: | :----------------------------------------------------------: | :----------------------------------------: |
+|      `add`      |             ` <result> = add <ty> <op1>, <op2>`              |                     /                      |
+|      `sub`      |              `<result> = sub <ty> <op1>, <op2>`              |                     /                      |
+|      `mul`      |             `<result> = mul <ty> <op1>, <op2> `              |                     /                      |
+|     `sdiv`      |            `<result> = sdiv <ty> <op1>, <op2>  `             |                 有符号除法                 |
+| `srem` | `<result> = srem <type> <op1>, <op2>` |有符号取余|
+|     `icmp`      |        `<result> = icmp <cond> <ty> <op1>, <op2>   `         |                  比较指令                  |
+|      `and`      |             `<result> = and <ty> <op1>, <op2>  `             |                     按位与                     |
+|      `or`       |             `<result> = or <ty> <op1>, <op2>   `             |                     按位或                     |
+|     `call`      | `<result> =  call  [ret attrs]  <ty> <name>(<...args>)` |                  函数调用                  |
+|    `alloca`     |                `  <result> = alloca <type> `                 |                  分配内存                  |
+|     `load`      |           `<result> = load  <ty>, <ty>* <pointer>`           |                  读取内存                  |
+|     `store`     |            `store  <ty> <value>, <ty>* <pointer>`            |                   写内存                   |
+| `getelementptr` | `<result> = getelementptr <ty>, * {, [inrange] <ty> <idx>}*` <br>  `<result> = getelementptr inbounds <ty>, <ty>* <ptrval>{, [inrange] <ty> <idx>}*` | 计算目标元素的位置（数组部分会单独详细说明） |
+|      `phi`      | `<result> = phi [fast-math-flags] <ty> [ <val0>, <label0>], ...` |                     /                      |
+|   `zext..to`    |          `<result> = zext <ty> <value> to <ty2>  `           |     将 `ty`的`value`的type扩充为`ty2`      |
+|   `trunc..to`   |          `<result> = trunc <ty> <value> to <ty2>  `          |     将 `ty`的`value`的type缩减为`ty2`      |
+|      `br`       | `br i1 <cond>, label <iftrue>, label <iffalse>` <br> `br label <dest>  ` |                 改变控制流                 |
+|      `ret`      |             `ret <type> <value> `  ,`ret void  `             |           退出当前函数，并返回值           |
 
-<img src="imgs/chapter07-1/llvm-0-3.png" alt="llvm-0-3"  />
+### （4）LLVM 构建单元
+
+在 C/C++ 中，一个 `.c`/`.cpp` 文件是一个编译单元，在 LLVM 中也是一样，一个 `.ll` 文件对应一个 `Module`。在前的示例中大家可能已经注意到了，LLVM 有着非常严格清晰的结构，如下图。
+
+![llvm-0-3](07-ir-generation-1-llvm/llvm-overview.svg)
+
+> 细心的同学可能注意到了图中使用的箭头和斜体，不用怀疑，它们分别表示的就是面向对象中的继承与抽象类。
+
+在 LLVM 中，一个 `Module` 由若干 *`GlobalValue`* 组成，而一个 *`GlobalValue`* 可以是全局变量（`GlobalVariable`），也可以是函数（`Function`）。一个函数由若干基本块（`BasicBlock`）组成，与大家在理论课上学习的基本块是一样的。在基本块内部，则是由若干指令（`Instruction`）组成，也是 LLVM 的基本组成。
+
+可以发现，LLVM 中所有类都直接或间接继承自 `Value`，因此在 LLVM 中，有“一切皆 Value”的说法。通过规整的继承关系，我们就得到了 LLVM 的类型系统。
 
 可以发现，LLVM 中几乎所有的结构都可以认为是一个 `Value`，结构与结构之间的 `Value` 传递可以简单理解为继承属性和综合属性。`User` 类是 `Value` 的子类，存储了一个结构使用的其他 `Value` 的列表（维护 `Use *UseList;`）。而 `Use` 类则是LLVM中的重要概念，用来**维护 `User` 和 `Usee` 的双向索引关系**。
 
