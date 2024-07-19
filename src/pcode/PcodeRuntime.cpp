@@ -140,7 +140,8 @@ void PcodeRuntime::executeCall(const PcodeInstPtr &inst) {
 
     for (int i = 0; i < cnt; i++) {
         // Add parameters from the previous AR
-        ar.addArg(prevAr.popTmp());
+        auto num = prevAr.popTmp();
+        ar.addArg(num);
     }
     for (auto &inst : _labels.at(call->getFn()->getName())->instructions) {
         excuteInst(inst);
@@ -151,7 +152,6 @@ void PcodeRuntime::executeRet() {
     auto &funcAr = _ars.top();
     // Get return value
     float retVal = funcAr.popTmp();
-
     // Pop current AR
     _ars.pop();
 
@@ -169,5 +169,6 @@ void PcodeRuntime::executeRead() {
 
 void PcodeRuntime::executeWrite() {
     auto &ar = _ars.top();
-    std::cout << ar.popTmp() << std::endl;
+    // printf("%f\n", ar.popTmp());
+    std::cout << ar.popTmp() << "\n";
 }

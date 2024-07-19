@@ -8,7 +8,7 @@ public:
     std::vector<float> _tmps;
 
 public:
-    void addArg(float arg) { _args.push_back(arg); }
+    void addArg(float arg) { _args.emplace(_args.begin(), arg); }
     float getNthArg(int n) const { return _args[n - 1]; }
 
     void pushTmp(float tmp) { _tmps.push_back(tmp); } 
