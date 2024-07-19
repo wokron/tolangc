@@ -21,8 +21,8 @@ void usage(const char *name) {
     std::cerr << "Usage: " << name << " [options] [file]" << std::endl;
     std::cerr << "Options:" << std::endl;
     std::cerr << "  -h, --help: Show this help message" << std::endl;
-    std::cerr << "  --emit-ast: Emit AST as JSON" << std::endl;
-    std::cerr << "  --emit-ir: Emit IR as JSON" << std::endl;
+    std::cerr << "  --emit-ast: Emit AST" << std::endl;
+    std::cerr << "  --emit-ir: Emit IR" << std::endl;
     std::cerr << "  -S, --emit-asm: Emit assembly" << std::endl;
     std::cerr << "  -o, --output: Output file" << std::endl;
 }
