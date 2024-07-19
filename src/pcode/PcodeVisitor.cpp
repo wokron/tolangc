@@ -1,7 +1,7 @@
 #include "pcode/PcodeVisitor.h"
 
 void PcodeVisitor::visit(const CompUnit &node) {
-    for (auto &elm : node.funcDefs) {
+    for (auto &elm : node.func_defs) {
         visitFuncDef(*elm);
     }
 
@@ -10,7 +10,7 @@ void PcodeVisitor::visit(const CompUnit &node) {
     _curBlock->insertInst(label);
     _labels.emplace("_Main", _curBlock);
 
-    for (auto &elm : node.varDecls) {
+    for (auto &elm : node.var_decls) {
         visitVarDecl(*elm);
     }
 
@@ -21,8 +21,8 @@ void PcodeVisitor::visit(const CompUnit &node) {
 
 void PcodeVisitor::visitFuncDef(const FuncDef &node) {
     // Get function name and parameter count
-    auto funcName = node.ident.value;
-    auto paramCounter = node.funcFParams->idents.size();
+    auto funcName = node.ident->value;
+    auto paramCounter = node.func_f_params.size();
 
     // Create a pcode function object
     auto pcodeFunc = PcodeFunction::create(funcName, paramCounter);
@@ -40,7 +40,12 @@ void PcodeVisitor::visitFuncDef(const FuncDef &node) {
 
     // Create a new symbol table node for function parameters
     _symbolTable.pushScope();
-    visitFuncFParams(*node.funcFParams);
+    
+    for (auto &param : node.func_f_params) {
+        auto symbol = PcodeSymbol::create(param->value, PcodeSymbol::P_VAR);
+        _symbolTable.insertSymbol(symbol);
+    }
+
     visitExp(*node.exp);
     _symbolTable.popScope();
 
@@ -49,15 +54,8 @@ void PcodeVisitor::visitFuncDef(const FuncDef &node) {
     _curBlock->insertInst(ret);
 }
 
-void PcodeVisitor::visitFuncFParams(const FuncFParams &node) {
-    for (auto &param : node.idents) {
-        auto symbol = PcodeSymbol::create(param.value, PcodeSymbol::P_VAR);
-        _symbolTable.insertSymbol(symbol);
-    }
-}
-
 void PcodeVisitor::visitVarDecl(const VarDecl &node) {
-    auto content = node.ident.value;
+    auto content = node.ident->value;
     // Maintain symbol table
     auto symbol = PcodeSymbol::create(content, PcodeSymbol::P_VAR);
     _symbolTable.insertSymbol(symbol);
@@ -87,7 +85,7 @@ void PcodeVisitor::visitGetStmt(const GetStmt &node) {
     auto read = PcodeInstruction::create<ReadInst>();
     _curBlock->insertInst(read);
 
-    auto store = PcodeInstruction::create<StoreInst>(_variables.at(node.ident.value));
+    auto store = PcodeInstruction::create<StoreInst>(_variables.at(node.ident->value));
     _curBlock->insertInst(store);
 }
 
@@ -99,7 +97,7 @@ void PcodeVisitor::visitPutStmt(const PutStmt &node) {
 }
 
 void PcodeVisitor::visitTagStmt(const TagStmt &node) {
-    auto content = node.ident.value;
+    auto content = node.ident->value;
     createBlock();
     auto label = PcodeInstruction::create<LabelInst>(content);
     _curBlock->insertInst(label);
@@ -108,36 +106,36 @@ void PcodeVisitor::visitTagStmt(const TagStmt &node) {
 
 void PcodeVisitor::visitLetStmt(const LetStmt &node) {
     visitExp(*node.exp);
-    auto store = PcodeInstruction::create<StoreInst>(_variables.at(node.ident.value));
+    auto store = PcodeInstruction::create<StoreInst>(_variables.at(node.ident->value));
     _curBlock->insertInst(store);
 }
 
 void PcodeVisitor::visitIfStmt(const IfStmt &node) {
     visitCond(*node.cond);
-    auto jit = PcodeInstruction::create<JumpIfTrueInst>(node.ident.value);
+    auto jit = PcodeInstruction::create<JumpIfTrueInst>(node.ident->value);
     _curBlock->insertInst(jit);
 }
 
 void PcodeVisitor::visitToStmt(const ToStmt &node) {
-    auto jump = PcodeInstruction::create<JumpInst>(node.ident.value);
+    auto jump = PcodeInstruction::create<JumpInst>(node.ident->value);
     _curBlock->insertInst(jump);
 }
 
 void PcodeVisitor::visitExp(const Exp &node) {
-    return std::visit(
+    std::visit(
         overloaded{
             [this](const BinaryExp &node) { return visitBinaryExp(node); },
             [this](const CallExp &node) { return visitCallExp(node); },
             [this](const UnaryExp &node) { return visitUnaryExp(node); },
-            [this](const Ident &node) { return visitIdent(node); },
+            [this](const IdentExp &node) { return visitIdentExp(node); },
             [this](const Number &node) { return visitNumber(node); },
         },
         node);
 }
 
 void PcodeVisitor::visitBinaryExp(const BinaryExp &node) {
-    visitExp(*node.lexp);
-    visitExp(*node.rexp);
+    visitExp(*node.lhs);
+    visitExp(*node.rhs);
     OperationInst::OperationType op;
     switch (node.op) {
         case BinaryExp::PLUS: op = OperationInst::ADD; break;
@@ -151,8 +149,10 @@ void PcodeVisitor::visitBinaryExp(const BinaryExp &node) {
 }
 
 void PcodeVisitor::visitCallExp(const CallExp &node) {
-    visitFuncRParams(*node.funcRParams);
-    auto call = PcodeInstruction::create<CallInst>(_functions.at(node.ident.value));
+    for (auto &param : node.func_r_params) {
+        visitExp(*param);
+    }
+    auto call = PcodeInstruction::create<CallInst>(_functions.at(node.ident->value));
     _curBlock->insertInst(call);
 }
 
@@ -164,15 +164,15 @@ void PcodeVisitor::visitUnaryExp(const UnaryExp &node) {
     }
 }
 
-void PcodeVisitor::visitIdent(const Ident &node) {
+void PcodeVisitor::visitIdentExp(const IdentExp &node) {
     if (_symbolTable.inFunctionScope()) {
-        int index = _symbolTable.getIndexOf(node.value);
+        int index = _symbolTable.getIndexOf(node.ident->value);
         if (index > 0) {
             auto arg = PcodeInstruction::create<ArgumentInst>(index);
             _curBlock->insertInst(arg);
         }
     } else {
-        auto load = PcodeInstruction::create<LoadInst>(_variables.at(node.value));
+        auto load = PcodeInstruction::create<LoadInst>(_variables.at(node.ident->value));
         _curBlock->insertInst(load);
     }
 }
@@ -183,23 +183,17 @@ void PcodeVisitor::visitNumber(const Number &node) {
 }
 
 void PcodeVisitor::visitCond(const Cond &node) {
-    visitExp(*node.left);
-    visitExp(*node.right);
+    visitExp(*node.lhs);
+    visitExp(*node.rhs);
     OperationInst::OperationType op;
     switch (node.op) {
-        case Cond::EQL: op = OperationInst::EQL; break;
-        case Cond::NEQ: op = OperationInst::NEQ; break;
-        case Cond::LSS: op = OperationInst::LES; break;
-        case Cond::LEQ: op = OperationInst::LEQ; break;
-        case Cond::GRE: op = OperationInst::GRE; break;
-        case Cond::GEQ: op = OperationInst::GEQ; break;
+        case Cond::EQ: op = OperationInst::EQL; break;
+        case Cond::NE: op = OperationInst::NEQ; break;
+        case Cond::LT: op = OperationInst::LES; break;
+        case Cond::LE: op = OperationInst::LEQ; break;
+        case Cond::GT: op = OperationInst::GRE; break;
+        case Cond::GE: op = OperationInst::GEQ; break;
     }
     auto opr = PcodeInstruction::create<OperationInst>(op);
     _curBlock->insertInst(opr);
-}
-
-void PcodeVisitor::visitFuncRParams(const FuncRParams &node) {
-    for (auto &exp : node.exps) {
-        visitExp(*exp);
-    }
 }

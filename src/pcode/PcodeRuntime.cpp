@@ -37,7 +37,10 @@ void PcodeRuntime::run() {
 
 void PcodeRuntime::excuteInst(const PcodeInstPtr &inst) {
     switch (inst->getType()) {
-        case PcodeInstruction::DEF: // No need to handle this
+        case PcodeInstruction::DEF: 
+        case PcodeInstruction::JIT: 
+        case PcodeInstruction::JUMP: 
+        case PcodeInstruction::LABEL: 
             break;
         case PcodeInstruction::ARG: 
             executeArg(inst); break;
@@ -96,9 +99,6 @@ void PcodeRuntime::executeOpr(const PcodeInstPtr &inst) {
                 ar.pushTmp(first * second); break;
             case OperationInst::DIV:
                 ar.pushTmp(first / second); break;
-            // case OperationInst::MOD:
-            //     ar.pushTmp((int)first % (int)second); 
-            //     break;
             case OperationInst::LES:
                 ar.pushTmp(first < second); break;
             case OperationInst::LEQ:
@@ -111,6 +111,8 @@ void PcodeRuntime::executeOpr(const PcodeInstPtr &inst) {
                 ar.pushTmp(first == second); break;
             case OperationInst::NEQ:
                 ar.pushTmp(first != second); break;
+            case OperationInst::NEG: 
+                break;
         }
     }
 }
@@ -163,12 +165,11 @@ void PcodeRuntime::executeRet() {
 void PcodeRuntime::executeRead() {
     auto &ar = _ars.top();
     float val;
-    std::cin >> val;
+    scanf("%f", &val);
     ar.pushTmp(val);
 }
 
 void PcodeRuntime::executeWrite() {
     auto &ar = _ars.top();
-    // printf("%f\n", ar.popTmp());
-    std::cout << ar.popTmp() << "\n";
+    printf("%f\n", ar.popTmp());
 }

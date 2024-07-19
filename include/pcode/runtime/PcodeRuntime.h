@@ -4,6 +4,7 @@
 #include "../PcodeVisitor.h"
 #include <cmath>
 #include <iostream>
+#include <cstdio>
 #include <stack>
 #include <map>
 #include <string>
