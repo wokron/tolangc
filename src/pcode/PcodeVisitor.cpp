@@ -142,7 +142,7 @@ void PcodeVisitor::visitBinaryExp(const BinaryExp &node) {
         case BinaryExp::MINU: op = OperationInst::SUB; break;
         case BinaryExp::MULT: op = OperationInst::MUL; break;
         case BinaryExp::DIV : op = OperationInst::DIV; break;
-        // case BinaryExp::MOD : op = OperationInst::MOD; break;
+        case BinaryExp::MOD : break;
     }
     auto opr = PcodeInstruction::create<OperationInst>(op);
     _curBlock->insertInst(opr);
