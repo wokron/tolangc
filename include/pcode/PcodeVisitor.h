@@ -48,6 +48,7 @@ private:
     }
 
     void visitFuncDef(const FuncDef &node);
+    void visitFuncFParams(const FuncFParams &node);
 
     void visitVarDecl(const VarDecl &node);
 
@@ -63,9 +64,11 @@ private:
     void visitBinaryExp(const BinaryExp &node);
     void visitCallExp(const CallExp &node);
     void visitUnaryExp(const UnaryExp &node);
-    void visitIdentExp(const IdentExp &node);
+    void visitIdent(const Ident &node);
     void visitNumber(const Number &node);
     void visitCond(const Cond &node);
+
+    void visitFuncRParams(const FuncRParams &node);
 
 public:
     void visit(const CompUnit &node);
