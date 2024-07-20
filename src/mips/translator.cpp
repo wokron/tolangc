@@ -402,6 +402,7 @@ void Translator::translate(OutputInstPtr outputInstPtr) {
 
     auto reg = manager->loadConst(outputInstPtr->Operand(), FloatRegTy);
 
+    manager->addCode(new ICode(LS, reg0, name0));
     manager->addCode(new RCode(AddS, manager->f12, reg, reg0));
     manager->addCode(new ICode(Addiu, manager->v0, manager->zero, 2));
     manager->addCode(new RCode(Syscall));
