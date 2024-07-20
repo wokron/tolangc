@@ -292,7 +292,7 @@ void Translator::translate(CallInstPtr callInstPtr) {
 
     manager->addCode(
         new ICode(Addiu, manager->sp, manager->sp, manager->currentOffset));
-    manager->addCode(new JCode(J, callInstPtr->GetFunction()->GetName()));
+    manager->addCode(new JCode(Jal, callInstPtr->GetFunction()->GetName()));
     manager->addCode(new RCode(Nop));
 
     manager->addCode(
@@ -391,7 +391,7 @@ void Translator::translate(InputInstPtr inputInstPtr) {
     std::string name0 = manager->addFloat(0);
     manager->addCode(new ICode(LS, reg0, name0));
     auto result = manager->allocReg(inputInstPtr);
-    manager->addCode(new RCode(Addu, result, manager->f0, reg0));
+    manager->addCode(new RCode(AddS, result, manager->f0, reg0));
 }
 
 void Translator::translate(OutputInstPtr outputInstPtr) {
@@ -402,7 +402,7 @@ void Translator::translate(OutputInstPtr outputInstPtr) {
 
     auto reg = manager->loadConst(outputInstPtr->Operand(), FloatRegTy);
 
-    manager->addCode(new RCode(Addu, manager->f12, reg, reg0));
+    manager->addCode(new RCode(AddS, manager->f12, reg, reg0));
     manager->addCode(new ICode(Addiu, manager->v0, manager->zero, 2));
     manager->addCode(new RCode(Syscall));
 }

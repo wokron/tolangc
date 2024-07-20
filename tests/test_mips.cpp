@@ -27,44 +27,44 @@ tag end;
 
 llvm source file
  =========================================================
-define dso_local i32 @average(i32 %1, i32 %t_2) {
-    %t_3 = alloca i32
-    %t_4 = alloca i32
-    store i32 %1, i32 * %t_3
-    store i32 %t_2, i32 * %t_4
-    %t_5 = load i32, i32 * %t_3
-    %t_6 = load i32, i32 * %t_4
-    %t_7 = add i32 %t_5, %t_6
-    %t_8 = sdiv i32 %t_7, 2
-    ret i32 %t_8
+define dso_local float @average(float %1, float %2) {
+    %3 = alloca float
+    %4 = alloca float
+    store float %1, float * %3
+    store float %2, float * %4
+    %5 = load float, float * %3
+    %6 = load float, float * %4
+    %7 = fadd float %5, %6
+    %8 = fdiv float %7, 2
+    ret float %8
 }
-define dso_local i32 @main() {
-    %1 = alloca i32
-    %t_2 = alloca i32
-    store i32 10, i32 * %1
-    %t_3 = call i32 @getint()
-    store i32 %t_3, i32 * %t_2
-    %t_4 = load i32, i32 * %1
-    %t_5 = mul i32 %t_4, 3
-    %t_6 = load i32, i32 * %t_2
-    %t_7 = call i32 @average(i32 %t_5, i32 %t_6)
-    store i32 %t_7, i32 * %1
-    %t_10 = load i32, i32 * %1
-    %t_11 = icmp sgt i32 %t_10, 10
-    br i1 %t_11, label %t_8, label %t_9
-t_8:
-    %t_14 = load i32, i32 * %1
-    call void @putint(i32 %t_14)
-    br label %t_15
+define dso_local float @main() {
+    %1 = alloca float
+    %2 = alloca float
+    store float 1, float * %1
+    %3 = call float @getint()
+    store float %3, float * %2
+    %4 = load float, float * %1
+    %5 = fmul float %4, 3
+    %6 = load float, float * %2
+    %7 = call float @average(float %5, float %6)
+    store float %7, float * %1
+    %8 = load float, float * %1
+    %9 = fcmp sgt float %8, 10
+    br i1 %9, label %10, label %11
+10:
+    %11 = load float, float * %1
+    call void @putint(float %11)
+    br label %14
 
-t_9:
-    %t_16 = load i32, i32 * %t_2
-    %t_17 = sub i32 %t_16, 4
-    store i32 %t_17, i32 * %t_1
-    br label %t_15
+11:
+    %12 = load float, float * %2
+    %13 = fsub float %12, 4
+    store float %13, float * %1
+    br label %14
 
-t_15:
-    ret i32 0
+14:
+    ret float 0
 }
  =========================================================
 */
@@ -72,9 +72,10 @@ t_15:
 static constexpr char EXPECTED[] = R"(.data
 flt0: .float 2
 flt1: .float 0
-flt2: .float 10
+flt2: .float 1
 flt3: .float 3
-flt4: .float 4
+flt4: .float 10
+flt5: .float 4
 .text
 j main
 nop
@@ -100,7 +101,7 @@ s.s $f1, 0($sp)
 addiu $v0, $zero, 6
 syscall
 l.s $f2, flt1
-addu $f3, $f0, $f2
+add.s $f3, $f0, $f2
 s.s $f3, -4($sp)
 l.s $f4, 0($sp)
 l.s $f5, flt3
@@ -110,7 +111,7 @@ s.s $f6, -12($sp)
 s.s $f7, -16($sp)
 sw $ra, -8($sp)
 addiu $sp, $sp, -12
-j average
+jal average
 nop
 subiu $sp, $sp, -12
 lw $ra, -8($sp)
@@ -118,7 +119,7 @@ l.s $f9, flt1
 add.s $f8, $f0, $f9
 s.s $f8, 0($sp)
 l.s $f10, 0($sp)
-l.s $f11, flt2
+l.s $f11, flt4
 c.lt.s $f10, $f11
 bc1f main_1
 nop
@@ -137,7 +138,7 @@ nop
 
 main_3:
 l.s $f13, 0($sp)
-addu $f12, $f13, $f14
+add.s $f12, $f13, $f14
 addiu $v0, $zero, 2
 syscall
 j main_5
@@ -145,7 +146,7 @@ nop
 
 main_4:
 l.s $f15, -4($sp)
-l.s $f16, flt4
+l.s $f16, flt5
 sub.s $f17, $f15, $f16
 s.s $f17, 0($sp)
 j main_5
@@ -227,8 +228,8 @@ static FunctionPtr BuildMain(ModulePtr module, FunctionPtr average) {
     AllocaInstPtr i2 = AllocaInst::New(context->GetFloatTy());
     block->InsertInstruction(i1)->InsertInstruction(i2);
 
-    // let i1 = 10.0;
-    auto one = ConstantData::New(context->GetFloatTy(), 10.0f);
+    // let i1 = 1.0;
+    auto one = ConstantData::New(context->GetFloatTy(), 1.0f);
     block->InsertInstruction(StoreInst::New(one, i1));
 
     // get i2;
