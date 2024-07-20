@@ -13,10 +13,10 @@ var i2;
 
 let i1 = 1.0;
 get i2;
-i1 = average(i1*3, i2);
+let i1 = average(i1 * 3, i2);
 
 if i1 > 10 to do;
-i1 = i2 % 4;
+let i1 = i2 / 4;
 to end;
 
 tag do;
@@ -30,12 +30,12 @@ llvm source file
 define dso_local float @average(float %1, float %2) {
     %3 = alloca float
     %4 = alloca float
-    store float %1, float * %3
-    store float %2, float * %4
-    %5 = load float, float * %3
-    %6 = load float, float * %4
+    store float %1, float* %3
+    store float %2, float* %4
+    %5 = load float, float* %3
+    %6 = load float, float* %4
     %7 = fadd float %5, %6
-    %8 = fdiv float %7, 2
+    %8 = fdiv float %7, 2.000000
     ret float %8
 }
 define dso_local float @main() {
@@ -50,7 +50,7 @@ define dso_local float @main() {
     %7 = call float @average(float %5, float %6)
     store float %7, float * %1
     %8 = load float, float * %1
-    %9 = fcmp sgt float %8, 10
+    %9 = fcmp ogt float %8, 10
     br i1 %9, label %10, label %11
 10:
     %11 = load float, float * %1
@@ -138,6 +138,7 @@ nop
 
 main_3:
 l.s $f13, 0($sp)
+l.s $f14, flt1
 add.s $f12, $f13, $f14
 addiu $v0, $zero, 2
 syscall
