@@ -96,9 +96,10 @@ Windows 安装 Clang 比较麻烦，但是我们可以借助强大的 Visual Stu
 
 安装完成后，你的电脑中应该会多出 Visual Studio 的命令行工具，就可以在其中使用 `clang` 了。
 
-![image-20240712193426785](07-ir-generation-1-llvm/vs-cmd.png)
+![image-20240712193426785](imgs/chapter07-1/vs-cmd.png)
 
-不幸的是，Visual Studio 并没有直接对 `lli` 的支持，手动构建比较麻烦，感兴趣的同学可以自行尝试。
+> 不幸的是，Visual Studio 并没有直接对 `lli` 的支持，手动构建比较麻烦，感兴趣的同学可以自行尝试。
+>
 
 #### MacOS
 
