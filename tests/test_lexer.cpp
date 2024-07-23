@@ -2,6 +2,14 @@
 
 #include "lexer.h"
 #include "token.h"
+
+std::string src;
+std::vector<Token> tokens;
+
+static void AddSrc();
+static void AddResult();
+#include "lexer.h"
+#include "token.h"
 #include <sstream>
 #include <vector>
 

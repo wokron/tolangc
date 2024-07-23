@@ -40,3 +40,7 @@ out/
 *.user
 
 .vscode/
+
+CMakeFiles
+
+test/tests
