@@ -1,17 +1,17 @@
 #pragma once
 
-#include "./PcodeInstruction.h"
-#include "./PcodeVariable.h"
-#include "./PcodeFunction.h"
+#include "pcode/PcodeInstruction.h"
+#include "pcode/PcodeVariable.h"
+#include "pcode/PcodeFunction.h"
 #include <iostream>
 #include <string>
 
-class DefineInst : public PcodeInstruction {
+class PcodeDefineInst : public PcodeInstruction {
 private:
     PcodeVarPtr & _var;
 
 public:
-    DefineInst(PcodeVarPtr &var):
+    PcodeDefineInst(PcodeVarPtr &var):
         PcodeInstruction(PcodeInstruction::DEF), _var(var) {}
     
     void print(std::ostream &out) const override {
@@ -19,12 +19,12 @@ public:
     }
 };
 
-class ArgumentInst : public PcodeInstruction {
+class PcodeArgumentInst : public PcodeInstruction {
 private:
     int _index;
 
 public:
-    ArgumentInst(int index) : 
+    PcodeArgumentInst(int index) : 
         PcodeInstruction(PcodeInstruction::ARG), _index(index) {}
 
     int getIndex() const { return _index; }
@@ -34,12 +34,12 @@ public:
     }
 };
 
-class LoadImmediateInst : public PcodeInstruction {
+class PcodeLoadImmediateInst : public PcodeInstruction {
 private:
     float _imm;
 
 public:
-    LoadImmediateInst(float imm) :
+    PcodeLoadImmediateInst(float imm) :
         PcodeInstruction(PcodeInstruction::LI), _imm(imm) {}
 
     float getImm() const { return _imm; }
@@ -49,7 +49,7 @@ public:
     }
 };
 
-class OperationInst : public PcodeInstruction {
+class PcodeOperationInst : public PcodeInstruction {
 public:
     typedef enum {
         ADD, SUB, MUL, DIV, /* MOD, */ NEG,
@@ -60,7 +60,7 @@ private:
     OperationType _op;
 
 public:
-    OperationInst(OperationType op) :
+    PcodeOperationInst(OperationType op) :
         PcodeInstruction(PcodeInstruction::OPR), _op(op) {}
 
     OperationType getOp() const { return _op; }
@@ -86,12 +86,12 @@ public:
     }
 };
 
-class LoadInst : public PcodeInstruction {
+class PcodeLoadInst : public PcodeInstruction {
 private:
     PcodeVarPtr _var;
 
 public:
-    LoadInst(PcodeVarPtr & var) : 
+    PcodeLoadInst(PcodeVarPtr & var) : 
         PcodeInstruction(PcodeInstruction::LOAD), _var(var) {}
 
     PcodeVarPtr &getVar() { return _var; }
@@ -101,12 +101,12 @@ public:
     }
 };
 
-class StoreInst : public PcodeInstruction {
+class PcodeStoreInst : public PcodeInstruction {
 private:
     PcodeVarPtr _var;
 
 public:
-    StoreInst(PcodeVarPtr &var):
+    PcodeStoreInst(PcodeVarPtr &var):
         PcodeInstruction(PcodeInstruction::STORE), _var(var) {}
 
     PcodeVarPtr &getVar() { return _var; }
@@ -116,12 +116,12 @@ public:
     }
 };
 
-class CallInst : public PcodeInstruction {
+class PcodeCallInst : public PcodeInstruction {
 private:
     PcodeFuncPtr _fn;
 
 public:
-    CallInst(PcodeFuncPtr &fn) : 
+    PcodeCallInst(PcodeFuncPtr &fn) : 
         PcodeInstruction(PcodeInstruction::CALL), _fn(fn) {}
     
     PcodeFuncPtr &getFn() { return _fn; }
@@ -131,21 +131,21 @@ public:
     }
 };
 
-class ReturnInst : public PcodeInstruction {
+class PcodeReturnInst : public PcodeInstruction {
 public:
-    ReturnInst() : PcodeInstruction(PcodeInstruction::RET) {}
+    PcodeReturnInst() : PcodeInstruction(PcodeInstruction::RET) {}
 
     void print(std::ostream &out) const override {
         out << "RET" << std::endl;
     }
 };
 
-class JumpIfTrueInst : public PcodeInstruction {
+class PcodeJumpIfTrueInst : public PcodeInstruction {
 private:
     std::string _label;
 
 public:
-    JumpIfTrueInst(const std::string &label) :
+    PcodeJumpIfTrueInst(const std::string &label) :
         PcodeInstruction(PcodeInstruction::JIT), _label(label) {}
 
     const std::string &getLabel() const { return _label; }
@@ -155,12 +155,12 @@ public:
     }
 };
 
-class JumpInst : public PcodeInstruction {
+class PcodeJumpInst : public PcodeInstruction {
 private:
     std::string _label;
 
 public:
-    JumpInst(const std::string &label) :
+    PcodeJumpInst(const std::string &label) :
         PcodeInstruction(PcodeInstruction::JUMP), _label(label) {}
 
     const std::string &getLabel() const { return _label; }
@@ -170,30 +170,30 @@ public:
     }
 };
 
-class ReadInst : public PcodeInstruction {
+class PcodeReadInst : public PcodeInstruction {
 public:
-    ReadInst() : PcodeInstruction(PcodeInstruction::READ) {}
+    PcodeReadInst() : PcodeInstruction(PcodeInstruction::READ) {}
 
     void print(std::ostream &out) const override {
         out << "READ" << std::endl;
     }
 };
 
-class WriteInst : public PcodeInstruction {
+class PcodeWriteInst : public PcodeInstruction {
 public:
-    WriteInst() : PcodeInstruction(PcodeInstruction::WRITE) {}
+    PcodeWriteInst() : PcodeInstruction(PcodeInstruction::WRITE) {}
 
     void print(std::ostream &out) const override {
         out << "WRITE" << std::endl;
     }
 };
 
-class LabelInst : public PcodeInstruction {
+class PcodeLabelInst : public PcodeInstruction {
 private:
     std::string _label;
 
 public:
-    LabelInst(const std::string &label) :
+    PcodeLabelInst(const std::string &label) :
         PcodeInstruction(PcodeInstruction::LABEL), _label(label) {}
 
     const std::string &getLabel() const { return _label; }
@@ -203,16 +203,16 @@ public:
     }
 };
 
-using DefInstPtr = std::shared_ptr<DefineInst>;
-using ArgInstPtr = std::shared_ptr<ArgumentInst>;
-using LiInstPtr = std::shared_ptr<LoadImmediateInst>;
-using OprInstPtr = std::shared_ptr<OperationInst>;
-using LoadInstPtr = std::shared_ptr<LoadInst>;
-using StoreInstPtr = std::shared_ptr<StoreInst>;
-using CallInstPtr = std::shared_ptr<CallInst>;
-using RetInstPtr = std::shared_ptr<ReturnInst>;
-using JitInstPtr = std::shared_ptr<JumpIfTrueInst>;
-using JumpInstPtr = std::shared_ptr<JumpInst>;
-using ReadInstPtr = std::shared_ptr<ReadInst>;
-using WriteInstPtr = std::shared_ptr<WriteInst>;
-using LabelInstPtr = std::shared_ptr<LabelInst>;
+// using DefInstPtr = std::shared_ptr<PcodeDefineInst>;
+// using ArgInstPtr = std::shared_ptr<PcodeArgumentInst>;
+// using LiInstPtr = std::shared_ptr<PcodeLoadImmediateInst>;
+// using OprInstPtr = std::shared_ptr<PcodeOperationInst>;
+// using LoadInstPtr = std::shared_ptr<PcodeLoadInst>;
+// using StoreInstPtr = std::shared_ptr<PcodeStoreInst>;
+// using CallInstPtr = std::shared_ptr<PcodeCallInst>;
+// using RetInstPtr = std::shared_ptr<ReturnInst>;
+// using JitInstPtr = std::shared_ptr<PcodeJumpIfTrueInst>;
+// using JumpInstPtr = std::shared_ptr<PcodeJumpInst>;
+// using ReadInstPtr = std::shared_ptr<PcodeReadInst>;
+// using WriteInstPtr = std::shared_ptr<PcodeWriteInst>;
+// using LabelInstPtr = std::shared_ptr<PcodeLabelInst>;

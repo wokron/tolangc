@@ -1,8 +1,10 @@
 #pragma once
 
-#include "./PcodeInstruction.h"
-#include "./PcodeInstructions.h"
-#include "./PcodeSymbol.h"
+#include "pcode/PcodeModule.h"
+#include "pcode/PcodeInstruction.h"
+#include "pcode/PcodeInstructions.h"
+#include "pcode/PcodeSymbol.h"
+#include "pcode/PcodeBlock.h"
 #include "utils.h"
 #include "ast.h"
 
@@ -10,30 +12,11 @@
 #include <map>
 #include <vector>
 
-struct PcodeBlock;
-using PcodeBlockPtr = std::shared_ptr<PcodeBlock>; 
-
-struct PcodeBlock {
-    std::vector<PcodeInstPtr> instructions;
-    PcodeBlockPtr next = nullptr;
-
-    void insertInst(PcodeInstPtr &inst) {
-        instructions.push_back(inst);
-    }
-
-    static PcodeBlockPtr create() {
-        return std::make_shared<PcodeBlock>();
-    }
-};
-
 class PcodeVisitor {
 private:
-    std::vector<PcodeBlockPtr> _blocks;
-    PcodeBlockPtr _curBlock = nullptr;
+    PcodeModule &_module;
 
-    std::map<std::string, PcodeVarPtr> _variables;
-    std::map<std::string, PcodeFuncPtr> _functions;
-    std::map<std::string, PcodeBlockPtr> _labels;
+    PcodeBlockPtr _curBlock = nullptr;
 
     PcodeSymbolTable _symbolTable;
 
@@ -44,7 +27,7 @@ private:
             _curBlock->next = PcodeBlock::create();
             _curBlock = _curBlock->next;
         }
-        _blocks.push_back(_curBlock);
+        _module.addBlock(_curBlock);
     }
 
     void visitFuncDef(const FuncDef &node);
@@ -70,14 +53,5 @@ private:
 public:
     void visit(const CompUnit &node);
 
-    void print(std::ostream &out) const {
-        for (auto &b : _blocks) {
-            for (auto &i : b->instructions) {
-                i->print(out);
-            }
-            out << "\n";
-        }
-    }
-
-    friend class PcodeRuntime;
+    PcodeVisitor(PcodeModule &pm) : _module(pm) {}
 };

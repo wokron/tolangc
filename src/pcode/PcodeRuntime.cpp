@@ -13,16 +13,16 @@ void PcodeRuntime::run() {
             if (inst->getType() == PcodeInstruction::JIT) {
                 auto &ar = _ars.top();
                 if (::fabs(ar.popTmp() - 1) < eps) {
-                    auto jit = std::dynamic_pointer_cast<JumpIfTrueInst>(inst);
-                    _currentBlock = _labels.at(jit->getLabel());
+                    auto jit = std::dynamic_pointer_cast<PcodeJumpIfTrueInst>(inst);
+                    _currentBlock = _module.getLabel((jit->getLabel()));
                     flag = true;
                     break;
                 } else {
                     continue;
                 }
             } else if (inst->getType() == PcodeInstruction::JUMP) {
-                auto jump = std::dynamic_pointer_cast<JumpInst>(inst);
-                _currentBlock = _labels.at(jump->getLabel());
+                auto jump = std::dynamic_pointer_cast<PcodeJumpInst>(inst);
+                _currentBlock = _module.getLabel((jump->getLabel()));
                 flag = true;
                 break;
             } else {
@@ -69,49 +69,49 @@ void PcodeRuntime::excuteInst(const PcodeInstPtr &inst) {
 
 void PcodeRuntime::executeArg(const PcodeInstPtr &inst) {
     auto &ar = _ars.top();
-    auto arg = std::dynamic_pointer_cast<ArgumentInst>(inst);
+    auto arg = std::dynamic_pointer_cast<PcodeArgumentInst>(inst);
     ar.pushTmp(ar.getNthArg(arg->getIndex()));
 }
 
 void PcodeRuntime::executeLi(const PcodeInstPtr &inst) {
     auto &ar = _ars.top();
-    auto li = std::dynamic_pointer_cast<LoadImmediateInst>(inst);
+    auto li = std::dynamic_pointer_cast<PcodeLoadImmediateInst>(inst);
     ar.pushTmp(li->getImm());
 }
 
 void PcodeRuntime::executeOpr(const PcodeInstPtr &inst) {
     auto &ar = _ars.top();
-    auto opr = std::dynamic_pointer_cast<OperationInst>(inst);
+    auto opr = std::dynamic_pointer_cast<PcodeOperationInst>(inst);
     auto op = opr->getOp();
     // Only negative operation needs one operand
-    if (op == OperationInst::NEG) {
+    if (op == PcodeOperationInst::NEG) {
         auto operand = ar.popTmp();
         ar.pushTmp(-operand);
     } else {
         auto second = ar.popTmp();
         auto first = ar.popTmp();
         switch (op) {
-            case OperationInst::ADD:
+            case PcodeOperationInst::ADD:
                 ar.pushTmp(first + second); break;
-            case OperationInst::SUB:
+            case PcodeOperationInst::SUB:
                 ar.pushTmp(first - second); break;
-            case OperationInst::MUL:
+            case PcodeOperationInst::MUL:
                 ar.pushTmp(first * second); break;
-            case OperationInst::DIV:
+            case PcodeOperationInst::DIV:
                 ar.pushTmp(first / second); break;
-            case OperationInst::LES:
+            case PcodeOperationInst::LES:
                 ar.pushTmp(first < second); break;
-            case OperationInst::LEQ:
+            case PcodeOperationInst::LEQ:
                 ar.pushTmp(first <= second); break;
-            case OperationInst::GRE:
+            case PcodeOperationInst::GRE:
                 ar.pushTmp(first > second); break;
-            case OperationInst::GEQ:
+            case PcodeOperationInst::GEQ:
                 ar.pushTmp(first >= second); break;
-            case OperationInst::EQL:
+            case PcodeOperationInst::EQL:
                 ar.pushTmp(first == second); break;
-            case OperationInst::NEQ:
+            case PcodeOperationInst::NEQ:
                 ar.pushTmp(first != second); break;
-            case OperationInst::NEG: 
+            case PcodeOperationInst::NEG: 
                 break;
         }
     }
@@ -119,19 +119,19 @@ void PcodeRuntime::executeOpr(const PcodeInstPtr &inst) {
 
 void PcodeRuntime::executeLoad(const PcodeInstPtr &inst) {
     auto &ar = _ars.top();
-    auto &var = std::dynamic_pointer_cast<LoadInst>(inst)->getVar();
+    auto &var = std::dynamic_pointer_cast<PcodeLoadInst>(inst)->getVar();
     ar.pushTmp(var->getValue());
 }
 
 void PcodeRuntime::executeStore(const PcodeInstPtr &inst) {
     auto &ar = _ars.top();
-    auto &var = std::dynamic_pointer_cast<StoreInst>(inst)->getVar();
+    auto &var = std::dynamic_pointer_cast<PcodeStoreInst>(inst)->getVar();
     var->setValue(ar.popTmp());
 }
 
 void PcodeRuntime::executeCall(const PcodeInstPtr &inst) {
     auto &prevAr = _ars.top();
-    auto call = std::dynamic_pointer_cast<CallInst>(inst);
+    auto call = std::dynamic_pointer_cast<PcodeCallInst>(inst);
     
     // Parameter counter of the function 
     auto cnt = call->getFn()->getParamCounter();
@@ -145,7 +145,7 @@ void PcodeRuntime::executeCall(const PcodeInstPtr &inst) {
         auto num = prevAr.popTmp();
         ar.addArg(num);
     }
-    for (auto &inst : _labels.at(call->getFn()->getName())->instructions) {
+    for (auto &inst : _module.getLabel(call->getFn()->getName())->instructions) {
         excuteInst(inst);
     }
 }

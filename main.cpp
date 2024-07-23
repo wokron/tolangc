@@ -2,9 +2,10 @@
 #include "error.h"
 #include "lexer.h"
 #include "parser.h"
-// #include "visitor.h"
-// #include "llvm/asm/AsmPrinter.h"
-// #include "llvm/ir/Module.h"
+#include "visitor.h"
+#include "llvm/asm/AsmPrinter.h"
+#include "llvm/ir/Module.h"
+#include "pcode/PcodeModule.h"
 #include "pcode/PcodeVisitor.h"
 #include "pcode/runtime/PcodeRuntime.h"
 #include <fstream>
@@ -58,42 +59,44 @@ void compile(const char *name, const Options &options,
         return;
     }
 
-    // ModulePtr module = Module::New(input);
-    // auto visitor = Visitor(module);
-    // visitor.visit(*root);
+    ModulePtr module = Module::New(input);
+    auto visitor = Visitor(module);
+    visitor.visit(*root);
 
     if (ErrorReporter::get().has_error()) {
         ErrorReporter::get().dump(std::cerr);
         cmd_error(name, "compilation failed");
     }
 
-    // if (options.emit_ir) {
-    //     if (output.length() == 0) {
-    //         output = "out.ll";
-    //     }
-    //     outfile.open(output, std::ios::out);
+    if (options.emit_ir) {
+        if (output.length() == 0) {
+            output = "out.ll";
+        }
+        outfile.open(output, std::ios::out);
 
-    //     AsmPrinter printer;
-    //     printer.Print(module, outfile);
-    //     return;
-    // }
+        AsmPrinter printer;
+        printer.Print(module, outfile);
+        return;
+    }
 
     // TODO: ir to asm
     // if (options.emit_asm) {
     //     cmd_error(name, "ir to asm not implemented");
     // }
+
     // Added: Generate pcode
     if (options.emit_pcode) {
         // auto
-        PcodeVisitor pv;
+        PcodeModule pm;
+        PcodeVisitor pv(pm);
         pv.visit(*root);
         
         if (output.length() == 0) {
             output = "out.pcode";
         }
         outfile.open(output, std::ios::out);
-        pv.print(outfile);
-        PcodeRuntime pr(pv);
+        pm.print(outfile);
+        PcodeRuntime pr(pm);
         pr.run();
 
         return;

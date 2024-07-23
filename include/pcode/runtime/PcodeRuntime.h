@@ -1,7 +1,8 @@
 #pragma once
 
-#include "ActivityRecord.h"
-#include "../PcodeVisitor.h"
+#include "pcode/runtime/ActivityRecord.h"
+#include "pcode/PcodeModule.h"
+#include "pcode/PcodeInstructions.h"
 #include <cmath>
 #include <iostream>
 #include <cstdio>
@@ -15,10 +16,7 @@ class PcodeRuntime {
 private:
     std::stack<ActivityRecord> _ars;
 
-    std::vector<PcodeBlockPtr> &_blocks;
-    std::map<std::string, PcodeVarPtr> &_variables;
-    std::map<std::string, PcodeFuncPtr> &_functions;
-    std::map<std::string, PcodeBlockPtr> &_labels;
+    PcodeModule &_module;
 
     PcodeBlockPtr _currentBlock;
 
@@ -35,10 +33,8 @@ private:
     void executeWrite();
 
 public:
-    PcodeRuntime(PcodeVisitor &pv) :
-        _blocks(pv._blocks), _variables(pv._variables), 
-        _functions(pv._functions), _labels(pv._labels), 
-        _currentBlock(_blocks[_functions.size()]) {}
+    PcodeRuntime(PcodeModule &pm) : 
+        _module(pm), _currentBlock(pm.getMainBlock()) {}
 
     void run();
 };

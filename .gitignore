@@ -42,3 +42,5 @@ out/
 .vscode/
 
 CMakeFiles
+
+test/tests
