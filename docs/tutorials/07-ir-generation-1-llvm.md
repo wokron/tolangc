@@ -265,7 +265,7 @@ LLVM IR 使用的是**三地址码**。下面对上述代码进行简要注释�
 
 在 C/C++ 中，一个 `.c`/`.cpp` 文件是一个编译单元，在 LLVM 中也是一样，一个 `.ll` 文件对应一个 `Module`。在前的示例中大家可能已经注意到了，LLVM 有着非常严格清晰的结构，如下图。
 
-![llvm-0-3](07-ir-generation-1-llvm/llvm-overview.svg)
+![llvm-0-3](imgs/chapter07-1/llvm-overview.svg)
 
 > 细心的同学可能注意到了图中使用的箭头和斜体，不用怀疑，它们分别表示的就是面向对象中的继承与抽象类。
 
