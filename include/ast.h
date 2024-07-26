@@ -7,12 +7,12 @@
 #include <vector>
 
 struct Node {
-    int line;
-    // TODO: implement print method, maybe in json format?
+    int lineno;
+
+    Node() = default;
+    Node(int lineno) : lineno(lineno) {}
     virtual void print(std::ostream &out) = 0;
 };
-
-using Ident = std::string;
 
 struct GetStmt;
 struct PutStmt;
@@ -25,103 +25,108 @@ using Stmt = std::variant<GetStmt, PutStmt, TagStmt, LetStmt, IfStmt, ToStmt>;
 struct BinaryExp;
 struct CallExp;
 struct UnaryExp;
+struct IdentExp;
 struct Number;
-using Exp = std::variant<BinaryExp, CallExp, UnaryExp, Ident, Number>;
+using Exp = std::variant<BinaryExp, CallExp, UnaryExp, IdentExp, Number>;
 
 struct FuncDef;
 struct VarDecl;
 
-struct CompUnit : public Node {
-    std::vector<std::shared_ptr<FuncDef>> funcDefs;
-    std::vector<std::shared_ptr<VarDecl>> varDecls;
-    std::vector<std::shared_ptr<Stmt>> stmts;
+struct Ident : public Node {
+    std::string value;
 
-    void print(std::ostream &out) override{/* TODO: need to implement */};
+    void print(std::ostream &out) override;
+
+    Ident() = default;
+    Ident(int lineno, const std::string &value) : Node(lineno), value(value) {}
 };
 
-struct FuncFParams;
+struct CompUnit : public Node {
+    std::vector<std::unique_ptr<FuncDef>> func_defs;
+    std::vector<std::unique_ptr<VarDecl>> var_decls;
+    std::vector<std::unique_ptr<Stmt>> stmts;
+
+    void print(std::ostream &out) override;
+};
 
 struct FuncDef : public Node {
-    Ident ident;
-    std::shared_ptr<FuncFParams> funcFParams;
-    std::shared_ptr<Exp> exp;
+    std::unique_ptr<Ident> ident;
+    std::vector<std::unique_ptr<Ident>> func_f_params;
+    std::unique_ptr<Exp> exp;
 
-    void print(std::ostream &out) override{/* TODO: need to implement */};
-};
-
-struct FuncFParams : public Node {
-    std::vector<Ident> idents;
-
-    void print(std::ostream &out) override{/* TODO: need to implement */};
+    void print(std::ostream &out) override;
 };
 
 struct VarDecl : public Node {
-    Ident ident;
+    std::unique_ptr<Ident> ident;
 
-    void print(std::ostream &out) override{/* TODO: need to implement */};
+    void print(std::ostream &out) override;
 };
 
 struct GetStmt : public Node {
-    Ident ident;
+    std::unique_ptr<Ident> ident;
 
-    void print(std::ostream &out) override{/* TODO: need to implement */};
+    void print(std::ostream &out) override;
 };
 
 struct PutStmt : public Node {
-    std::shared_ptr<Exp> exp;
+    std::unique_ptr<Exp> exp;
 
-    void print(std::ostream &out) override{/* TODO: need to implement */};
+    void print(std::ostream &out) override;
 };
 
 struct TagStmt : public Node {
-    Ident ident;
+    std::unique_ptr<Ident> ident;
 
-    void print(std::ostream &out) override{/* TODO: need to implement */};
+    void print(std::ostream &out) override;
 };
 
 struct LetStmt : public Node {
-    Ident ident;
-    std::shared_ptr<Exp> exp;
+    std::unique_ptr<Ident> ident;
+    std::unique_ptr<Exp> exp;
 
-    void print(std::ostream &out) override{/* TODO: need to implement */};
+    void print(std::ostream &out) override;
 };
 
 struct Cond;
 
 struct IfStmt : public Node {
-    std::shared_ptr<Cond> cond;
-    Ident ident;
+    std::unique_ptr<Cond> cond;
+    std::unique_ptr<Ident> ident;
 
-    void print(std::ostream &out) override{/* TODO: need to implement */};
+    void print(std::ostream &out) override;
 };
 
 struct ToStmt : public Node {
-    Ident ident;
+    std::unique_ptr<Ident> ident;
 
-    void print(std::ostream &out) override{/* TODO: need to implement */};
+    void print(std::ostream &out) override;
 };
 
 struct BinaryExp : public Node {
-    std::shared_ptr<Exp> lexp;
-    enum {
+    std::unique_ptr<Exp> lhs;
+    enum BinaryOp {
         PLUS,
         MINU,
         MULT,
         DIV,
         MOD,
     } op;
-    std::shared_ptr<Exp> rexp;
+    std::unique_ptr<Exp> rhs;
 
-    void print(std::ostream &out) override{/* TODO: need to implement */};
+    BinaryExp() = default;
+
+    BinaryExp(BinaryOp op, std::unique_ptr<Exp> lhs, std::unique_ptr<Exp> rhs)
+        : lhs(std::move(lhs)), op(op), rhs(std::move(rhs)) {}
+
+    void print(std::ostream &out) override;
 };
 
-struct FuncRParams;
-
 struct CallExp : public Node {
-    Ident ident;
-    std::shared_ptr<FuncRParams> funcRParams;
+    std::unique_ptr<Ident> ident;
+    std::vector<std::unique_ptr<Exp>> func_r_params;
 
-    void print(std::ostream &out) override{/* TODO: need to implement */};
+    void print(std::ostream &out) override;
 };
 
 struct UnaryExp : public Node {
@@ -129,34 +134,33 @@ struct UnaryExp : public Node {
         PLUS,
         MINU,
     } op;
-    std::shared_ptr<Exp> exp;
-
-    void print(std::ostream &out) override{/* TODO: need to implement */};
+    std::unique_ptr<Exp> exp;
+    void print(std::ostream &out) override;
 };
 
-struct FuncRParams : public Node {
-    std::vector<std::shared_ptr<Exp>> exps;
+struct IdentExp : public Node {
+    std::unique_ptr<Ident> ident;
 
-    void print(std::ostream &out) override{/* TODO: need to implement */};
+    void print(std::ostream &out) override;
 };
 
 struct Cond : public Node {
-    std::shared_ptr<Exp> left;
+    std::unique_ptr<Exp> lhs;
     enum {
-        LSS,
-        GRE,
-        LEQ,
-        GEQ,
-        EQL,
-        NEQ,
+        LT,
+        GT,
+        LE,
+        GE,
+        EQ,
+        NE,
     } op;
-    std::shared_ptr<Exp> right;
+    std::unique_ptr<Exp> rhs;
 
-    void print(std::ostream &out) override{/* TODO: need to implement */};
+    void print(std::ostream &out) override;
 };
 
 struct Number : public Node {
     float value;
 
-    void print(std::ostream &out) override{/* TODO: need to implement */};
+    void print(std::ostream &out) override;
 };

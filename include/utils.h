@@ -13,5 +13,9 @@ bool _die(const char *fmt, const char *file, int line, ...);
 #define TOLANG_ASSERT(expression)
 #endif
 
+/**
+ * @brief A helper class to create a visitor pattern for a variant.
+ * @tparam Ts The types of the variant.
+ */
 template <class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;

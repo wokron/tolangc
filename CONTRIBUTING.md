@@ -26,6 +26,6 @@
 - 头文件中使用 `#param once` 而非 `#ifndef`。
 - 变量使用 `snake_case`。
 - 类名使用 `PascalCase`。
-- 函数使用 `snake_case`，类方法使用 `PascalCase`。
-- 私有方法、属性在前面加上一个下划线，如 `_PrivateMethod`、`_private_attr`。
+- 函数和方法使用 `snake_case`。
+- 私有方法、属性在前面加上一个下划线，如 `_private_method`、`_private_attr`。
 - 其他未明确的格式化规范由项目中的 `.clang-format` 确定。可使用脚本 `scripts/format.sh` 进行代码格式化。
