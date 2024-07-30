@@ -6,7 +6,7 @@
 
 #### （一）语法树
 
-语法树是按照给定的文法，将一个句子转化为有结构层次的树结构。**树中的每个节点都代表一个语法成分，而其子节点则代表组成该语法成分的其他语法成分，根节点为开始符号**。以下面的几条文法为例，假设Exp为开始符号（可以理解成最高级的语法成分）：
+在此，我们先回顾一下什么是语法树。语法树是按照给定的文法，将一个句子转化为有结构层次的树结构。**树中的每个节点都代表一个语法成分，而其子节点则代表组成该语法成分的其他语法成分，根节点为开始符号**。以下面的几条文法为例，假设Exp为开始符号（可以理解成最高级的语法成分）：
 
 ```c
 左值表达式 LVal → Ident {'[' Exp ']'}
@@ -64,33 +64,44 @@ a + (3 + b) * 2
 递归下降的主要思路，就是**为每个语法成分都编写一个子程序，该子程序会调用其他的子程序来解析组成该语法成分的其他语法成分，每个子程序返回的结果都是一棵对应语法成分的子树**。具体来说，例如有以下文法：
 
 ```
-A -> B '+' C
+FuncDef: 'fn' Ident '(' [FuncFParams] ')' '=>' Exp ';'
 ```
 
-那么，就可以为语法成分A编写一个这样的子程序（可以暂时忽略词法分析器lexer的调用，只关注其他子程序的调用顺序）：
+那么，就可以为语法成分FuncDef编写一个这样的子程序（可以暂时忽略词法分析器lexer的调用，只关注其他子程序的调用顺序）：
 
-```
-parseA() {
-	B = parseB(); // 调用B的子程序，解析语法成分B
-	if(lexer.type != PLUS) error();	
-	lexer.next();	
-	C = parseC();	// 调用C的子程序，解析语法成分C
-	return new A(B,C);	// 返回由B和C组成的语法成分A
+``` C++
+std::unique_ptr<FuncDef> Parser::_parse_func_def() {
+    auto func_def = std::make_unique<FuncDef>();
+    func_def->lineno = _token.lineno;
+
+    _match(_token, Token::TK_FN); 
+
+    func_def->ident = _parse_ident(); // 解析Ident
+ 
+    _match(_token, Token::TK_LPARENT); 
+
+    if (_token.type != Token::TK_RPARENT) {
+        _parse_func_f_params(func_def->func_f_params); // 解析函数形参FuncFParams
+    }
+
+    _match(_token, Token::TK_RPARENT);
+
+    _match(_token, Token::TK_RARROW);
+
+    func_def->exp = _parse_exp(); // 解析Exp
+
+    _match(_token, Token::TK_SEMINCN);
+
+    return func_def;
 }
 ```
 
-如下图所示，解析A的子程序分别调用解析B和C的子程序，得到了两棵蓝色的子树，再将两棵子树和终结符'+'合并为绿色的子树（即语法成分A的语法树）。而**在解析A的子程序中，我们并不关心解析B和C的子程序究竟做了什么，只关注其返回的结果。**
+解析FuncDef的子程序分别调用解析Ident和FuncFParams和Exp的子程序，得到了三棵子树，再将三棵子树和终结符'fn','(',')'等合并为语法成分FuncDef的语法树。而**在解析FuncDef的子程序中，我们并不关心解析Ident和FuncFParams和Exp的子程序究竟做了什么，只关注其返回的结果。**
 
 <img src="imgs\chapter03\parser_3.png" alt="parser_3" style="zoom:60%;" />
 
-当然，解析A的子程序也可能被其他子程序调用，它们也不关心解析A的子程序究竟做了什么。而且解析A的子程序在调用其他子程序时，可能会再次调用解析A的子程序，例如以下文法：
+当然，解析FuncDef的子程序也可能被其他子程序调用，它们也不关心解析FuncDef的子程序究竟做了什么。
 
-```
-A -> B '+' C
-C -> A | '1'
-```
-
-那么，解析C的子程序就有可能调用解析A的子程序，这就是递归下降中的递归思想。
 
 **总而言之，我们只需要为文法中的每个语法成分都编写一个子程序并确保它们之间的正确调用，最后调用开始符号的解析子程序，就可以生成整棵语法树。**
 
@@ -108,20 +119,49 @@ C -> A | '1'
 - 刚进入一个子程序时，词法分析器已经预读好了一个单词
 - 从一个子程序返回时，词法分析器已经预读好了一个单词
 
-因此，对于前面例子中的解析A的子程序，词法分析器的调用顺序如下：
+即``_parser._token``时刻指向待解析的第一个单词.
+与此同时，我们在语法分析时的同时进行**语法错误处理**。当我们在当前位置需要匹配一个语法成分时，parser“试探性”地去解析该语法成分，如果解析失败，则报错；并“假装”这个语法成分解析正确，继续进行语法分析（这就是我们经常提到的错误处理的局部化，它可以使得编译器能够发现尽可能多的语法错误，而不至于每次编译只抛出一个错误编译器就罢工了）。
 
+于是，我们设计了一个``_match``方法，当parser成功匹配语法成分时则读入下一个单词，否则报错，从而这个函数兼具错误处理和语法分析的作用。同学们在编写自己的编译器时也可以使用这样的方法来处理语法错误。
+```cpp
+void Parser::_match(const Token &token, Token::TokenType expected) {
+    if (token.type != expected) {
+        ErrorReporter::error(_token.lineno,
+                             "expect '" + token_type_to_string(expected) + "'");
+    } else {
+        _next_token();
+    }
+}
 ```
-parseA() {
-	// 进入子程序A时，词法分析器已经预读好一个单词，从而确保了进入子程序B时，词法分析器已经预读好一个单词
-	B = parseB(); 
-	// 从子程序B返回时，词法分析器已经预读好了一个单词（B后面的单词），这个单词应该是'+'，检查是否符合
-	if(lexer.type != PLUS) error();	// 检查'+'
-	// 进入子程序C前，预读一个单词
-	lexer.next();
-	C = parseC();
-	// 从子程序C返回时，词法分析器已经预读好了一个单词（C后面的单词，也是A后面的单词）
-	// 从而保证了子程序A退出时，词法分析器已经预读好了一个单词（A后面的单词）
-	return new A(B,C);
+
+
+因此，对于前面例子中的解析FuncDef的子程序，词法分析器的调用顺序如下：
+
+
+``` C++
+std::unique_ptr<FuncDef> Parser::_parse_func_def() {
+    auto func_def = std::make_unique<FuncDef>();
+    func_def->lineno = _token.lineno;
+
+    _match(_token, Token::TK_FN); // 匹配fn关键字
+
+    func_def->ident = _parse_ident(); 
+ 
+    _match(_token, Token::TK_LPARENT); // 匹配左括号
+
+    if (_token.type != Token::TK_RPARENT) {
+        _parse_func_f_params(func_def->func_f_params); 
+    }
+
+    _match(_token, Token::TK_RPARENT); // 匹配右括号
+
+    _match(_token, Token::TK_RARROW); // 匹配右箭头
+
+    func_def->exp = _parse_exp(); // 
+
+    _match(_token, Token::TK_SEMINCN); // 匹配分号
+
+    return func_def;
 }
 ```
 
@@ -132,130 +172,113 @@ parseA() {
 如果一个语法成分只有一条产生式，那么其解析方法就是唯一确定的。但是文法中可能存在某个语法成分有多条产生式，例如
 
 ```c
-语句 Stmt → LVal '=' Exp ';'
-| [Exp] ';' 
-| Block 
-| 'if' '(' Cond ')' Stmt [ 'else' Stmt ] 
-| 'for' '(' [ForStmt] ';' [Cond] ';' [ForStmt] ')' Stmt
-| 'break' ';' 
-| 'continue' ';' 
-| 'return' [Exp] ';' 
-| LVal '=' 'getint''('')'';' 
-| 'printf''('FormatString{','Exp}')'';'
+Stmt:
+    'get' Ident ';'
+    | 'put' Exp ';'
+    | 'tag' Ident ';'
+    | 'let' Ident '=' Exp ';'
+    | 'if' Cond 'to' Ident ';'
+    | 'to' Ident ';'
 ```
 
-那么，**在解析Stmt的子程序中，就要考虑选择哪一条产生式进行后续的解析。**这里，我们可以考虑产生式右边的FIRST集。
+那么，**在解析Stmt的子程序中，就要考虑选择哪一条产生式进行后续的解析。**这里，我们可以考虑产生式右边的FIRST集。在理论课中，同学们会知道一个产生式的FIRST集就是头符号集合。我们的tolangc文法非常简单，对于Stmt语法成分，我们一眼就能看出右产生式的FIRST集。当当前单词是``'get'``时，则一定使用规则``Stmt:'get' Ident ';'``解析；若是``'put'``则用``Stmt:'put' Exp ';'``解析。
 
-假设A是某一条产生式的右部。那么A的FIRST集是一个终结符的集合，它由A能推理出的所有句子的第一个终结符组成。具体来说，对于产生式
+从而对于具有多产生式的语法成分的递归子程序``_parse_stmt``可以这样编写：
 
-```c
-Stmt -> 'if' '(' Cond ')' Stmt [ 'else' Stmt ] 
-```
-
-很明显，该产生式的右部所能推出的任何句子的第一个终结符一定是'if'，因此，其FIRST集中只包含一个终结符'if'。
-
-对于产生式
-
-```c
-Stmt -> Block
-Block → '{' { BlockItem } '}'
-```
-
-则该Stmt产生式的右部所能推出的任何句子的第一个终结符一定是'{'，其FIRST集只包含一个终结符'{'。
-
-对于产生式
-
-```c
-Stmt -> Exp
-Exp → AddExp // EXP的FIRST={(,Number,Ident,+,-,!}
-AddExp → MulExp | AddExp ('+' | '−') MulExp // AddExp的FIRST={(,Number,Ident,+,-,!}
-MulExp → UnaryExp | MulExp ('*' | '/' | '%') UnaryExp // MulExp的FIRST={(,Number,Ident,+,-,!}
-UnaryExp → PrimaryExp | Ident '(' [FuncRParams] ')' | UnaryOp UnaryExp // UnaryExp的FIRST={(,Number,Ident,+,-,!} 其中，(,Number,Ident属于PrimaryExp的FIRST，因此也属于UnaryExp的FIRST
-UnaryOp → '+' | '−' | '!'
-PrimaryExp → '(' Exp ')' | LVal | Number // PrimaryExp的FIRST={(,Number,Ident}，其中Ident属于LVal的FIRST，因此也属于PrimaryExp的FIRST
-LVal → Ident {'[' Exp ']'}  // LVal的FIRST={Ident}
-```
-
-按照**自底向上**的顺序，根据注释，我们可以求出该Stmt产生式右部Exp的FIRST集为$\{+,-,!,(,Ident,Number\}$（这里将Ident和Number视为终结符，因为它们是通过词法分析直接得到的单词）。
-
-求出Stmt每条产生式的右部的FIRST集后，我们就可以根据这些FIRST集来编写解析Stmt的子程序。
-
-```c
-Stmt -> 'if' '(' Cond ')' Stmt [ 'else' Stmt ] 
-```
-
-例如，由于终结符'if'只在产生式的FIRST集中出现，因此，如果当前词法分析的单词为'if'，则只能利用这条产生式来进行解析。同样地，'for'和'break'等也是如此，据此，可以编写出下面部分的子程序：
-
-```c
-parseStmt() {
-	if(lexer.type == IFTK) {
-		// 用 Stmt -> 'if' '(' Cond ')' Stmt [ 'else' Stmt ] 解析
+```cpp
+std::unique_ptr<Stmt> Parser::_parse_stmt() {
+    switch (_token.type) {
+    case Token::TK_GET: {
+        GetStmt get_stmt;
+        // parse get_stmt
+    }
+    case Token::TK_PUT: {
+        PutStmt put_stmt;
+        // parse put_stmt
+    }
+    // ...
 	}
-	else if (lexer.type == CONTINUETK) {
-		// 用 Stmt -> 'continue' ';'解析
-	}
-	......
 }
 ```
 
-需要特别注意Stmt的这几条产生式
+当然，实验课的文法会更加复杂：FIRST集需要计算得出，而且存在我们无法仅凭预读一个单词就能判断该用哪个产生式的情况，在此不做赘述。
 
-```c
- Stmt → LVal '=' Exp ';'	// FIRST={Ident}
-| LVal '=' 'getint''('')'';' 	// FIRST={Ident}
-| [Exp] ';' 	// FIRST={(,Number,Ident,+,-,!}
-```
-
-其产生式右部的FIRST集存在交集$\{Ident\}$，因此，**如果当前词法分析的单词为Ident，我们就不能直接判断选择哪一条产生式进行解析。**
-
-这里提供一种参考思路。考虑到Exp可以推理出LVal（Exp -> AddExp -> MulExp -> UnaryExp -> PrimaryExp -> LVal），因此我们**可以用Exp的解析方法来解析LVal**。如果当前单词为Ident，则
-
-1. 首先利用调用Exp的子程序来解析出语法成分Exp，判断下一个单词是';'还是'='，如果是';'，则按第三条产生式处理，完成Stmt解析，否则转第2步，从前两条产生式中选择一条解析，.
-2. 从Exp提取出LVal（该Exp一定由唯一的LVal组成），继续判断下一个单词是不是'getint'，如果是则按第二条产生式处理，否则按第一条产生式处理，完成Stmt解析
-
-注意，如果采用Exp的解析方法来解析LVal，你需要确保输出的结果正确（即输出应该是按照LVal的解析方法来解析出来的LVal）。
-
-对于除Stmt以外的其他语法成分的多产生式，也需要仔细考虑产生式右部的FIRST集，以编写正确的解析子程序。
 
 #### （四）左递归文法
 
 文法中存在左递归文法，如果直接据此编写递归下降子程序，将会导致无限递归，最终栈溢出程序崩溃。
 
 ```c
-AddExp → MulExp | AddExp ('+' | '−') MulExp
-MulExp → UnaryExp | MulExp ('*' | '/' | '%') UnaryExp
+AddExp: AddExp ('+' | '-') MulExp
+
+MulExp: MulExp ('*' | '/') UnaryExp
 ```
 
 我们需要通过改写文法来解决左递归问题。一般来说，有两种改写方法：
 
-第一种是将左递归改为右递归。我们可以将上述两条文法改写为：
+第一种是将左递归改为右递归，这也是tolangc的实现方法。我们可以将上述两条文法改写为：
 
    ```c
    AddExp → MulExp | MulExp ('+' | '−') AddExp
-   MulExp → UnaryExp | UnaryExp ('*' | '/' | '%') MulExp
+   MulExp → UnaryExp | UnaryExp ('*' | '/') MulExp
    ```
 
    以解析AddExp为例，先调用MulExp的解析子程序，然后判断后面的单词是否是'+'或'-'，如果是，再递归调用解析AddExp的子程序。
+   在此，我们提供一种非递归的写法来解析AddExp：
+       1. 先解析一个MulExp，作为预备返回的exp；
+       2. 若当前符号为'+'或者'-'，则构造一个binary_exp，其左子表达式为已经解析的exp，右子表达式为新解析的MulExp，并把这个binary_exp作为预备返回的exp，循环执行该步骤
+   
+```cpp
+std::unique_ptr<Exp> Parser::_parse_add_exp() {
+    auto lineno = _token.lineno;
+
+    auto exp = _parse_mul_exp();
+    while (_token.type == Token::TK_PLUS || _token.type == Token::TK_MINU) {
+        BinaryExp binary_exp;
+        binary_exp.lineno = lineno;
+        binary_exp.lhs = std::move(exp);
+        binary_exp.op =
+            _token.type == Token::TK_PLUS ? BinaryExp::PLUS : BinaryExp::MINU;
+
+        _next_token();
+        auto rhs = _parse_mul_exp();
+        binary_exp.rhs = std::move(rhs);
+        exp = std::make_unique<Exp>(std::move(binary_exp));
+    }
+    return exp;
+}
+```
+
+相关的语法树数据结构如下，关键点在于使用了``std::variant``和``std::unique_ptr``
+
+```cpp
+using Exp = std::variant<BinaryExp, CallExp, UnaryExp, IdentExp, Number>;
+
+struct BinaryExp : public Node {
+    std::unique_ptr<Exp> lhs;
+    enum BinaryOp {
+        PLUS,
+        MINU,
+        MULT,
+        DIV,
+        MOD,
+    } op;
+    std::unique_ptr<Exp> rhs;
+};
+```
+
+对于MulExp的解析程序类似。
 
 第二种是改写为BNF范式。通过分析结构，不难发现AddExp本质上是由若干个MulExp组成，MulExp本质上是由若干个UnaryExp组成，因此可以将上述两条文法改写为
 
    ```c
    AddExp → MulExp {('+' | '−') MulExp}
-   MulExp → UnaryExp {('*' | '/' | '%') UnaryExp}
+   MulExp → UnaryExp {('*' | '/') UnaryExp}
    ```
 
    其中，{}表示其中的语法成分可以出现0到若干次。
 
    以解析AddExp为例，先调用MulExp的解析子程序，然后判断后面的单词是否是'+'或'-'，如果是，则再次调用MulExp的解析子程序，直至解析完MulExp后的单词不是'+'也不是'-'。
 
-需要特别注意的是，尽管编写程序时按照改写后的文法编写，但是需要确保输出的解析次序和原来的文法一致。以第二种改写方法为例，可以在每次解析`('+' | '−') MulExp`之前，先将之前已经解析出的若干个MulExp合成一个AddExp，输出一次\<AddExp\>。
 
-#### （五）语法错误
 
-在语法分析阶段，需要在检测词法错误的基础上，进一步检测语法错误，包括以下几种类型。
-
-| 错误类型        | 错误类别码 | 解释                                           | 对应文法                                                     |
-| --------------- | ---------- | ---------------------------------------------- | ------------------------------------------------------------ |
-| 缺少分号        | i          | 报错行号为分号**前一个非终结符**所在行号。     | \<Stmt\>,\<ConstDecl\>及\<VarDecl\>中的';’                   |
-| 缺少右小括号    | j          | 报错行号为右小括号**前一个非终结符**所在行号。 | 函数调用(\<UnaryExp\>)、函数定义(\<FuncDef\>)及\<Stmt\>中的')’ |
-| 缺少右中括号’]’ | k          | 报错行号为右中括号**前一个非终结符**所在行号.  | 数组定义(\<ConstDef\>,\<VarDef\>,\<FuncFParam\>)和使用(\<LVal\>)中的']’ |
