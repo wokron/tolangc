@@ -17,7 +17,7 @@ int a = 1;
 printf("%d", (a+2)*3);
 ```
 
-<img src="..\..\figure\stack.png" alt="./figure/stack.png" style="zoom: 67%;" />
+<img src="imgs\chapter07-3\stack.png" alt="./figure/stack.png" style="zoom: 67%;" />
 
 栈式虚拟机的栈变化如上图所示（黄色为栈顶，蓝色为次栈顶）：
 
@@ -76,7 +76,7 @@ int main() {
 
 活动记录Activity Record（AR）一般指一个过程一次执行所需的内存信息。其中，在sysY文法中，过程可以简单理解为一个block。也就是说，在每次执行一个block时，我们都会为其分配一块内存区域，这块区域用于分配变量、保存临时结果、保存运行时状态等信息，称为活动记录。
 
-<img src="..\..\figure\AR.png" alt="./figure/stack.png" style="zoom: 67%;" />
+<img src="imgs\chapter07-3\AR.png" alt="./figure/stack.png" style="zoom: 67%;" />
 
 在栈式虚拟机中，一个活动记录主要包含以下几种数据：
 
@@ -114,7 +114,7 @@ int main() {				// block1
 
 如下图所示，在程序执行到block3时，内层中存在3个AR，对应三个block。图中只简单画出了AR的局部变量区和静态链SL，黑色加粗表示AR基地址。
 
-<img src="..\..\figure\static_link.png" alt="./figure/stack.png" style="zoom: 67%;" />
+<img src="imgs\chapter07-3\static_link.png" alt="./figure/stack.png" style="zoom: 67%;" />
 
 在程序执行到block3中的1处时，此时需要引用变量b，但是变量b在当前AR（AR3）中并没有定义，因此通过SL3找到AR2，发现在AR2中也没有变量b的定义，再次通过SL2找到AR1，在AR1中发现了变量b的定义。事实上，从源程序中也可以发现，引用的确实是block1定义的变量b。在执行到2处时，引用变量a，类似上面的过程，在AR2中找到变量a的定义，说明引用的是此处的变量a。上述过程说明，我们只要沿着静态链找，找到的第一个定义点，就是对应的变量定义。
 
@@ -264,7 +264,7 @@ int main() {
 
 对于这种情况，建议先读取形参的值作为绝对基地址（图a），然后由绝对基地址+偏移值得到绝对地址存储在栈顶，来进行绝对寻址（图c）。注意，在绝对地址寻址时，可以将LOD/STO指令中的level和addr设置为特殊值以示区分。
 
-<img src="..\..\figure\abs_addr.png" alt="./figure/stack.png" style="zoom: 67%;" />
+<img src="imgs\chapter07-3\abs_addr.png" alt="./figure/stack.png" style="zoom: 67%;" />
 
 给出上面例子中`func()`一种供参考的生成的pcode代码
 
@@ -315,7 +315,7 @@ int main() {
 }
 ```
 
-<img src="..\..\figure\call_ret.png" alt="./figure/stack.png" style="zoom: 67%;" />
+<img src="imgs\chapter07-3\call_ret.png" alt="./figure/stack.png" style="zoom: 67%;" />
 
 - 图（a）：main中准备好三个参数，存储在栈顶，准备调用add()
 - 图（b）：执行CAL指令，为函数分配AR，设置返回地址、SL、DL，同时把参数填入到参数区，更新PC、SP、MP寄存器。注意，分配的AR可以直接覆盖原本栈顶的参数。

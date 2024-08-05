@@ -29,4 +29,4 @@ Java开发环境使用的JDK版本为JDK17，可以到[官网](https://www.oracl
 
 ## 使用IDEA进行开发
 
-IDEA同样也可以到[官网](https://www.jetbrains.com/idea/download/other.html)进行下载，选择Version 2018.3.6,根据自己的操作系统选择对应的安装包(注册了教育邮箱之后可以使用最终版，但机房中安装的是社区版，建议大家尽量和机房环境保持一致)。在IDEA中配置项目的JDK可以参考[博客](https://blog.csdn.net/qq_35387940/article/details/104769659)。
+IDEA同样也可以到[官网](https://www.jetbrains.com/idea/download/other.html)进行下载，选择Version 2022.2.2,根据自己的操作系统选择对应的安装包(注册了教育邮箱之后可以使用最终版，但机房中安装的是社区版，建议大家尽量和机房环境保持一致)。在IDEA中配置项目的JDK可以参考[博客](https://blog.csdn.net/qq_35387940/article/details/104769659)。
