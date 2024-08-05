@@ -18,7 +18,11 @@ std::unique_ptr<CompUnit> Parser::_parse_comp_unit() {
     auto comp_unit = std::make_unique<CompUnit>();
     comp_unit->lineno = _token.lineno;
 
-    while (_token.type != Token::TK_VAR && _token.type != Token::TK_EOF) {
+
+    while (_token.type != Token::TK_VAR && _token.type != Token::TK_GET &&
+           _token.type != Token::TK_PUT && _token.type != Token::TK_TAG &&
+           _token.type != Token::TK_LET && _token.type != Token::TK_IF &&
+           _token.type != Token::TK_TO && _token.type != Token::TK_EOF) {
         if (_token.type == Token::TK_FN) {
             comp_unit->func_defs.push_back(_parse_func_def());
         } else {
