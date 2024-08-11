@@ -1,7 +1,3 @@
-//
-// Created by 荇子 on 2024/6/19.
-//
-
 #include "mips/mips_manager.h"
 #include "llvm/ir/value/Use.h"
 #include <cassert>
@@ -123,7 +119,7 @@ void MipsManager::resetFrame(std::string name) {
     for (int i = 0; i < TMPCOUNT; i++) {
         tmpRegPool.insert(std::pair<int, TmpRegPtr>(i, new TmpReg(i)));
     }
-    // f0，f12 保留
+    // restore f0 & f12
     for (int i = 1; i < FLOATCOUNT; i++) {
         if (i == 12)
             continue;
@@ -154,9 +150,9 @@ MipsRegPtr MipsManager::getReg(ValuePtr valuePtr) {
         }
     }
     if (occupation.find(valuePtr)->second->GetType() == OffsetTy) {
-        // 存offset有两种情况：
-        // 1. 临时寄存器池中变量推到栈中，occupation中存相对sp的偏移量；
-        // 2. 指针变量，存所指的相对sp的位置
+        // different cases of offset:
+        // 1. The variables in the temporary register pool are pushed to the stack and the offset relative to sp is stored in the occupation.
+        // 2. Pointer variable, with reference to the relative sp position
         if (!valuePtr->GetType()->IsPointerTy()) {
             load(valuePtr);
         }

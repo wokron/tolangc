@@ -1,4 +1,3 @@
-//
 #include "mips/translator.h"
 #include "utils.h"
 #include "llvm/asm/AsmWriter.h"
@@ -115,7 +114,7 @@ void Translator::translate(BinaryOperatorPtr binaryOperatorPtr) {
             op = MipsCodeType::DivS;
             break;
         default:
-            // 不支持浮点数取余数
+            // rem for float is not supported
             TOLANG_DIE("invalid binary float instruction.");
         }
     } else {
@@ -304,11 +303,11 @@ void Translator::translate(CallInstPtr callInstPtr) {
     if (!callInstPtr->GetType()->IsVoidTy()) {
         auto resultReg = manager->allocReg(callInstPtr);
         if (callInstPtr->GetType()->IsIntegerTy()) {
-            // 整数返回值已经存在v0中
+            // returned int has been stored in $v0
             manager->addCode(
                 new RCode(Addu, resultReg, manager->v0, manager->zero));
         } else if (callInstPtr->GetType()->IsFloatTy()) {
-            // 浮点数返回值已经存在f0中
+            // returned float has been stored in $f0
             auto reg0 = manager->getFreeFloat();
             std::string name0 = manager->addFloat(0);
             manager->addCode(new ICode(LS, reg0, name0));
@@ -362,12 +361,12 @@ void Translator::translate(ReturnInstPtr returnInstPtr) {
             return;
         }
         if (returnInstPtr->ReturnValue()->GetType()->IsIntegerTy()) {
-            // 整数返回值存在v0中
+            // returned int stored in $v0
             auto reg =
                 manager->loadConst(returnInstPtr->ReturnValue(), TmpRegTy);
             manager->addCode(new RCode(Addu, manager->v0, reg, manager->zero));
         } else {
-            // 浮点数返回值存在f0
+            // returned float stored in $f0
             auto reg =
                 manager->loadConst(returnInstPtr->ReturnValue(), FloatRegTy);
 
@@ -382,7 +381,7 @@ void Translator::translate(ReturnInstPtr returnInstPtr) {
 }
 
 void Translator::translate(InputInstPtr inputInstPtr) {
-    // 只有浮点类型的输入
+    // input number-float
     // v0 = 6, syscall, f0 = input
     manager->addCode(new ICode(Addiu, manager->v0, manager->zero, 6));
     manager->addCode(new RCode(Syscall));
@@ -395,7 +394,7 @@ void Translator::translate(InputInstPtr inputInstPtr) {
 }
 
 void Translator::translate(OutputInstPtr outputInstPtr) {
-    // 只输出浮点数
+    // print number-float
     // v0 = 2, f12 = output, syscall
     auto reg0 = manager->getFreeFloat();
     std::string name0 = manager->addFloat(0);
