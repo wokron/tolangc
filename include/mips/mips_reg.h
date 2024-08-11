@@ -20,7 +20,7 @@ class MipsReg {
 public:
     int GetIndex() const { return index; };
     MipsRegType GetType() { return type; };
-    virtual void PrintReg(std::ostream &out){};
+    virtual void PrintReg(std::ostream &out) {};
 
 protected:
     MipsReg(int index, MipsRegType type) : index(index), type(type){};

@@ -151,7 +151,8 @@ MipsRegPtr MipsManager::getReg(ValuePtr valuePtr) {
     }
     if (occupation.find(valuePtr)->second->GetType() == OffsetTy) {
         // different cases of offset:
-        // 1. The variables in the temporary register pool are pushed to the stack and the offset relative to sp is stored in the occupation.
+        // 1. The variables in the temporary register pool are pushed to the
+        // stack and the offset relative to sp is stored in the occupation.
         // 2. Pointer variable, with reference to the relative sp position
         if (!valuePtr->GetType()->IsPointerTy()) {
             load(valuePtr);

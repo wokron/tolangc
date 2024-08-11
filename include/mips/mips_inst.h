@@ -14,7 +14,7 @@ class MipsData {
 protected:
     explicit MipsData(std::string &name) : name(name){};
     void printName(std::ostream &out) { out << name; };
-    virtual void printValue(std::ostream &out){};
+    virtual void printValue(std::ostream &out) {};
 
 protected:
     std::string name;
@@ -25,7 +25,7 @@ protected:
 public:
     std::string GetName() { return name; };
     int GetValue{};
-    virtual void PrintData(std::ostream &out){};
+    virtual void PrintData(std::ostream &out) {};
 };
 
 // .word
@@ -128,7 +128,7 @@ protected:
         : op(op), rs(rs), rt(rt), rd(rd), intermediate(inter){};
 
 public:
-    virtual void PrintCode(std::ostream &out){};
+    virtual void PrintCode(std::ostream &out) {};
 };
 
 class RCode : public MipsCode {
