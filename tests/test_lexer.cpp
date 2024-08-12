@@ -1,7 +1,7 @@
 #include "doctest.h"
 
-#include "lexer.h"
-#include "token.h"
+#include "tolang/lexer.h"
+#include "tolang/token.h"
 #include <sstream>
 #include <vector>
 

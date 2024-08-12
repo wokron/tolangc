@@ -1,8 +1,8 @@
-#include <error.h>
+#include "tolang/parser.h"
+#include "tolang/error.h"
+#include "tolang/token.h"
 #include <memory>
-#include <parser.h>
 #include <string>
-#include <token.h>
 
 std::unique_ptr<CompUnit> Parser::parse() {
     _lexer.next(_token);
@@ -17,7 +17,6 @@ std::unique_ptr<CompUnit> Parser::parse() {
 std::unique_ptr<CompUnit> Parser::_parse_comp_unit() {
     auto comp_unit = std::make_unique<CompUnit>();
     comp_unit->lineno = _token.lineno;
-
 
     while (_token.type != Token::TK_VAR && _token.type != Token::TK_GET &&
            _token.type != Token::TK_PUT && _token.type != Token::TK_TAG &&

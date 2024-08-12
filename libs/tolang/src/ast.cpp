@@ -1,5 +1,4 @@
-#include <ast.h>
-
+#include "tolang/ast.h"
 #include <iostream>
 
 void Ident::print(std::ostream &out) {

@@ -1,7 +1,7 @@
-#include "ast.h"
-#include "lexer.h"
-#include "parser.h"
-#include "visitor.h"
+#include "tolang/ast.h"
+#include "tolang/lexer.h"
+#include "tolang/parser.h"
+#include "tolang/visitor.h"
 #include "llvm/asm/AsmPrinter.h"
 #include <doctest.h>
 #include <sstream>

@@ -1,6 +1,6 @@
-#include "lexer.h"
-#include "error.h"
-#include "token.h"
+#include "tolang/lexer.h"
+#include "tolang/error.h"
+#include "tolang/token.h"
 #include <ctype.h>
 #include <fstream>
 #include <string>
