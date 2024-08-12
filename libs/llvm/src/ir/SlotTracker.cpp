@@ -1,6 +1,6 @@
 #include "llvm/ir/SlotTracker.h"
 
-#include "utils.h"
+#include "llvm/utils.h"
 
 #include "llvm/ir/Type.h"
 #include "llvm/ir/value/Argument.h"

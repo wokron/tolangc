@@ -3,6 +3,6 @@ add_executable(tests
     ${TEST_FILES}
 )
 target_include_directories(tests PRIVATE .)
-target_link_libraries(tests ${PROJECT_LIBRARY})
+target_link_libraries(tests llvm mips tolang)
 
 add_test(NAME TestAll COMMAND tests)
