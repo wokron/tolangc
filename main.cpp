@@ -2,6 +2,7 @@
 #include "error.h"
 #include "lexer.h"
 #include "parser.h"
+#include "mips/translator.h"
 #include "visitor.h"
 #include "llvm/asm/AsmPrinter.h"
 #include "llvm/ir/Module.h"
@@ -74,16 +75,16 @@ void compile(const char *name, const Options &options,
         return;
     }
 
-    // TODO: ir to asm
-    cmd_error(name, "ir to asm not implemented");
-
     if (options.emit_asm) {
         if (output.length() == 0) {
             output = "out.s";
         }
         outfile.open(output, std::ios::out);
-        // TODO: emit assembly
-        cmd_error(name, "emit assembly not implemented");
+
+        Translator translator;
+        translator.translate(module);
+        translator.print(outfile);
+        return;
     }
 
     cmd_error(name, "nothing to do");
