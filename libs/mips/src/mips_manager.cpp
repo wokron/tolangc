@@ -20,6 +20,33 @@ MipsManager::MipsManager() {
     f12 = new FloatReg(12);
 }
 
+MipsManager::~MipsManager() {
+    for (auto& d: datas) {
+        delete d;
+    }
+    for (auto& c: codes) {
+        delete c;
+    }
+    for (auto& n: blockNames) {
+        delete n.second;
+    }
+    for (int i = 0; i < TMPCOUNT; i++) {
+        delete tmpRegPool[i];
+    }
+    // f0 保留
+    for (int i = 1; i < FLOATCOUNT; i++) {
+        if (i == 12)
+            continue;
+        delete floatRegPool[i];
+    }
+    delete zero;
+    delete sp;
+    delete ra;
+    delete v0;
+    delete f0;
+    delete f12;
+}
+
 void MipsManager::addAsciiz(std::string value) {
     addData(new AsciizData("str" + std::to_string(asciizCount++), value));
 }
