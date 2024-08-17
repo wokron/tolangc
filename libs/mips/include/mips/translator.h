@@ -26,6 +26,7 @@ private:
 
 public:
     Translator() { manager = new MipsManager(); };
+    ~Translator() { delete manager; };
 
     void translate(const ModulePtr &modulePtr);
     void print(std::ostream &_out);
