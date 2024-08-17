@@ -1,5 +1,5 @@
 #include "doctest.h"
-#include "symtable.h"
+#include "tolang/symtable.h"
 #include <memory>
 #include <string>
 #include <unordered_map>
