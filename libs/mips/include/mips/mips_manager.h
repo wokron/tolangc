@@ -66,5 +66,6 @@ private:
 
 public:
     MipsManager();
+    ~MipsManager();
     void PrintMips(std::ostream &_out);
 };
