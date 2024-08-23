@@ -1,4 +1,8 @@
-﻿#include <sstream>
+﻿#include "tolang/utils.h"
+
+#if TOLANG_BACKEND == LLVM
+
+#include <sstream>
 
 #include "doctest.h"
 
@@ -221,3 +225,5 @@ static FunctionPtr BuildMain(ModulePtr module, FunctionPtr calc) {
 
     return mainFunc;
 }
+
+#endif

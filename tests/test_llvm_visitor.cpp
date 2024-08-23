@@ -1,3 +1,7 @@
+#include "tolang/utils.h"
+
+#if TOLANG_BACKEND == LLVM
+
 #include "tolang/ast.h"
 #include "tolang/lexer.h"
 #include "tolang/parser.h"
@@ -108,3 +112,5 @@ TEST_CASE("testing visitor") {
 
     CHECK_EQ(ir, EXPECTED);
 }
+
+#endif

@@ -1,5 +1,9 @@
 #pragma once
 
+#include "utils.h"
+
+#if TOLANG_BACKEND == LLVM
+
 #include "llvm/ir/Llvm.h"
 #include <memory>
 #include <string>
@@ -150,3 +154,5 @@ private:
     // The father symbol table, `nullptr` if this is the global symbol table.
     std::shared_ptr<SymbolTable> _father;
 };
+
+#endif
