@@ -1,3 +1,7 @@
+#include "tolang/utils.h"
+
+#if TOLANG_BACKEND == LLVM
+
 #include "doctest.h"
 #include "tolang/symtable.h"
 #include <memory>
@@ -47,3 +51,5 @@ TEST_CASE("testing low symbol table") {
     CHECK((cur_symbol = cur_table->get_symbol("a")) != nullptr);
     CHECK(cur_symbol->lineno == 10);
 }
+
+#endif

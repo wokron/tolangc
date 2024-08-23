@@ -56,3 +56,5 @@ public:
         }
     }
 };
+
+using Module = PcodeModule;

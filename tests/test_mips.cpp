@@ -1,3 +1,7 @@
+#include "tolang/utils.h"
+
+#if TOLANG_BACKEND == LLVM
+
 #include "mips/translator.h"
 #include "llvm/ir/Llvm.h"
 #include <doctest.h>
@@ -300,3 +304,5 @@ ModulePtr build_module() {
 
     return modulePtr;
 }
+
+#endif
