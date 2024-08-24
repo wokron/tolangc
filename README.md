@@ -1,11 +1,14 @@
 # tolangc: tolang compiler
 
-tolang 指 toy lang，是一款用于教学目的的简单编程语言。tolangc 即 tolang compiler，是 tolang 语言的样例编译器，可以为编译技术的学习者提供对编译器架构的初步认识。
+tolang 指 “toy lang”，是一款用于教学目的的简单编程语言。tolangc 即 tolang compiler，是 tolang 语言的样例编译器，可以为编译技术的学习者提供对编译器架构的初步认识。
+
+> 本编译器为北京航空航天大学本科三年级《编译技术》课程实验教程的配套示例，实验教程同样位于本仓库中。
 
 ## tolangc 介绍
 
 - 使用 C++ 编写
-- 以 LLVM 作为中间代码形式
+- 以 LLVM / Pcode 作为中间代码形式
+- 支持输出 MIPS 汇编码 / Pcode 解释执行
 
 ## 文法定义
 tolang 语言（v1）的文法由下面的 EBNF 范式确定：
