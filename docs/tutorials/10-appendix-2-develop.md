@@ -177,3 +177,91 @@ def build(backend: Literal["llvm", "pcode"]):
 
 ## 三、流水线
 
+尽管我们通过脚本自动化了项目的测试过程。但脚本的执行依旧需要我们手动触发。像测试、发布、部署这样的操作，本应当随着项目的演进而随时进行。为了实现这一点，我们在 tolangc 中使用 Github Action 配置了一组 CI 流水线，每当向 PR 或 master 分支中推送提交时，便会运行该流水线，自动对代码进行测试。
+
+我们的流水线配置位于 `.github/workflows` 中。类似于一个在满足条件时自动触发的脚本。配置文件中较为关键的包括如下几个部分。
+
+首先是触发流水线的条件。对应配置中的 `on` 字段。在我们的例子中，触发流水线的条件是更新目标为 master 的 PR 以及向 mater 分支推送。每当仓库中出现此类事件，便会触发该流水线的执行。
+
+```yml
+# pr-check.yml
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+```
+
+接下来是 `jobs` 字段，用于定义流水线中运行的任务。在这里我们定义了两个任务 `build` 和 `test`。前者用于验证构建过程的正确性并进行单元测试，后者则用于运行集成测试。任务之间可以设定依赖关系，例如这里我们使 `test` 任务依赖于 `build`。这样若 `build` 任务出现了问题，便不会再运行 `test` 任务。
+
+```yml
+jobs:
+  build:
+    # ...
+
+  test:
+    needs: build
+    # ...
+```
+
+在任务内部，我们需要设定任务的运行环境 `runs-on`，每一步的执行操作 `steps`，也可以设置任务的运行策略 `strategy`。
+
+运行环境指任务运行所处的操作系统环境。在这里是 `ubuntu-latest`。
+
+```yml
+  build:
+    runs-on: ubuntu-latest
+```
+
+在运行环境中，我们可以像脚本一样运行一系列命令，或是使用其他人编写好的 Action 应用执行某些操作。例如在 `build` 任务中，我们执行了 `bash ...` 和 `ctest ...` 两条命令。
+
+```yml
+jobs:
+  build:
+    # ...
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build
+      env:
+        BUILD_TYPE: ${{env.BUILD_TYPE}}
+      run: bash ./scripts/build.sh ${{matrix.backend}}
+
+    - name: Unit test
+      working-directory: ${{github.workspace}}/build
+      run: ctest -C ${{env.BUILD_TYPE}}
+```
+
+Action 是其他人封装好的操作。例如在配置中我们使用了 `KyleMayes/install-llvm-action@v2` 用于在运行环境中安装 llvm。
+
+```yml
+    - name: Install llvm
+      if: matrix.stage == 'llvm'
+      uses: KyleMayes/install-llvm-action@v2
+      with:
+        version: "16.0"
+```
+
+通过设置 `matrix` 策略，我们可以并行执行一系列不同相近但配置有所不同的任务。例如在 tolangc 中我们有着 llvm 和 pcode 两个后端。通过 matrix 我们可以同时对这两种后端进行测试。如下图，在 Build 步骤中，我们使用了 `matrix` 中定义的 `matrix.backend`。根据当前 `backend` 的取值不同采用不同的构建方式。
+
+```yml
+jobs:
+  build:
+    strategy:
+      matrix:
+        backend: [ "llvm", "pcode" ]
+
+    # ...
+
+    - name: Build
+      env:
+        BUILD_TYPE: ${{env.BUILD_TYPE}}
+      run: bash ./scripts/build.sh ${{matrix.backend}}
+```
+
+配置完成之后，当满足流水线的触发条件时，流水线便会自行运行，实现项目的自动化测试。
+
+![workflow-result](./imgs/chapter10-2/workflow.png)
+
+当然流水线所能做到的不止自动化测试，还可以实现版本发布或自动化部署等功能。由于与本教程的主题并不相关，因此不做介绍。各位同学可以自行探索。
