@@ -41,5 +41,15 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Install llvm
+      if: matrix.stage == 'llvm'
+      uses: KyleMayes/install-llvm-action@v2
+      with:
+        version: "10.0"
+
+    - name: Install MARS for mips
+      if: matrix.stage == 'mips'
+      run: wget https://courses.missouristate.edu/KenVollmar/MARS/MARS_4_5_Aug2014/Mars4_5.jar -O ${{github.workspace}}/mars.jar
+
     - name: Run test script
       run: python ./scripts/test.py -s ${{matrix.stage}} -d ${{github.workspace}}/testcases
