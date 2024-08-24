@@ -1,0 +1,30 @@
+name: CMake build and unit test
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        backend: [ "llvm", "pcode" ]
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build
+      env:
+        BUILD_TYPE: ${{env.BUILD_TYPE}}
+      run: bash ./scripts/build.sh ${{matrix.backend}}
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      run: ctest -C ${{env.BUILD_TYPE}}

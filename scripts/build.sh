@@ -43,7 +43,12 @@ fi
 # Build the compiler
 opt=""
 if [ "$backend" = "pcode" ]; then
-    opt="-DPCODE_BACKEND=ON"
+    opt="$opt -DPCODE_BACKEND=ON"
+fi
+
+# If BUILD_TYPE is set, use it
+if [ ! -z "$BUILD_TYPE" ]; then
+    opt="$opt -DCMAKE_BUILD_TYPE=$BUILD_TYPE"
 fi
 
 echo $BUILD_DIR
