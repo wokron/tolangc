@@ -1,0 +1,3 @@
+var a;
+get a;
+put a + 1;
