@@ -41,6 +41,5 @@ out/
 
 .vscode/
 
-CMakeFiles
-
-test/tests
+.llvm_cache/
+.test_cache/
