@@ -30,13 +30,15 @@ if ! command -v clang &>/dev/null; then
     exit 1
 fi
 
-# Create build directory if it doesn't exist
-if [ ! -d build ]; then
-    mkdir build
+# Check if BUILD_DIR env variable is set
+if [ -z "$BUILD_DIR" ]; then
+    BUILD_DIR="build"
 fi
 
-# Change to build directory
-cd build
+# Create build directory if it doesn't exist
+if [ ! -d $BUILD_DIR ]; then
+    mkdir -p $BUILD_DIR
+fi
 
 # Build the compiler
 opt=""
@@ -44,6 +46,8 @@ if [ "$backend" = "pcode" ]; then
     opt="-DPCODE_BACKEND=ON"
 fi
 
-cmake $opt ..
+echo $BUILD_DIR
 
-make
+cmake $opt -B$BUILD_DIR .
+
+make -C $BUILD_DIR

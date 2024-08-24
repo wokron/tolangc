@@ -7,8 +7,6 @@ from typing import Literal
 TEST_CACHE_DIR = pathlib.Path(".test_cache")
 TEST_CACHE_DIR.mkdir(exist_ok=True)
 
-TOLANGC = pathlib.Path("build/bin/tolangc")
-
 MARS_PATH = os.environ.get("MARS_PATH", "mars.jar")
 
 
@@ -32,12 +30,19 @@ class TestStat:
         return f"total/pass/fail: {self.total}/{self.passed}/{self.failed}"
 
 
+def get_tolangc(backend: Literal["llvm", "pcode"]):
+    return TEST_CACHE_DIR / "build" / backend / "bin" / "tolangc"
+
+
 def build(backend: Literal["llvm", "pcode"]):
+    print(f"Building target with backend: {backend}...", end=" ", flush=True)
     subprocess.run(
         ["bash", "./scripts/build.sh", backend],
         stdout=subprocess.DEVNULL,
         check=True,
+        env=dict(os.environ) | {"BUILD_DIR": TEST_CACHE_DIR / "build" / backend},
     )
+    print("done!")
 
 
 def get_output_file(test_file: pathlib.Path):
@@ -95,7 +100,7 @@ def test_llvm(test_files: list[pathlib.Path]):
         target_file = TEST_CACHE_DIR / f"{test_file.stem}.ll"
         # compile the test file
         subprocess.run(
-            [TOLANGC, test_file, "--emit-ir", "-o", target_file],
+            [get_tolangc("llvm"), test_file, "--emit-ir", "-o", target_file],
             check=True,
         )
         if not target_file.exists():
@@ -127,7 +132,7 @@ def test_pcode(test_files: list[pathlib.Path]):
         test_result_file = TEST_CACHE_DIR / f"{test_file.stem}.output"
         with open(test_result_file, "w") as f:
             subprocess.run(
-                [TOLANGC, test_file],
+                [get_tolangc("pcode"), test_file],
                 check=True,
                 stdin=open(input_file, "r") if input_file else None,
                 stdout=f,
@@ -144,7 +149,7 @@ def test_mips(test_files: list[pathlib.Path]):
         target_file = TEST_CACHE_DIR / f"{test_file.stem}.s"
         # compile the test file
         subprocess.run(
-            [TOLANGC, test_file, "-S", "-o", target_file],
+            [get_tolangc("llvm"), test_file, "-S", "-o", target_file],
             check=True,
         )
         if not target_file.exists():

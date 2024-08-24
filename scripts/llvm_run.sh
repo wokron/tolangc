@@ -30,8 +30,6 @@ fi
 
 # Check if lib.ll exists
 if [ ! -f $CACHE_DIR/lib.ll ]; then
-    echo "Generating lib.ll..."
-
     # Generate lib.c
     cat >$CACHE_DIR/lib.c <<EOF
 #include <stdio.h>
