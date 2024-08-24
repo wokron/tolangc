@@ -112,12 +112,68 @@ TEST_CASE("testing lexer") {
 
 当然，如果每次测试都需要手动进行编译，那就太不方便了。合理的做法是为集成测试编写自动化脚本。接下来我们介绍一下 tolangc 中的集成测试脚本。
 
-### （1）测试样例规定
+### （1）测试样例与测试程序
 
+我们规定一个测试样例由源文件、输入文件和输出文件三部分组成。源文件使用 `.tol` 后缀，输入文件使用 `.input` 后缀，输出文件使用 `.output` 后缀。三个文件需要位于同一目录中。输出文件中包含程序对给定的输入应当返回的输出。由于 llvm、mips 或 pcode 对浮点数的显示有所不同，所以在评测正确性时我们统一将结果转换为浮点数再进行比较。
 
+我们用 python 编写评测脚本 `./script/test.py`。该脚本有如下参数：
 
-### （2）
+1. 测试阶段：选择对 llvm、mips 或 pcode 的输出结果进行测试
+2. 样例文件：选择指定的样例文件进行测试，需要给出 `*.tol` 源文件的路径
+3. 样例目录：选择指定目录中的样例文件进行测试，需要给出测试样例所在的目录
 
+```console
+$ python ./scripts/test.py -h                                     
+usage: test.py [-h] -s {llvm,mips,pcode} [-d DIR] [-f FILE]
 
+Integration test script for tolangc
+
+options:
+  -h, --help            show this help message and exit
+  -s {llvm,mips,pcode}, --stage {llvm,mips,pcode}
+                        stage to test
+  -d DIR, --dir DIR     directory of test cases
+  -f FILE, --file FILE  test case to run
+```
+
+### （2）集成测试过程
+
+集成测试的主体逻辑由 python 写成。首先，我们根据命令行参数获取进行测试的阶段和测试样例。之后对于每一个评测阶段，我们进行如下操作：
+
+1. 按照测试阶段编译 tolangc
+2. 使用各测试样例对编译得到的 tolangc 进行测试
+
+而对于第二步，我们遵循了和单元测试一致的结构，即**构造**、**操作**和**检验**。我们可以查看脚本中的 `general_test` 函数。该函数传入的 `preprocess_fn`、`run_fn` 和 `compare_fn` 分别代表了这三个阶段。
+
+```py
+def general_test(test_files: list[pathlib.Path], preprocess_fn, run_fn, compare_fn):
+    for test_file in test_files:
+        # ...
+
+        preprocess_result = preprocess_fn(test_file)
+        run_result = run_fn(
+            preprocess_result, input_file if input_file.exists() else None
+        )
+        is_success = compare_fn(run_result, output_file)
+
+        # ...
+```
+
+对于编译操作和运行操作，由于需要进行大量的命令行操作，所以我们选择使用 shell 脚本编写，并通过 python 的 `subprocess.run` 方法进行调用。
+
+```py
+def build(backend: Literal["llvm", "pcode"]):
+    # ...
+    subprocess.run(
+        ["bash", "./scripts/build.sh", backend],
+        stdout=subprocess.DEVNULL,
+        check=True,
+        env=dict(os.environ) | {"BUILD_DIR": TEST_CACHE_DIR / "build" / backend},
+    )
+    # ...
+```
+
+最后，我们将评测的结果存储在 `TestStat` 中，并在测试结束后输出。
 
 ## 三、流水线
+
