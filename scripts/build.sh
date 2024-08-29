@@ -51,8 +51,6 @@ if [ ! -z "$BUILD_TYPE" ]; then
     opt="$opt -DCMAKE_BUILD_TYPE=$BUILD_TYPE"
 fi
 
-echo $BUILD_DIR
-
 cmake $opt -B$BUILD_DIR .
 
 make -C $BUILD_DIR
