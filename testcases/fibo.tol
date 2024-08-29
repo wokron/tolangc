@@ -1,0 +1,35 @@
+var a;
+var b;
+var i;
+var n;
+var j;
+var m;
+var tmp;
+
+let i = 0;
+get n;
+
+tag loop;
+if i >= n to done;
+
+    get m;
+    let j = 0;
+    let a = 1;
+    let b = 1;
+
+    tag loop2;
+    if j >= m to done2;
+
+        let tmp = b;
+        let b = b + a;
+        let a = tmp;
+
+        let j = j + 1;
+    to loop2;
+    tag done2;
+
+    put a;
+
+    let i = i + 1;
+to loop;
+tag done;

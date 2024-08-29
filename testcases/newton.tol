@@ -1,0 +1,39 @@
+
+fn square(x) => x * x;
+
+var eps;
+var n;
+var x;
+var absval;
+var N;
+var i;
+
+get N;
+get eps;
+
+let i = 0;
+tag outerloop;
+if i >= N to outerdone;
+
+    get n;
+
+    let x = n;
+
+    tag loop;
+    let absval = square(x) - n;
+    if absval > 0 to absfin;
+        let absval = -absval;
+    tag absfin;
+
+    if absval < eps to done;
+
+        let x = 0.5 * (x + (n / x)); 
+
+    to loop;
+    tag done;
+
+    put x;
+
+    let i = i + 1;
+to outerloop;
+tag outerdone;
