@@ -4,13 +4,13 @@
 
 ```c
 int main() {
-	int var = 8 + 2;
-	if (var != 10) {
-		printf("error!");
-	} else {
-		printf("correct!");
-	}
-	return 0;
+    int var = 8 + 2;
+    if (var != 10) {
+        printf("error!");
+    } else {
+        printf("correct!");
+    }
+    return 0;
 }
 ```
 

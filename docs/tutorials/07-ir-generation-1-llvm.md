@@ -1,4 +1,4 @@
-# LLVM 指导手册
+# 中间代码生成 - LLVM
 
 对于大部分同学来说，可能是第一次接触 **LLVM**，虽然看上去上手比较困难，但了解了基本语法后还是比较容易的。本教程将分模块为大家讲解 LLVM 主要特点和语法结构，实验文法、C 语言函数与 LLVM IR 之间的对应转换关系，以及如何使用 LLVM 进行代码生成。建议学习过程中可以结合**语法分析**和**中间代码生成**。
 
@@ -39,21 +39,21 @@ Linux 下的环境配置相对更方便，使用 Windows 的话推荐大家使�
 
 首先更新包信息。
 
-```bash
+```shell
 sudo apt update
 sudo apt upgrade
 ```
 
 如果不在意版本，直接进行安装即可。
 
-```bash
+```shell
 sudo apt install llvm
 sudo apt install clang
 ```
 
-如果比较在意版本，可以使用 `apt search` 查找当前发行版包含的 Clang 版本。在 Ubuntu 20.04 中，有 7~12；在 Ubuntu 22.04 中，有 11~15，大家可以选择自己喜欢的版本，当然高版本会更好，也可以选择和评测机相同的 12。
+如果比较在意版本，可以使用 `apt search` 查找当前发行版包含的 Clang 版本。在 Ubuntu 20.04 中，有 7-12；在 Ubuntu 22.04 中，有 11-15，大家可以选择自己喜欢的版本，当然高版本会更好，也可以选择和评测机相同的 12。
 
-```bash
+```console
 $ apt search clang | grep -P ^clang-[0-9]+/
 clang-10/focal 1:10.0.0-4ubuntu1 amd64
 clang-11/focal-updates 1:11.0.0-2~ubuntu20.04.1 amd64
@@ -72,7 +72,7 @@ llvm-9/focal 1:9.0.1-12 amd64
 
 安装特定版本时，可以手动修改默认的版本，从而避免每次命令都包含版本号。
 
-```bash
+```shell
 sudo apt install llvm-12
 sudo apt install clang-12
 sudo update-alternatives --install /usr/bin/lli lli /usr/bin/lli-12 100
@@ -83,7 +83,7 @@ sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-12 
 
 安装完成后，输入指令查看版本。如果出现版本信息则说明安装成功。
 
-```bash
+```shell
 clang -v 
 lli --version 
 ```
@@ -105,14 +105,14 @@ Windows 安装 Clang 比较麻烦，但是我们可以借助强大的 Visual Stu
 
 MacOS 上 LLVM 的安装需要 XCode 或 XCode Command Line Tools，其默认自带 Clang 支持。
 
-```bash
+```shell
 xcode-select --install
 brew install llvm
 ```
 
 安装完成后，需要添加 LLVM 到 `$PATH`。
 
-```bash
+```shell
 echo 'export PATH="/usr/local/opt/llvm/bin:$PATH"' >> ~/.bash_profile
 ```
 
@@ -124,7 +124,7 @@ echo 'export PATH="/usr/local/opt/llvm/bin:$PATH"' >> ~/.bash_profile
 
 LLVM IR 具有三种表示形式，首先当然是代码中的数据结构，其次是作为输出的二进制位码（Bitcode）格式 `.bc` 和文本格式 `.ll`。在我们的实验中，要求大家能够输出正确的 `.ll` 文件。下面是一些常用指令，针对编译执行的不同阶段输出相应结果：
 
-```bash
+```shell
 clang -ccc-print-phases main.c               # 查看编译的过程
 clang -E -Xclang -dump-tokens main.c         # 生成 tokens（词法分析）
 clang -fsyntax-only -Xclang -ast-dump main.c # 生成抽象语法树
@@ -204,16 +204,16 @@ attributes #0 = { noinline nounwind optnone uwtable ...}
 
 在本次实验中，同学们会用到一些库函数。库函数将打包为 `libsysy.zip` 放在课程资料区，使用的时候请将 `libsysy.c` 和 `libsysy.h` 放在同一目录下，对使用到了库函数的源程序进行编译时，需要用到如下指令：
 
-```bash
+```shell
 # 分别导出 libsysy 和 main.c 对应的的 .ll 文件
-$ clang -emit-llvm -S libsysy.c -o lib.ll
-$ clang -emit-llvm -S main.c -o main.ll
+clang -emit-llvm -S libsysy.c -o lib.ll
+clang -emit-llvm -S main.c -o main.ll
 
 # 使用 llvm-link 将两个文件链接，生成新的 IR 文件
-$ llvm-link main.ll lib.ll -S -o out.ll
+llvm-link main.ll lib.ll -S -o out.ll
 
 # 用 lli 解释运行
-$ lli out.ll
+lli out.ll
 ```
 
 > 对于这些基本的指令，同学们可自行编写自动化脚本进行生成。
