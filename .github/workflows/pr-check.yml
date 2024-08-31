@@ -8,14 +8,16 @@ on:
 
 env:
   BUILD_TYPE: Release
+  LLVM_VERSION: 16.0
 
 jobs:
   build:
     strategy:
       matrix:
+        os: [ "ubuntu-22.04", "macos-14" ]
         backend: [ "llvm", "pcode" ]
 
-    runs-on: ubuntu-latest
+    runs-on: ${{matrix.os}}
 
     steps:
     - uses: actions/checkout@v4
@@ -34,20 +36,33 @@ jobs:
 
     strategy:
       matrix:
+        os: [ "ubuntu-22.04", "macos-14" ]
         stage: [ "llvm", "pcode", "mips" ]
 
-    runs-on: ubuntu-latest
+    runs-on: ${{matrix.os}}
 
     steps:
     - uses: actions/checkout@v4
 
     - name: Install llvm
-      if: matrix.stage == 'llvm'
+      if: ${{ matrix.stage == 'llvm' }}
       uses: KyleMayes/install-llvm-action@v2
       with:
-        version: "16.0"
+        version: ${{env.LLVM_VERSION}}
+    
+    - name: Setup llvm environment for macos
+      if: ${{ matrix.stage == 'llvm' && contains(matrix.os, 'macos') }}
+      run: |
+        LLVM_PATH=${{ env.LLVM_PATH }}
+        LLVM_VERSION=${{ env.LLVM_VERSION }}
+        echo "SDKROOT=$(xcrun --sdk macosx --show-sdk-path)" >> $GITHUB_ENV
+        echo "CPATH=$LLVM_PATH/lib/clang/$LLVM_VERSION/include/" >> $GITHUB_ENV
+        echo "LDFLAGS=-L$LLVM_PATH/lib" >> $GITHUB_ENV
+        echo "CPPFLAGS=-I$LLVM_PATH/include" >> $GITHUB_ENV
+        echo "CC=$LLVM_PATH/bin/clang" >> $GITHUB_ENV
+        echo "CXX=$LLVM_PATH/bin/clang++" >> $GITHUB_ENV
 
-    - name: Install MARS for mips
+    - name: Install mars emulator for mips
       if: matrix.stage == 'mips'
       run: wget https://courses.missouristate.edu/KenVollmar/MARS/MARS_4_5_Aug2014/Mars4_5.jar -O ${{github.workspace}}/mars.jar
 

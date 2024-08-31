@@ -1,0 +1,19 @@
+var sum;
+var n;
+var num;
+var i;
+
+let i = 0;
+let sum = 0;
+
+get n;
+
+tag loop;
+if i >= n to done;
+    get num;
+    let sum = sum + num;
+    let i = i + 1;
+to loop;
+tag done;
+
+put sum;

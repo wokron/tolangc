@@ -1,0 +1,8 @@
+fn add5(a, b) => a + b;
+fn add4(a, b) => add5(a, b) + add5(a, b);
+fn add3(a, b) => add4(a, b) + add4(a, b);
+fn add2(a, b) => add3(a, b) + add3(a, b);
+fn add1(a, b) => add2(a, b) + add2(a, b);
+fn add(a, b) => add1(a, b) + add1(a, b);
+
+put add(1, 1);
