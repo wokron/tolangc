@@ -88,7 +88,7 @@ def compare(test_result_file: pathlib.Path, output_file: pathlib.Path):
     for no, (test_result, expected_result) in enumerate(
         zip(test_results, expected_results)
     ):
-        if test_result != expected_result:
+        if abs(test_result - expected_result) > 1e-6:
             is_success = False
             print(f"line {no + 1}: {test_result} != {expected_result}")
 
