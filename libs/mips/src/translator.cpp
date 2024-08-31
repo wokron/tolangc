@@ -133,9 +133,17 @@ void Translator::translate(UnaryOperatorPtr unaryOperatorPtr) {
         manager->occupy(operandRegPtr, unaryOperatorPtr);
     } else if (unaryOperatorPtr->OpType() == UnaryOpType::Neg) { // -
         auto result = manager->allocReg(unaryOperatorPtr);
+        if (unaryOperatorPtr->GetType()->IsIntegerTy()) {
+            manager->addCode(
+                new RCode(Subu, result, manager->zero, operandRegPtr));
+        } else if (unaryOperatorPtr->GetType()->IsIntegerTy()) {
+            auto reg0 = manager->getFreeFloat();
+            std::string name0 = manager->addFloat(0);
+            manager->addCode(new ICode(LS, reg0, name0));
+            manager->addCode(new RCode(SubS, result, reg0, operandRegPtr));
+        }
         auto optype = unaryOperatorPtr->GetType()->IsFloatTy() ? SubS : Subu;
-        manager->addCode(
-            new RCode(optype, result, manager->zero, operandRegPtr));
+
     } else { // not !
         assert(unaryOperatorPtr->OpType() == UnaryOpType::Not &&
                "invalid unary operator");
@@ -211,11 +219,11 @@ void Translator::translate(CompareInstructionPtr compareInstructionPtr) {
             doOpposite = true;
             break;
         case CompareOpType::GreaterThan:
-            op = CLtS;
+            op = CLeS;
             doOpposite = true;
             break;
         case CompareOpType::GreaterThanOrEqual:
-            op = CLeS;
+            op = CLtS;
             doOpposite = true;
             break;
         case CompareOpType::LessThan:
@@ -255,10 +263,10 @@ void Translator::translate(BranchInstPtr branchInstPtr) {
     std::string falseLabel =
         *manager->getLabelName(branchInstPtr->FalseBlock());
 
-    manager->addCode(new ICode(Bnez, cond, falseLabel));
+    manager->addCode(new ICode(Bnez, cond, trueLabel));
     manager->addCode(new RCode(Nop));
 
-    manager->addCode(new JCode(J, trueLabel));
+    manager->addCode(new JCode(J, falseLabel));
     manager->addCode(new RCode(Nop));
 }
 
@@ -269,8 +277,12 @@ void Translator::translate(CallInstPtr callInstPtr) {
             pushSet.insert(occ.first);
         }
     }
+    for (UsePtr use : *(callInstPtr->GetUseList())) {
+        pushSet.erase(use->GetValue());
+    }
+
     int pos = manager->currentOffset - 4 -
-              4 * (pushSet.size() - callInstPtr->GetUseList()->size());
+              4 * pushSet.size();
     for (UsePtr use : *(callInstPtr->GetUseList())) {
         MipsCodeType codeType =
             use->GetValue()->GetType()->IsFloatTy() ? SS : SW;
@@ -279,7 +291,6 @@ void Translator::translate(CallInstPtr callInstPtr) {
             use->GetValue()->GetType()->IsFloatTy() ? FloatRegTy : TmpRegTy);
         manager->addCode(new ICode(codeType, reg, manager->sp, pos));
         pos -= 4;
-        pushSet.erase(use->GetValue());
     }
 
     for (auto valuePtr : pushSet) {
@@ -404,5 +415,9 @@ void Translator::translate(OutputInstPtr outputInstPtr) {
     manager->addCode(new ICode(LS, reg0, name0));
     manager->addCode(new RCode(AddS, manager->f12, reg, reg0));
     manager->addCode(new ICode(Addiu, manager->v0, manager->zero, 2));
+    manager->addCode(new RCode(Syscall));
+    // for test: put '\n'
+    manager->addCode(new ICode(Addiu, manager->a0, manager->zero, 10));
+    manager->addCode(new ICode(Addiu, manager->v0, manager->zero, 11));
     manager->addCode(new RCode(Syscall));
 }

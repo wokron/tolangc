@@ -160,7 +160,7 @@ void ICode::PrintCode(std::ostream &out) {
         rs->PrintReg(out);
         out << ", " << label << std::endl;
     } else if (op <= BC1T && op >= BC1F) {
-        Ope = op == BC1F ? "bc1f" : op == BC1T ? "bc1f" : "";
+        Ope = op == BC1F ? "bc1f" : op == BC1T ? "bc1t" : "";
         out << Ope << " " << label << std::endl;
     } else {
         TOLANG_DIE("ICode not supported.");

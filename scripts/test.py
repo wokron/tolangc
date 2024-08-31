@@ -79,18 +79,35 @@ def general_test(test_files: list[pathlib.Path], preprocess_fn, run_fn, compare_
 
 
 def compare(test_result_file: pathlib.Path, output_file: pathlib.Path):
+
+    def is_not_empty_line(text: str):
+        return len(text.strip()) > 0
+
+    def convert_to_float(text: str):
+        try:
+            val = float(text)
+        except ValueError:
+            val = f"'{text}'"
+        return val
+
     with open(test_result_file, "r") as f:
-        test_results = map(float, f.readlines())
+        test_results = map(convert_to_float, filter(is_not_empty_line, f.readlines()))
     with open(output_file, "r") as f:
-        expected_results = map(float, f.readlines())
+        expected_results = map(
+            convert_to_float, filter(is_not_empty_line, f.readlines())
+        )
 
     is_success = True
-    for no, (test_result, expected_result) in enumerate(
-        zip(test_results, expected_results)
-    ):
-        if test_result != expected_result:
-            is_success = False
-            print(f"line {no + 1}: {test_result} != {expected_result}")
+    try:
+        for no, (test_result, expected_result) in enumerate(
+            zip(test_results, expected_results, strict=True)
+        ):
+            if type(test_result) != float or abs(test_result - expected_result) > 1e-6:
+                is_success = False
+                print(f"Error: line {no + 1}: {test_result} != {expected_result}")
+    except ValueError:
+        is_success = False
+        print("Error: different number of lines")
 
     return is_success
 
