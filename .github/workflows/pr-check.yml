@@ -8,6 +8,7 @@ on:
 
 env:
   BUILD_TYPE: Release
+  LLVM_VERSION: 16.0
 
 jobs:
   build:
@@ -44,10 +45,22 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Install llvm
-      if: ${{ matrix.stage == 'llvm' && matrix.os != 'macos-14' }}
+      if: ${{ matrix.stage == 'llvm' }}
       uses: KyleMayes/install-llvm-action@v2
       with:
-        version: "16.0"
+        version: ${{env.LLVM_VERSION}}
+    
+    - name: Prepare llvm in macos
+      if: ${{ matrix.stage == 'llvm' && contains(matrix.os, 'macos') }}
+      run: |
+        LLVM_PATH=${{ env.LLVM_PATH }}
+        LLVM_VERSION=${{ env.LLVM_VERSION }}
+        echo "SDKROOT=$(xcrun --sdk macosx --show-sdk-path)" >> $GITHUB_ENV
+        echo "CPATH=$LLVM_PATH/lib/clang/$LLVM_VERSION/include/" >> $GITHUB_ENV
+        echo "LDFLAGS=-L$LLVM_PATH/lib" >> $GITHUB_ENV
+        echo "CPPFLAGS=-I$LLVM_PATH/include" >> $GITHUB_ENV
+        echo "CC=$LLVM_PATH/bin/clang" >> $GITHUB_ENV
+        echo "CXX=$LLVM_PATH/bin/clang++" >> $GITHUB_ENV
 
     - name: Install MARS for mips
       if: matrix.stage == 'mips'
