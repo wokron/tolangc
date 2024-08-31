@@ -67,6 +67,12 @@ Number: (0|[1-9][0-9]*)(\.[0-9]+)?
 
 见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
+## 编译构建
+
+- 经过测试的编译环境：ubuntu-22.04、macos-14。
+- 前置条件：已安装 cmake、make、clang。
+- 构建方式：运行 `./script/build.sh` 脚本，并指定对应后端，如  `bash ./script/build.sh llvm`。
+
 ## Todo
 - [x] 编译器前端
   - [x] 词法分析
