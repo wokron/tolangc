@@ -50,7 +50,7 @@ jobs:
       with:
         version: ${{env.LLVM_VERSION}}
     
-    - name: Prepare llvm in macos
+    - name: Setup llvm environment for macos
       if: ${{ matrix.stage == 'llvm' && contains(matrix.os, 'macos') }}
       run: |
         LLVM_PATH=${{ env.LLVM_PATH }}
@@ -62,7 +62,7 @@ jobs:
         echo "CC=$LLVM_PATH/bin/clang" >> $GITHUB_ENV
         echo "CXX=$LLVM_PATH/bin/clang++" >> $GITHUB_ENV
 
-    - name: Install MARS for mips
+    - name: Install mars emulator for mips
       if: matrix.stage == 'mips'
       run: wget https://courses.missouristate.edu/KenVollmar/MARS/MARS_4_5_Aug2014/Mars4_5.jar -O ${{github.workspace}}/mars.jar
 
