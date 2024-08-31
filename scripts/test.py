@@ -79,7 +79,11 @@ def general_test(test_files: list[pathlib.Path], preprocess_fn, run_fn, compare_
 
 
 def compare(test_result_file: pathlib.Path, output_file: pathlib.Path):
-    def convert_to_float(text):
+
+    def is_not_empty_line(text: str):
+        return len(text.strip()) > 0
+
+    def convert_to_float(text: str):
         try:
             val = float(text)
         except ValueError:
@@ -88,9 +92,11 @@ def compare(test_result_file: pathlib.Path, output_file: pathlib.Path):
         return val
 
     with open(test_result_file, "r") as f:
-        test_results = map(convert_to_float, f.readlines())
+        test_results = map(convert_to_float, filter(is_not_empty_line, f.readlines()))
     with open(output_file, "r") as f:
-        expected_results = map(convert_to_float, f.readlines())
+        expected_results = map(
+            convert_to_float, filter(is_not_empty_line, f.readlines())
+        )
 
     is_success = True
     try:
