@@ -83,6 +83,7 @@ def compare(test_result_file: pathlib.Path, output_file: pathlib.Path):
         try:
             val = float(text)
         except ValueError:
+            print(f"line {no + 1}: {text} is not float")
             val = f"'{text}'"
         return val
 
