@@ -33,7 +33,7 @@ UnaryExp:
 
 UnaryOp:
     '+'
-    | '−'
+    | '-'
     | '!'
 
 MulExp:
@@ -42,7 +42,7 @@ MulExp:
 
 AddExp:
     MulExp
-    | AddExp ('+' | '−') MulExp
+    | AddExp ('+' | '-') MulExp
 
 Exp: AddExp
 ```
@@ -106,7 +106,7 @@ FuncDef: 'fn' Ident '(' [FuncFParams] ')' '=>' Exp ';'
 我们便可以为非终结符 FuncDef 定义对应的子程序 `_parse_func_def`：
 
 ```cpp
-std::unique_ptr<FuncDef> Parser::() {
+std::unique_ptr<FuncDef> Parser::_parse_func_def() {
     // ...
     _match(_token, Token::TK_FN); 
  
@@ -223,7 +223,7 @@ MulExp: UnaryExp { ('*' | '/') UnaryExp }
 ```text
 AddExp:
     MulExp
-    | MulExp ('+' | '−') AddExp
+    | MulExp ('+' | '-') AddExp
 
 MulExp:
     UnaryExp
@@ -276,7 +276,7 @@ void parse_add_exp() {
 >         // parse put_stmt
 >     }
 >     // ...
-> 	}
+>     }
 > }
 > ```
 > 而实现这一点的方法其实很简单，那就是使用不同的关键字作为语法成分的前缀。一些程序设计语言的文法也被设计成易于解析，例如 go。

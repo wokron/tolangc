@@ -381,8 +381,8 @@ tag tag1;
 tag2;
 ```
 
-```riscv
-// riscv
+```asm
+// mips
 tag1:
     // do something
     li a1, 1
