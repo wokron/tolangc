@@ -15,6 +15,7 @@ MipsManager::MipsManager() {
     zero = new ZeroReg();
     sp = new StkPtrReg();
     ra = new RetAddrReg();
+    a0 = new ArgumentReg(0);
     v0 = new ValueReg(0);
     f0 = new FloatReg(0);
     f12 = new FloatReg(12);
@@ -42,6 +43,7 @@ MipsManager::~MipsManager() {
     delete zero;
     delete sp;
     delete ra;
+    delete a0;
     delete v0;
     delete f0;
     delete f12;

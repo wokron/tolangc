@@ -416,4 +416,8 @@ void Translator::translate(OutputInstPtr outputInstPtr) {
     manager->addCode(new RCode(AddS, manager->f12, reg, reg0));
     manager->addCode(new ICode(Addiu, manager->v0, manager->zero, 2));
     manager->addCode(new RCode(Syscall));
+    // for test: put '\n'
+    manager->addCode(new ICode(Addiu, manager->a0, manager->zero, 10));
+    manager->addCode(new ICode(Addiu, manager->v0, manager->zero, 11));
+    manager->addCode(new RCode(Syscall));
 }

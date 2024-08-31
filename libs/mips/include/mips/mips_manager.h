@@ -31,6 +31,7 @@ private:
     ZeroReg *zero;
     StkPtrReg *sp;
     RetAddrReg *ra;
+    ArgumentReg *a0;
     ValueReg *v0;
     // f0 和 f12 保留，用于输入输出
     FloatReg *f0;

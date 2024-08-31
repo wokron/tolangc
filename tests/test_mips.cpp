@@ -146,6 +146,9 @@ l.s $f14, flt1
 add.s $f12, $f13, $f14
 addiu $v0, $zero, 2
 syscall
+addiu $a0, $zero, 10
+addiu $v0, $zero, 11
+syscall
 j main_5
 nop
 
