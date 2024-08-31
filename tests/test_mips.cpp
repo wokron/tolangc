@@ -124,7 +124,7 @@ add.s $f8, $f0, $f9
 s.s $f8, 0($sp)
 l.s $f10, 0($sp)
 l.s $f11, flt4
-c.lt.s $f10, $f11
+c.le.s $f10, $f11
 bc1f main_1
 nop
 addiu $t0, $zero, 0
@@ -135,9 +135,9 @@ main_1:
 addiu $t0, $zero, 1
 
 main_2:
-bnez $t0, main_4
+bnez $t0, main_3
 nop
-j main_3
+j main_4
 nop
 
 main_3:
@@ -177,7 +177,7 @@ TEST_CASE("testing mips") {
     translator.print(ss);
 
     auto ir = ss.str();
-    // std::cout << ir;
+//    std::cout << ir;
     CHECK_EQ(ir, EXPECTED);
 }
 
