@@ -1,9 +1,9 @@
 #include "llvm/ir/value/inst/Instructions.h"
-#include "llvm/utils.h"
 #include "llvm/ir/LlvmContext.h"
 #include "llvm/ir/Type.h"
 #include "llvm/ir/value/BasicBlock.h"
 #include "llvm/ir/value/Function.h"
+#include "llvm/utils.h"
 
 #pragma region AllocaInst
 
@@ -73,27 +73,31 @@ BranchInstPtr BranchInst::New(ValuePtr condition, BasicBlockPtr trueBlock,
 }
 
 BasicBlockPtr BranchInst::SetTrueBlock(BasicBlockPtr block) {
+    BasicBlockPtr old = _trueBlock;
+
     if (_trueBlock) {
         ReplaceOperand(_trueBlock, block);
-        return _trueBlock;
+    }
+    _trueBlock = block;
+    if (_trueBlock) {
+        AddOperand(_trueBlock);
     }
 
-    _trueBlock = block;
-    AddOperand(_trueBlock);
-
-    return nullptr;
+    return old;
 }
 
 BasicBlockPtr BranchInst::SetFalseBlock(BasicBlockPtr block) {
+    BasicBlockPtr old = _falseBlock;
+
     if (_falseBlock) {
         ReplaceOperand(_falseBlock, block);
-        return _falseBlock;
+    }
+    _falseBlock = block;
+    if (_falseBlock) {
+        AddOperand(_falseBlock);
     }
 
-    _falseBlock = block;
-    AddOperand(_falseBlock);
-
-    return nullptr;
+    return old;
 }
 
 #pragma endregion
@@ -119,14 +123,17 @@ JumpInstPtr JumpInst::New(LlvmContextPtr context) {
 }
 
 BasicBlockPtr JumpInst::SetTarget(BasicBlockPtr block) {
+    BasicBlockPtr old = _target;
+
     if (_target) {
         ReplaceOperand(_target, block);
-        return _target;
+    }
+    _target = block;
+    if (_target) {
+        AddOperand(_target);
     }
 
-    _target = block;
-    AddOperand(_target);
-    return nullptr;
+    return old;
 }
 
 #pragma endregion

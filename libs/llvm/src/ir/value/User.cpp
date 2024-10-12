@@ -46,7 +46,11 @@ ValuePtr User::RemoveUse(ValuePtr use) {
 ValuePtr User::ReplaceUse(ValuePtr oldValue, ValuePtr newValue) {
     for (auto it = _useList.begin(); it != _useList.end(); ++it) {
         if ((*it)->GetValue() == oldValue) {
-            *it = Use::New(this, newValue);
+            if (newValue) {
+                *it = Use::New(this, newValue);
+            } else {
+                _useList.erase(it);
+            }
             return oldValue;
         }
     }
