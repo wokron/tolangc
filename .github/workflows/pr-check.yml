@@ -64,7 +64,7 @@ jobs:
 
     - name: Install mars emulator for mips
       if: matrix.stage == 'mips'
-      run: wget https://courses.missouristate.edu/KenVollmar/MARS/MARS_4_5_Aug2014/Mars4_5.jar -O ${{github.workspace}}/mars.jar
+      run: wget https://github.com/Lord-Turmoil/Mars-for-BUAA/releases/download/v1.0.1/Mars-2024.jar -O ${{github.workspace}}/mars.jar
 
     - name: Run test script
       run: python ./scripts/test.py -s ${{matrix.stage}} -d ${{github.workspace}}/testcases
