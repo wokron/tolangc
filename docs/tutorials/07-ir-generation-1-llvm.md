@@ -1,6 +1,6 @@
 # 中间代码生成 - LLVM
 
-对于大部分同学来说，可能是第一次接触 **LLVM**，虽然看上去上手比较困难，但了解了基本语法后还是比较容易的。本教程将分模块为大家讲解 LLVM 主要特点和语法结构，实验文法、C 语言函数与 LLVM IR 之间的对应转换关系，以及如何使用 LLVM 进行代码生成。建议学习过程中可以结合**语法分析**和**中间代码生成**。
+对于大部分同学来说，可能是第一次接触 **LLVM**，虽然看上去上手比较困难，但了解了基本语法后还是比较容易的。本教程将分模块为大家讲解 LLVM IR 主要特点和语法结构，实验文法、C 语言函数与 LLVM IR 之间的对应转换关系，以及如何使用 LLVM IR 进行代码生成。建议学习过程中可以结合**语法分析**和**中间代码生成**。
 
 ## 一、基本概念
 
@@ -151,7 +151,7 @@ int main() {
 }
 ```
 
-使用命令 `clang -S -emit-llvm main.c -o main.ll` 后，会在同目录下生成一个 `main.ll` 的文件。在 LLVM 中，注释以 `;` 打头。
+使用命令 `clang -S -emit-llvm main.c -o main.ll` 后，会在同目录下生成一个 `main.ll` 的文件。在 LLVM IR 中，注释以 `;` 打头。
 
 ```llvm
 ; ModuleID = 'main.c'     
@@ -236,7 +236,7 @@ LLVM IR 使用的是**三地址码**。下面对上述代码进行简要注释�
 - 大括号中间的是函数体，是由一系列 `BasicBlock` 组成的。每个 `BasicBlock` 都有一个 label，label 使得该 `BasicBlock` 有一个符号表的入口点。`BasicBlock` 以 terminator instruction（`ret`、`br` 等）结尾。每个 `BasicBlock` 由一系列 `Instruction` 组成，`Instruction` 是 LLVM IR 的基本指令。
 - `%7 = add i32 %5, %6`：随便拿上面一条指令来说，`%7` 是一个临时寄存器，是 `Instruction` 的实例，它的操作数里面有两个值，一个是 `%5`，一个是 `%6`。`%5` 和 `%6` 也是临时寄存器，即前两条 `Instruction` 的实例。
 
-### （3）LLVM 指令概览
+### （3）LLVM IR 指令概览
 
 对于一些常用的 Instructions，下面给出示例。对于一些没有给出的，可以参考 [LLVM IR 指令集](https://llvm.org/docs/LangRef.html#instruction-reference)。
 
@@ -250,28 +250,28 @@ LLVM IR 使用的是**三地址码**。下面对上述代码进行简要注释�
 |     `icmp`      |        `<result> = icmp <cond> <ty> <op1>, <op2>   `         |                  比较指令                  |
 |      `and`      |             `<result> = and <ty> <op1>, <op2>  `             |                     按位与                     |
 |      `or`       |             `<result> = or <ty> <op1>, <op2>   `             |                     按位或                     |
-|     `call`      | `<result> =  call  [ret attrs]  <ty> <name>(<...args>)` |                  函数调用                  |
+|     `call`      | `<result> = call [ret attrs] <ty> <name>(<...args>)` |                  函数调用                  |
 |    `alloca`     |                `  <result> = alloca <type> `                 |                  分配内存                  |
-|     `load`      |           `<result> = load  <ty>, <ty>* <pointer>`           |                  读取内存                  |
-|     `store`     |            `store  <ty> <value>, <ty>* <pointer>`            |                   写内存                   |
-| `getelementptr` | `<result> = getelementptr <ty>, * {, [inrange] <ty> <idx>}*` <br>  `<result> = getelementptr inbounds <ty>, <ty>* <ptrval>{, [inrange] <ty> <idx>}*` | 计算目标元素的位置（数组部分会单独详细说明） |
-|      `phi`      | `<result> = phi [fast-math-flags] <ty> [ <val0>, <label0>], ...` |                     /                      |
-|   `zext..to`    |          `<result> = zext <ty> <value> to <ty2>  `           |     将 `ty`的`value`的type扩充为`ty2`      |
-|   `trunc..to`   |          `<result> = trunc <ty> <value> to <ty2>  `          |     将 `ty`的`value`的type缩减为`ty2`      |
-|      `br`       | `br i1 <cond>, label <iftrue>, label <iffalse>` <br> `br label <dest>  ` |                 改变控制流                 |
-|      `ret`      |             `ret <type> <value> `  ,`ret void  `             |           退出当前函数，并返回值           |
+|     `load`      |           `<result> = load <ty>, ptr <pointer>`           |                  读取内存                  |
+|     `store`     |            `store <ty> <value>, ptr <pointer>`            |                   写内存                   |
+| `getelementptr` | `<result> = getelementptr <ty>, ptr <ptrval>{, <ty> <idx>}*` | 计算目标元素的位置（数组部分会单独详细说明） |
+|      `phi`      | `<result> = phi [fast-math-flags] <ty> [<val0>, <label0>], ...` |                     /                      |
+|   `zext..to`    |          `<result> = zext <ty> <value> to <ty2>`           |     将 `ty` 的 `value` 的 type 扩充为 `ty2`（zero extend）     |
+|   `trunc..to`   |          `<result> = trunc <ty> <value> to <ty2>`          |     将 `ty` 的 `value` 的 type 缩减为 `ty2`（truncate）     |
+|      `br`       | `br i1 <cond>, label <iftrue>, label <iffalse>` <br> `br label <dest>` |                 改变控制流                 |
+|      `ret`      |             `ret <type> <value> `, `ret void`             |           退出当前函数，并返回值           |
 
-### （4）LLVM 构建单元
+### （4）LLVM IR 构建单元
 
-在 C/C++ 中，一个 `.c`/`.cpp` 文件是一个编译单元，在 LLVM 中也是一样，一个 `.ll` 文件对应一个 `Module`。在前的示例中大家可能已经注意到了，LLVM 有着非常严格清晰的结构，如下图。
+在 C/C++ 中，一个 `.c`/`.cpp` 文件是一个编译单元，在 LLVM IR 中也是一样，一个 `.ll` 文件对应一个 `Module`。在前的示例中大家可能已经注意到了，LLVM IR 有着非常严格清晰的结构，如下图。
 
 ![llvm-0-3](imgs/chapter07-1/llvm-overview.svg)
 
 > 细心的同学可能注意到了图中使用的箭头和斜体，不用怀疑，它们分别表示的就是面向对象中的继承与抽象类。
 
-在 LLVM 中，一个 `Module` 由若干 *`GlobalValue`* 组成，而一个 *`GlobalValue`* 可以是**全局变量**（`GlobalVariable`），也可以是**函数**（`Function`）。一个函数由若干**基本块**（`BasicBlock`）组成，与大家在理论课上学习的基本块是一样的。在基本块内部，则是由若干**指令**（`Instruction`）组成，也是 LLVM 的基本组成。
+在 LLVM IR 中，一个 `Module` 由若干 *`GlobalValue`* 组成，而一个 *`GlobalValue`* 可以是**全局变量**（`GlobalVariable`），也可以是**函数**（`Function`）。一个函数由若干**基本块**（`BasicBlock`）组成，与大家在理论课上学习的基本块是一样的。在基本块内部，则是由若干**指令**（`Instruction`）组成，也是 LLVM IR 的基本组成。
 
-可以发现，LLVM 中所有类都直接或间接继承自 `Value`，因此在 LLVM 中，有**“一切皆 Value”**的说法。通过规整的继承关系，我们就得到了 LLVM 的类型系统。为了表达 `Value` 之间的引用关系，LLVM 中还有一种特殊的 `Value` 叫做 `User`，其将其他 `Value` 作为参数。例如，对于下面的代码：
+可以发现，LLVM IR 中所有类都直接或间接继承自 `Value`，因此在 LLVM IR 中，有**“一切皆 Value”**的说法。通过规整的继承关系，我们就得到了 LLVM IR IR 的类型系统。为了表达 `Value` 之间的引用关系，LLVM IR 中还有一种特殊的 `Value` 叫做 `User`，其将其他 `Value` 作为参数。例如，对于下面的代码：
 
 ```llvm
 A: %add1 = add nsw i32 %a, %b
@@ -281,11 +281,11 @@ C: %sum  = add nsw i32 %add1, %add2
 
 其中，A 是一条 `Instruction`，更具体的，是一个 `BinaryOperator`，它在代码中的体现就是 `%add1`，即指令的返回值，也称作一个**虚拟寄存器**。`Instruction` 继承自 `User`，因此它可以将其他 `Value`（`%a` 和  `%b`）作为参数。因此，在 `%add1` 与 `%a`、`%b` 之间分别构成了 `Use` 关系。紧接着，`%add1` 又和 `%add2` 一起作为 `%sum` 的参数，从而形成了一条 `Use` 链。
 
-> LLVM 是可以用非数字作为变量标识符的，但二者不能混用。
+> LLVM IR 是可以用非数字作为变量标识符的，但二者不能混用。
 
-这种指令间的关系正是 LLVM 的核心之一，实现了 SSA 形式的中间代码。这样的形式可以方便 LLVM 进行分析和优化，例如，在这样的形式下，可以很容易地识别出，`%add1` 和 `%add2` 实际上是同一个值，因此可以进行替换。同时，如果一个 `Value` 没有 `Use` 关系，那么它很可能就是可以删除的冗余代码。
+这种指令间的关系正是 LLVM IR 的核心之一，实现了 SSA 形式的中间代码。这样的形式可以方便 LLVM IR 进行分析和优化，例如，在这样的形式下，可以很容易地识别出，`%add1` 和 `%add2` 实际上是同一个值，因此可以进行替换。同时，如果一个 `Value` 没有 `Use` 关系，那么它很可能就是可以删除的冗余代码。
 
-> 同学们可以根据自己的需要自行设计数据类型。但如果对代码优化效果要求不高，这部分内容其实没有那么重要，可以直接面向 AST 生成代码。
+> 同学们可以根据自己的需要自行设计数据类型。但如果对代码优化效果要求不高，这部分内容其实没有那么重要，可以直接面向 AST 生成代码。（你甚至不需要中间代码就能生成目标代码。）
 
 ### （5）一些说明
 
@@ -298,9 +298,9 @@ LLVM 是一个非常庞大的系统，这里介绍的仅仅是它的冰山一角
 
 这一部分代码生成的目标是根据语法、语义分析生成的 AST，构建出 LLVM IR（或是四元式）。想继续生成 MIPS 代码的同学也可以先生成 LLVM IR 来检验自己中间代码的正确性。
 
-大家可能会发现，`clang` 生成的 LLVM IR 中，虚拟寄存器是按数字命名的。LLVM 限制了一个函数内所有数字命名的虚拟寄存器必须**严格从 0 开始递增**。其实，这些数字就是每个（对应了虚拟寄存器的） `Value` 在 `Function` 内的顺序，实现起来并没有想象中那么复杂，可以参考 LLVM 中的 `SlotTracker` 类。如果不想严格按照数字命名，那么就需要使用非数字的字符串命名，两种方式不能混用。
+大家可能会发现，`clang` 生成的 LLVM IR 中，虚拟寄存器是按数字命名的。LLVM IR 限制了一个函数内所有数字命名的虚拟寄存器必须**严格从 0 开始递增**。其实，这些数字就是每个（对应了虚拟寄存器的） `Value` 在 `Function` 内的顺序，实现起来并没有想象中那么复杂，可以参考 LLVM IR 中的 `SlotTracker` 类。如果不想严格按照数字命名，那么就需要使用非数字的字符串命名，两种方式不能混用。
 
-LLVM 的架构比较复杂，为了方便同学们理解，我们定义了一个较为简单的语法 tolangc，并为它实现了一套相对简单的 LLVM IR 数据结构，大家可以进行参考。
+LLVM IR 的架构比较复杂，为了方便同学们理解，我们定义了一个较为简单的语法 tolangc，并为它实现了一套相对简单的 LLVM IR 数据结构，大家可以进行参考。
 
 ## 三、主函数与常量表达式
 
@@ -392,8 +392,8 @@ define dso_local i32 @main() {
 CompUnit     → {Decl} MainFuncDef
 Decl         → ConstDecl | VarDecl
 ConstDecl    → 'const' BType ConstDef { ',' ConstDef } ';' 
-BType        → 'int' 
-ConstDef     → Ident  '=' ConstInitVal
+BType        → 'int' | 'char'
+ConstDef     → Ident '=' ConstInitVal
 ConstInitVal → ConstExp
 ConstExp     → AddExp
 VarDecl      → BType VarDef { ',' VarDef } ';'
@@ -401,7 +401,7 @@ VarDef       → Ident | Ident '=' InitVal
 InitVal      → Exp
 ```
 
-在 LLVM 中，全局变量使用的是和函数一样的全局标识符 `@` ，所以全局变量的写法其实和函数的定义几乎一样。在本次的实验中，全局变/常量声明中指定的初值表达式必须是**常量表达式**，例如：
+在 LLVM IR 中，全局变量使用的是和函数一样的全局标识符 `@` ，所以全局变量的写法其实和函数的定义几乎一样。在本次的实验中，全局变/常量声明中指定的初值表达式必须是**常量表达式**，例如：
 
 ```c
 // 以下都是全局变量
@@ -417,6 +417,8 @@ char b = 2 + 3;
 ```
 
 可以看到，对于全局变量中的常量表达式，在生成的 LLVM IR 中需要直接算出其**具体的值**，同时，也需要完成必要的类型转换。此外，全局变量对应的是一个地址，使用时需要结合 `load`/`store` 指令。
+
+> 需要注意的是，我们的文法中存在 `int` 和 `char` 两个不同大小的类型，因此我们需要选择 LLVM IR 中合适的类型，即 `i32` 和 `i8`。LLVM IR 中，不同类型的变量不能直接运算，因此会涉及类型转换，具体内容见类型转换部分。
 
 ### （2）局部变量与作用域
 
@@ -442,6 +444,8 @@ store i32 %2, i32* %1
 ```
 
 注意到，对于局部变量，我们首先需要通过 `alloca` 指令分配一块内存，才能对其进行 `load`/`store` 操作。
+
+> 与全局变量相同，我们同样需要为 `int` 和 `char` 选择对应的类型。
 
 ### （3）符号表设计
 
@@ -469,7 +473,7 @@ int main() {
 }
 ```
 
-如果需要将上述代码转换为 LLVM，应当怎么考虑呢？直观来看，`a` 和 `b` 是**全局变量**，`c` 是**局部变量**。直观上来说，过程是首先将全局变量 `a` 和 `b` 进行赋值，然后进入到 `main` 函数内部，对 `c` 进行赋值。那么生成的 `main` 函数的 LLVM IR 可能如下。
+如果需要将上述代码转换为 LLVM IR，应当怎么考虑呢？直观来看，`a` 和 `b` 是**全局变量**，`c` 是**局部变量**。直观上来说，过程是首先将全局变量 `a` 和 `b` 进行赋值，然后进入到 `main` 函数内部，对 `c` 进行赋值。那么生成的 `main` 函数的 LLVM IR 可能如下。
 
 ```llvm
 @a = dso_local global i32 1
@@ -491,7 +495,7 @@ define dso_local i32 @main() {
 
 这时候就有问题了，在 AST 中，不同地方的标识符之间是毫无关系的，那么如何确定代码中出现的 `a` 是谁，以及出现的多个 `b` 是不是同一个变量？这时候符号表的作用就体现出来了。简单来说，符号表类似于一个索引，通过它可以很快速的找到标识符对应的变量。
 
-在 SysY 中，我们遵循**先声明，后使用**的原则，因此可以在第一次遇见变量声明时，将标识符与对应的 LLVM `Value` 添加到符号表中，那么之后再次遇到标识符时就可以获得最初的声明，找不到的话说明出现了使用未定义变量的错误。
+在 SysY 中，我们遵循**先声明，后使用**的原则，因此可以在第一次遇见变量声明时，将标识符与对应的 LLVM IR 中的 `Value` 添加到符号表中，那么之后再次遇到标识符时就可以获得最初的声明，找不到的话说明出现了使用未定义变量的错误。
 
 > 注意，虚拟寄存器的数字并不是符号表的一部分，它们只是输出时的标记。因此，只需要在输出 LLVM IR 时，遍历一遍 `Function` 内的所有 `Value`，对其标号即可。
 
@@ -506,7 +510,7 @@ int c = 3;
 int main() {
     int d = 4;
     int e = 5;
-    { // blockA
+    {   // BlockA
         int a = 7;
         int e = 8;
         int f = 9;
@@ -516,9 +520,9 @@ int main() {
 }
 ```
 
-在上面的程序中，在 **blockA** 中，`a` 的值为 `7`，覆盖了全局变量 `a = 1`，`e` 覆盖了 `main` 中的 `e = 5`，而在 `main` 的最后一行，`f` 并不存在覆盖，因为 `main` 外层不存在其他 `f` 的定义。
+在上面的程序中，在 BlockA 中，`a` 的值为 `7`，覆盖了全局变量 `a = 1`，`e` 覆盖了 `main` 中的 `e = 5`，而在 `main` 的最后一行，`f` 并不存在覆盖，因为 `main` 外层不存在其他 `f` 的定义。
 
-同样的，下面给出上述程序的 LLVM 代码：
+同样的，下面给出上述程序的 LLVM IR 代码：
 
 ```llvm
 @a = dso_local global i32 1
@@ -547,6 +551,8 @@ define dso_local i32 @main() {
 
 <img src="imgs/chapter07-1/llvm-2-1.png" style="zoom:50%;" />
 
+所有的变量都会唯一对应一个中间代码的值，因此在中间代码里不会有重名问题。
+
 ### （4）测试样例
 
 源程序如下。
@@ -570,7 +576,7 @@ int main() {
 }
 ```
 
-LLVM 参考如下：
+LLVM IR 参考如下：
 
 ```llvm
 @a = dso_local global i32 1
@@ -630,13 +636,13 @@ Stmt → LVal '=' 'getint''('')'';'
 ```
 
 
-首先添加**库函数**的调用，在实验的 LLVM 代码中，库函数的声明如下：
+首先添加**库函数**的调用，在实验的 LLVM IR 代码中，库函数的声明如下：
 
 ```llvm
 declare i32 @getint()
-declare i32 @getch()
+declare i32 @getchar()
 declare void @putint(i32)
-declare void @putchar(i8)
+declare void @putch(i8)
 declare void @putstr(i8*)
 ```
 
@@ -648,49 +654,50 @@ declare void @putstr(i8*)
 
 ```c
 int main() {
-    int a, b;
+    int a;
+    char b;
     a = getint();
     b = getchar();
-    printf("Hello: %d, %d", a, b);
+    printf("Hello: %d, %c", a, b);
     return 0;
 }
 ```
 
-生成的 LLVM 代码如下：
+生成的 LLVM IR 代码如下：
 
 ```llvm
 declare i32 @getint()
-declare i32 @getch()
+declare i32 @getchar()
 declare void @putint(i32)
-declare void @putchar(i32)
+declare void @putch(i32)
 declare void @putstr(i8*)
 
 
 @.str = private unnamed_addr constant [8 x i8] c"Hello: \00", align 1
 @.str.1 = private unnamed_addr constant [3 x i8] c", \00", align 1
-@.str.2 = private unnamed_addr constant [2 x i8] c"\0A\00", align 1
 
 define dso_local i32 @main() {
     %1 = alloca i32
-    %2 = alloca i32
+    %2 = alloca i8
     %3 = call i32 @getint()
     store i32 %3, i32* %1
-    %4 = call i32 @getchar()
-    store i32 %4, i32* %2
-    %5 = load i32, i32* %2
-    %6 = load i32, i32* %1
+    %4 = call i32 @getchar()  ; 注意 getchar 的返回值类型
+    %5 = trunc i32 %4 to i8   ; 不可避免地进行一次类型转换
+    store i8 %5, i8* %2
+    %6 = load i8, i8* %2
+    %7 = load i32, i32* %1
     call void @putstr(i8* getelementptr inbounds ([8 x i8], [8 x i8]* @.str, i64 0, i64 0))
-    call void @putint(i32 %6)
+    call void @putint(i32 %7)
     call void @putstr(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.str.1, i64 0, i64 0))
-    call void @putchar(i32 %5)
-    call void @putstr(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.2, i64 0, i64 0))
+    %8 = zext i8 %6 to i32
+    call void @putch(i32 %8)
     ret i32 0
 }
 ```
 
 不难看出，`call i32 @getint()` 即为调用 `getint` 的语句，`call i32 @getchar()` 即为调用 `getchar` 的语句，对于其他的任何函数的调用也是像这样去写。
 
-对于 `printf`，则需要将其转化为多条语句，将格式字符串与变量值分别输出。对于格式字符串的输出，可以直接调用 `putstr`，比较方便，之后也可以直接编译为 MIPS 中的 4 号系统调用。这种方式需要配合全局的字符串常量，不过由于仅需考虑输出字符串这一种情况，因此可以将输出硬编码。注意 LLVM 中需要对 `\n` 和 `\0` 进行转义。当然，也可以转化为多个 `putchar` 的调用。
+对于 `printf`，则需要将其转化为多条语句，将格式字符串与变量值分别输出。对于格式字符串的输出，可以直接调用 `putstr`，比较方便，之后也可以直接编译为 MIPS 中的 4 号系统调用。这种方式需要配合全局的字符串常量，不过由于仅需考虑输出字符串这一种情况，因此可以将输出硬编码。注意 LLVM IR 中需要对 `\n` 和 `\0` 等进行转义。当然，也可以转化为多个 `putch` 的调用。
 
 
 ### （2）函数定义与调用
@@ -708,10 +715,6 @@ UnaryExp    → PrimaryExp | Ident '(' [FuncRParams] ')' | UnaryOp UnaryExp
 ```
 
 其实之前的 main 函数也是一个函数，即主函数。这里将其拓广到一般函数。对于一个函数，其特征包括**函数名**，**函数返回类型**和**参数**。在本实验中，函数返回类型有`char`、`int` 和 `void` 三种，参数类型有 `char` 和 `int` 两种。
-
-> 在这里我们讨论一下 `char` 类型数据的处理。
->
-> 我们从文法中可以看出，`char` 类型的数据在输入时因为字面量的存在，需要和 `int` 类型区分；在赋值时需要截断高位的数字。在计算和输出时，`int` 和 `char` 并无区别，都作为常量按数字处理。因此一种简单的处理方法是，在语义分析中，我们可以将 `int` 和 `char` 都视为统一的数字，**用 i32** 作为 LLVM 中的**统一数据类型**存储使用，在赋值时特殊处理。因此，函数的类型在中间代码翻译时可以简化为 `void` 和 `i32`，函数参数类型可以统一成 `i32`。当然，最好是能够实现 `char` 类型的处理，将其翻译成 `i8`。
 
 `FuncFParams` 之后的 `Block` 则与之前主函数内处理方法一样。值得一提的是，由于每个**临时寄存器**和**基本块**占用一个编号，所以没有参数的函数的第一个临时寄存器的编号应该从 **1** 开始，因为函数体入口占用了一个编号 0。而有参数的函数，参数编号从 **0** 开始，**进入 Block 后需要跳过一个基本块入口的编号**（可以参考测试样例）。
 
@@ -744,13 +747,13 @@ int main() {
 }
 ```
 
-LLVM 输出参考：
+LLVM IR 输出参考：
 
 ```llvm
 declare i32 @getint()
+declare i32 @getchar()
 declare void @putint(i32)
-declare i32 @getch()
-declare void @putchar(i32)
+declare void @putch(i32)
 declare void @putstr(i8*)
 
 @a = dso_local global i32 1000
@@ -807,7 +810,7 @@ LAndExp → EqExp | LAndExp '&&' EqExp
 LOrExp  → LAndExp | LOrExp '||' LAndExp 
 ```
 
-> 在条件语法中，需要同学们进行条件的判断与选择。这时采用数字编号的同学可能会对基本块的标号产生疑惑，因为需要跳转到之后还未构建的基本块。你可能回想到**回填**操作，但是之后每次优化后 LLVM 都会发生变化，因此并不实际。所以最佳的做法还是使用 LLVM 中的 `SlotTracker`，因为编号其实只用在输出中，所以只需要在输出前，遍历每个 `Function` 中的所有 `Value`，按顺序为它们分配编号即可。
+> 在条件语法中，需要同学们进行条件的判断与选择。这时采用数字编号的同学可能会对基本块的标号产生疑惑，因为需要跳转到之后还未构建的基本块。你可能回想到**回填**操作，但是之后每次优化后 LLVM IR 都会发生变化，因此并不实际。所以最佳的做法还是使用 LLVM IR 中的 `SlotTracker`，因为编号其实只用在输出中，所以只需要在输出前，遍历每个 `Function` 中的所有 `Value`，按顺序为它们分配编号即可。
 
 要写出条件语句，首先要理清楚逻辑。在上述文法中，最重要的莫过于下面这一条语法：
 
@@ -820,13 +823,13 @@ Stmt    → 'if' '(' Cond ')' Stmt1 [ 'else' Stmt2 ] BasicBlock3
 <img src="imgs/chapter07-1/llvm-4-1.png" style="zoom:50%;" />
 
 
-首先进行 Cond 结果的判断，如果结果为 **1** 则进入 **Stmt1**，如果 Cond 结果为**0**，若文法有 `else` 则将进入 **Stmt2**，否则进入下一条文法的基本块 **BasicBlock3**。在 Stmt1 或 Stmt2 执行完成后都需要跳转到 BasicBlock3。对于一个 LLVM 程序来说，对一个含 `else` 的条件分支，其基本块构造可以如右上图所示。如果能够理清楚基本块跳转的逻辑，那么在写代码的时候就会变得十分简单。
+首先进行 Cond 结果的判断，如果结果为 **1** 则进入 **Stmt1**，如果 Cond 结果为**0**，若文法有 `else` 则将进入 **Stmt2**，否则进入下一条文法的基本块 **BasicBlock3**。在 Stmt1 或 Stmt2 执行完成后都需要跳转到 BasicBlock3。对于一个 LLVM IR 程序来说，对一个含 `else` 的条件分支，其基本块构造可以如右上图所示。如果能够理清楚基本块跳转的逻辑，那么在写代码的时候就会变得十分简单。
 
 这时候再回过头去看 Cond 里面的代码，即 LOr 和 LAnd，Eq 和 Rel。不难发现，其处理方式和加减乘除非常像，除了运算结果都是 1 位（i1）而非 32 位（i32）。同学们可能需要用到 `trunc` 或者 `zext` 指令进行类型转换。
 
 ### （2）短路求值
 
-可能有的同学会认为，反正对于 LLVM 来说，跳转与否只看 Cond 的值，所以只要把 Cond 算完结果就行，不会影响正确性。不妨看一下下面这个例子：
+可能有的同学会认为，反正对于 LLVM IR 来说，跳转与否只看 Cond 的值，所以只要把 Cond 算完结果就行，不会影响正确性。不妨看一下下面这个例子：
 
 ```c
 int a = 5;
@@ -842,7 +845,7 @@ int main() {
 }
 ```
 
-如果要将上面这段代码翻译为 LLVM，同学们会怎么做？如果按照传统方法，即先**统一计算 Cond**，则一定会执行一次 `change()` 函数，把全局变量的值变为 **6**。但事实上，由于短路求值的存在，在读完 1 后，整个 `Cond` 的值就**已经被确定**了，即无论 `1 ||` 后面跟的是什么，都不影响 `Cond` 的结果，那么根据短路求值，后面的东西就不应该执行。所以上述代码的输出应当为 **5** 而不是 6，也就是说， LLVM 不能够单纯的把 `Cond` 计算完后再进行跳转。这时候就需要对 `Cond` 的跳转逻辑进行改写。
+如果要将上面这段代码翻译为 LLVM IR，同学们会怎么做？如果按照传统方法，即先**统一计算 Cond**，则一定会执行一次 `change()` 函数，把全局变量的值变为 **6**。但事实上，由于短路求值的存在，在读完 1 后，整个 `Cond` 的值就**已经被确定**了，即无论 `1 ||` 后面跟的是什么，都不影响 `Cond` 的结果，那么根据短路求值，后面的东西就不应该执行。所以上述代码的输出应当为 **5** 而不是 6，也就是说， LLVM IR 不能够单纯的把 `Cond` 计算完后再进行跳转。这时候就需要对 `Cond` 的跳转逻辑进行改写。
 
 改写之前同学们不妨思考一个问题，即什么时候跳转。根据短路求值，只要条件判断出现“短路”，即不需要考虑后续与或参数的情况下就已经能确定值的时候，就可以进行跳转。或者更简单的来说，当 **LOrExp 值为 1** 或者 **LAndExp 值为 0** 的时候，就已经没有必要再进行计算了。
 
@@ -901,13 +904,13 @@ int main() {
 }
 ```
 
-参考 LLVM 如下。
+参考 LLVM IR 如下。
 
 ```llvm
 declare i32 @getint()
-declare i32 @getch()
+declare i32 @getchar()
 declare void @putint(i32)
-declare void @putchar(i32)
+declare void @putch(i32)
 declare void @putstr(i8*)
 
 @a = dso_local global i32 1
@@ -1067,13 +1070,13 @@ int main() {
 }
 ```
 
-参考 LLVM 如下。
+参考 LLVM IR 如下。
 
 ```llvm
 declare i32 @getint()
-declare i32 @getch()
+declare i32 @getchar()
 declare void @putint(i32)
-declare void @putchar(i32)
+declare void @putch(i32)
 declare void @putstr(i8*)
 
 @.str = private unnamed_addr constant [7 x i8] c"round \00", align 1
@@ -1197,8 +1200,14 @@ LVal         → Ident {'[' Exp ']'}
 `getelementptr` 指令的工作是计算地址。其本身不对数据做任何访问与修改。其语法如下：
 
 ```llvm
-<result> = getelementptr <ty>, <ty>* <ptrval>, {<ty> <index>}*
+<result> = getelementptr <ty>, <ty>* <ptrval>{, [inrange] <ty> <idx>}*
 ```
+
+> 也可以为 `getelementptr` 的参数添加括号，如下。
+>
+> ```llvm
+> <result> = getelementptr (<ty>, <ty>* <ptrval>{, [inrange] <ty> <idx>}*)
+> ```
 
 现在来理解一下上面这一条指令。第一个 `<ty>` 表示的是第一个索引所指向的类型，有时也是**返回值的类型**。第二个 `<ty>` 表示的是后面的指针基地址 `<ptrval>` 的类型， `<ty> <index>` 表示的是一组索引的类型和值，在本实验中索引的类型为 `i32`。索引指向的基本类型确定的是增加索引值时指针的偏移量。
 
@@ -1220,12 +1229,12 @@ LVal         → Ident {'[' Exp ']'}
 例如，我们有如下的全局数组。
 
 ```c
-int a[1 + 2 + 3 + 4] = {1, 1 + 1, 1 + 3 - 1, 0, 0, 0, 0, 0, 0, 0};
+int a[1 + 2 + 3 + 4] = { 1, 1 + 1, 1 + 3 - 1, 0, 0, 0, 0, 0, 0, 0 };
 int b[20];
 char c[8] = "foobar";
 ```
 
-对应的 LLVM 中的数组如下。
+对应的 LLVM IR 中的数组如下。
 
 ```llvm
 @a = dso_local global [10 x i32] [i32 1, i32 2, i32 3, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0, i32 0]
@@ -1243,9 +1252,13 @@ char c[8] = "foobar";
 
 对于局部数组，在定义的时候同样需要使用 `alloca` 指令，其存取指令同样采用 **load 和 store**，只是在此之前需要采用 `getelementptr` 获取数组内应位置的地址。
 
-字符数组的字符串常量初始化，可以自行设计实现。LLVM 中，全局字符数组的字符串常量初始化可以直接通过字符串赋值，局部字符数组则也需要通过 `alloca` 指令分配内存空间，逐个元素初始化。不要忘记字符串常量末尾的结束符 '\00' 和填充符号 '\00'。
+字符数组的字符串常量初始化，可以自行设计实现。LLVM IR 中，全局字符数组的字符串常量初始化可以直接通过字符串赋值，局部字符数组则也需要通过 `alloca` 指令分配内存空间，逐个元素初始化。不要忘记字符串常量末尾的结束符 '\00' 和填充符号 '\00'。
 
 对于数组传参，其中涉及到维数的变化问题，例如，对于参数中**含维度的数组**，同学们可以参考上述 `getelementptr` 指令自行设计，因为该指令很灵活，所以下面的测试样例仅仅当一个参考。同学们可以将自己生成的 LLVM IR 使用 `lli` 编译后自行查看输出比对。
+
+此外，你可能注意到，教程中生成的 `getelementptr` 指令中添加了 `inbound`。当指定 `inbound` 时，如果下标访问超过了数组的实际大小，那么 `getelementptr` 就会返回一个 “poison” 值，而不是正常计算得到的地址，算是一种越界检查。官网对此的描述如下。
+
+> "With the `inbounds` keyword, the result value of the GEP is `poison` if the address is outside the actual underlying allocated object and not the address one-past-the-end."
 
 ### （3）测试样例
 
@@ -1265,13 +1278,13 @@ int main() {
 }
 ```
 
-参考 LLVM 如下。
+参考 LLVM IR 如下。
 
 ```llvm
 declare i32 @getint()
-declare i32 @getch()
+declare i32 @getchar()
 declare void @putint(i32)
-declare void @putchar(i32)
+declare void @putch(i32)
 declare void @putstr(i8*)
 
 @a = dso_local global [6 x i32] [i32 1, i32 2, i32 3, i32 4, i32 5, i32 6]
@@ -1338,13 +1351,13 @@ int main()
 }
 ```
 
-对于 `char` 类型的溢出，我们的实验中统一按照无符号处理，即 `char` 的取值范围是 0 ~ 255。那么对于上面的源代码，可能的 LLVM 如下。 
+当 `int` 类型值赋给 `char` 类型变量时，需要进行截断。在 LLVM IR 中，我们可以直接使用 `trunc` 指令将 `i32` 转换为 `i8`。同理，当 `char` 类型值赋给 `int` 类型变量时，需要进行扩展。由于我们文法中限制了 `char` 的取值大于零，所以我们使用无符号扩展 `zext` 即可。因此那么对于上面的源代码，可能的 LLVM IR 如下。 
 
 ```llvm
 declare i32 @getint()
-declare i32 @getch()
+declare i32 @getchar()
 declare void @putint(i32)
-declare void @putchar(i32)
+declare void @putch(i32)
 declare void @putstr(i8*)
 
 @.str = private unnamed_addr constant [5 x i8] c"a = \00", align 1
@@ -1387,3 +1400,4 @@ a = 255, b = 2
 b = 1
 ```
 
+此外，参数传递也可以视为特殊的赋值，当 `int` 类型值传递给 `char` 类型参数（或反之）时，同样需要进行类型转换。当然，如果是数组，那么是没法进行转换的，如果出现，则应该报错。
