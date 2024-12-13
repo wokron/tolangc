@@ -1218,7 +1218,7 @@ LVal         → Ident {'[' Exp ']'}
 %1 = getelementptr [5 x i32], [5 x i32]* @a, i32 0, i32 3
 
 ; 方法二
-%2 = getelementptr [5 x i32], [5 x i32]* @a, i32 0, i32 0
+%2 = getelementptr [5 x i32], [5 x i32]* @a, i32 0
 %3 = getelementptr i32, i32* %2, i32 3
 ```
 
